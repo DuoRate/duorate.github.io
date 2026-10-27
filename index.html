@@ -1,0 +1,2709 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DuoRate</title>
+	<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KICA8cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzAwMDAwMCIvPgogIDxwYXRoIGQ9Ik01MCAxNSBMODAgODAgTDIwIDgwIFoiIGZpbGw9IiNmZmZmZmYiLz4KICA8Y2lyY2xlIGN4PSI1MCIgY3k9IjYwIiByPSIxNSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjUiIGZpbGw9Im5vbmUiLz4KPC9zdmc+Cg==">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Кнопка и выпадающее меню уведомлений в правом верхнем углу -->
+<div id="topRightNotifications" class="top-notifications-wrapper" style="display: none;">
+    <button id="notifToggleBtn" class="btn-notif-bell" title="Уведомления">
+        <span>🔔</span>
+        <span class="notif-btn-text">Уведомления</span>
+        <span id="notifBadge" class="notif-badge" style="display: none;">0</span>
+    </button>
+    <div id="notifDropdown" class="notif-dropdown">
+        <div class="notif-dropdown-header">
+            <span>Уведомления для вас</span>
+            <button id="clearAllNotifsBtn" class="btn-clear-notifs" title="Очистить просмотренные">Очистить</button>
+        </div>
+        <div id="notifList" class="notif-list"></div>
+    </div>
+</div>
+
+<!-- Модальное окно авторизации и регистрации -->
+<div id="authModal" class="auth-modal">
+    <div class="auth-modal-content">
+        <div class="auth-modal-header">
+            <span id="authModalTitle">Вход в аккаунт</span>
+            <button id="closeAuthModal" class="btn-close-modal">✕</button>
+        </div>
+        <div class="auth-tabs">
+            <button id="tabLogin" class="auth-tab active">Вход</button>
+            <button id="tabRegister" class="auth-tab">Регистрация</button>
+        </div>
+        <div class="auth-form">
+            <input type="text" id="authLoginInput" placeholder="Логин (только англ., до 32 симв.)" maxlength="32" autocomplete="username" />
+            <input type="password" id="authPasswordInput" placeholder="Пароль (только англ., до 32 симв.)" maxlength="32" autocomplete="current-password" />
+            <div id="authError" class="auth-error"></div>
+            <button id="authSubmitBtn" class="btn-auth-submit">Войти</button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно создания нового зала -->
+<div id="newHallModal" class="auth-modal">
+    <div class="auth-modal-content">
+        <div class="auth-modal-header">
+            <span>Новый оценочный зал</span>
+            <button id="closeNewHallModal" class="btn-close-modal">✕</button>
+        </div>
+        <div class="auth-form">
+            <input type="text" id="modalFriendNickInput" placeholder="Вводите ник друга (англ.)" maxlength="32" autocomplete="off" />
+            <div id="modalInviteStatus" class="invite-status"></div>
+            <button id="modalSendInviteBtn" class="btn-auth-submit">Отправить приглашение</button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно подтверждения удаления зала -->
+<div id="deleteHallModal" class="auth-modal">
+    <div class="auth-modal-content">
+        <div class="auth-modal-header">
+            <span>Подтверждение удаления</span>
+            <button id="closeDeleteHallModal" class="btn-close-modal">✕</button>
+        </div>
+        <div id="deleteHallConfirmText" class="delete-hall-confirm-text">
+            Вы действительно хотите удалить этот оценочный зал?
+        </div>
+        <div class="delete-hall-actions">
+            <button id="confirmDeleteHallBtn" class="btn-confirm-delete-hall">Да, удалить</button>
+            <button id="cancelDeleteHallBtn" class="btn-cancel-delete-hall">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно подтверждения удаления профиля через ввод пароля -->
+<div id="deleteProfileModal" class="auth-modal">
+    <div class="auth-modal-content">
+        <div class="auth-modal-header">
+            <span>Удаление профиля</span>
+            <button id="closeDeleteProfileModal" class="btn-close-modal">✕</button>
+        </div>
+        <div class="delete-hall-confirm-text">
+            Вы действительно хотите безвозвратно удалить свой профиль <strong id="deleteProfileNameDisplay" style="color: #eab308;"></strong> из базы данных?<br>
+            <span style="font-size: 0.82rem; color: #aaa;">Для подтверждения введите пароль от вашего профиля:</span>
+        </div>
+        <div class="auth-form">
+            <input type="password" id="deleteProfilePasswordInput" placeholder="Введите пароль от профиля" maxlength="32" autocomplete="current-password" />
+            <div id="deleteProfileError" class="auth-error"></div>
+        </div>
+        <div class="delete-hall-actions">
+            <button id="confirmDeleteProfileBtn" class="btn-confirm-delete-hall">Удалить профиль</button>
+            <button id="cancelDeleteProfileBtn" class="btn-cancel-delete-hall">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<div class="watchlist-sidebar" id="watchlistSidebar" style="display: none;">
+    <div class="watchlist-title" style="justify-content: space-between;">
+        <span id="watchlistTitleText" style="cursor: pointer; flex: 1;">Нужно посмотреть</span>
+        <div class="watchlist-header-controls">
+            <button id="watchlistAddToggleBtn" class="watchlist-ctrl-btn" title="Добавить проект в список">+</button>
+            <button id="watchlistToggle" class="watchlist-ctrl-btn" title="Развернуть / свернуть список">
+                <span id="watchlistArrow" class="rotated" style="display: inline-block; transition: transform 0.3s; font-size: 0.85em;">▼</span>
+            </button>
+        </div>
+    </div>
+    <div class="watchlist-form collapsed" id="watchlistFormBlock">
+        <input type="text" id="watchTitle" class="watchlist-input" placeholder="Название фильма..." />
+        <select id="watchPriority" class="custom-select">
+            <option value="highest">Высочайший</option>
+            <option value="high">Высокий</option>
+            <option value="normal" selected>Обычный</option>
+            <option value="low">Низкий</option>
+        </select>
+
+        <select id="watchTagPicker" class="custom-select">
+            <option value="" disabled selected>+ Тег</option>
+            <option value="Фильм">Фильм</option>
+            <option value="Сериал">Сериал</option>
+            <option value="Мультфильм">Мультфильм</option>
+            <option value="Мультсериал">Мультсериал</option>
+            <option value="Аниме">Аниме</option>
+            <option value="Марвел">Марвел</option>
+            <option value="Не марвел">Не марвел</option>
+            <option value="Фантастика">Фантастика</option>
+            <option value="Комедия">Комедия</option>
+            <option value="Драма">Драма</option>
+            <option value="Экшен">Экшен</option>
+            <option value="Хоррор">Хоррор</option>
+            <option value="Фэнтези">Фэнтези</option>
+            <option value="Приключения">Приключения</option>
+            <option value="Детектив">Детектив</option>
+        </select>
+        <div id="watchFormTagsList" class="form-tags-list"></div>
+
+        <select id="watchlistFilterSelect" class="custom-select">
+            <option value="">Все теги (Буду смотреть)</option>
+            <option value="Фильм">Фильм</option>
+            <option value="Сериал">Сериал</option>
+            <option value="Мультфильм">Мультфильм</option>
+            <option value="Мультсериал">Мультсериал</option>
+            <option value="Аниме">Аниме</option>
+            <option value="Марвел">Марвел</option>
+            <option value="Не марвел">Не марвел</option>
+            <option value="Фантастика">Фантастика</option>
+            <option value="Комедия">Комедия</option>
+            <option value="Драма">Драма</option>
+            <option value="Экшен">Экшен</option>
+            <option value="Хоррор">Хоррор</option>
+            <option value="Фэнтези">Фэнтези</option>
+            <option value="Приключения">Приключения</option>
+            <option value="Детектив">Детектив</option>
+        </select>
+        <button id="addWatchlistBtn" class="btn-add-watchlist">+ Добавить в список</button>
+    </div>
+    <div id="watchlistItems" class="watchlist-items collapsed"></div>
+</div>
+
+<div class="stats-sidebar" id="statsSidebar" style="display: none;">
+    <div class="auth-panel">
+        <div id="authUserDisplay" class="auth-user-display">Гость</div>
+        <button id="openAuthBtn" class="btn-auth-panel">Войти / Регистрация</button>
+        <div id="authActionsRow" class="auth-actions-row" style="display: none;">
+            <button id="logoutBtn" class="btn-auth-panel btn-logout">Выйти</button>
+            <button id="deleteProfileBtn" class="btn-delete-profile-square" title="Удалить профиль">✕</button>
+        </div>
+    </div>
+
+    <div id="hallsSection" class="halls-section">
+        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.15); margin: 4px 0;">
+        <div class="stats-title">Оценочные залы</div>
+        <div id="hallsList" class="halls-list"></div>
+        <button id="openNewHallModalBtn" class="btn-new-hall">+ Новый зал</button>
+    </div>
+
+    <div id="statsBlock" class="stats-block-wrapper" style="display: none;">
+        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.15); margin: 4px 0;">
+        <div class="stats-title">Статистика</div>
+        <div class="stats-item total">
+            <span class="stats-label">Всего проектов:</span>
+            <span class="stats-value" id="countTotal">0</span>
+        </div>
+        <div class="stats-item aristo">
+            <span class="stats-label" id="statsLabelUser1">Оценено:</span>
+            <span class="stats-value" id="countAristo">0</span>
+        </div>
+        <div class="stats-item fliri">
+            <span class="stats-label" id="statsLabelFliri">Оценено:</span>
+            <span class="stats-value" id="countFliri">0</span>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="site-header">
+        <h1>DuoRate</h1>
+        <p id="siteSubtitle" class="site-subtitle">Совместная оценка просмотренным фильмам, сериалам и др.</p>
+    </div>
+
+    <!-- 1. Состояние для неавторизованного пользователя -->
+    <div id="guestStateBox" class="center-state-box" style="display: none;">
+        <p class="center-state-text">Авторизуйтесь, чтобы оценивать проекты вместе с друзьями</p>
+        <button id="guestAuthBtn" class="btn-state-action">Авторизация / Регистрация</button>
+    </div>
+
+    <!-- 2. Состояние после авторизации, когда нет активного зала -->
+    <div id="inviteStateBox" class="center-state-box" style="display: none;">
+        <p class="center-state-text">Предложите другу оценивать вместе</p>
+        <div class="invite-inline-form">
+            <input type="text" id="mainFriendNickInput" placeholder="Вводите ник друга (англ.)" maxlength="32" autocomplete="off" />
+            <button id="mainSendInviteBtn" class="btn-state-action">Пригласить</button>
+        </div>
+        <div id="mainInviteStatus" class="invite-status"></div>
+    </div>
+
+    <!-- 3. Полный функционал оценочного зала -->
+    <div id="hallContentWrapper" class="hall-content-wrapper" style="display: none;">
+        <button id="openFormBtn" class="btn-open-form">Добавить проект</button>
+
+        <div id="addFormContainer" class="add-form-container">
+            <div class="form-inputs">
+                <div class="form-row-main">
+                    <input type="text" id="newTitle" placeholder="Название фильма" />
+                    <input type="url" id="newPoster" placeholder="Ссылка на постер" />
+                    <button id="confirmBtn" class="btn-confirm" title="Подтвердить добавление">✓</button>
+                    <button id="cancelFormBtn" class="btn-cancel-form" title="Отменить создание">✕</button>
+                </div>
+                
+                <div class="tags-form-group">
+                    <select id="newRatingAristo" class="custom-select">
+                        <option value="" id="newRatingUser1Placeholder">Оценка</option>
+                        <option value="11">11</option><option value="10.5">10.5</option><option value="10">10</option>
+                        <option value="9.5">9.5</option><option value="9">9</option><option value="8.5">8.5</option>
+                        <option value="8">8</option><option value="7.5">7.5</option><option value="7">7</option>
+                        <option value="6.5">6.5</option><option value="6">6</option><option value="5.5">5.5</option>
+                        <option value="5">5</option><option value="4.5">4.5</option><option value="4">4</option>
+                        <option value="3.5">3.5</option><option value="3">3</option><option value="2.5">2.5</option>
+                        <option value="2">2</option><option value="1.5">1.5</option><option value="1">1</option>
+                        <option value="0.5">0.5</option><option value="0">0</option>
+                    </select>
+
+                    <select id="newRatingFliri" class="custom-select">
+                        <option value="" id="newRatingUser2Placeholder">Оценка</option>
+                        <option value="11">11</option><option value="10.5">10.5</option><option value="10">10</option>
+                        <option value="9.5">9.5</option><option value="9">9</option><option value="8.5">8.5</option>
+                        <option value="8">8</option><option value="7.5">7.5</option><option value="7">7</option>
+                        <option value="6.5">6.5</option><option value="6">6</option><option value="5.5">5.5</option>
+                        <option value="5">5</option><option value="4.5">4.5</option><option value="4">4</option>
+                        <option value="3.5">3.5</option><option value="3">3</option><option value="2.5">2.5</option>
+                        <option value="2">2</option><option value="1.5">1.5</option><option value="1">1</option>
+                        <option value="0.5">0.5</option><option value="0">0</option>
+                    </select>
+
+                    <select id="tagPicker" class="custom-select tag-picker">
+                        <option value="" disabled selected>+ Добавить тег</option>
+                        <option value="Фильм">Фильм</option>
+                        <option value="Сериал">Сериал</option>
+                        <option value="Мультфильм">Мультфильм</option>
+                        <option value="Мультсериал">Мультсериал</option>
+                        <option value="Аниме">Аниме</option>
+                        <option value="Марвел">Марвел</option>
+                        <option value="Не марвел">Не марвел</option>
+                        <option value="Фантастика">Фантастика</option>
+                        <option value="Комедия">Комедия</option>
+                        <option value="Драма">Драма</option>
+                        <option value="Экшен">Экшен</option>
+                        <option value="Хоррор">Хоррор</option>
+                        <option value="Фэнтези">Фэнтези</option>
+                        <option value="Приключения">Приключения</option>
+                        <option value="Детектив">Детектив</option>
+                    </select>
+                    <div id="formTagsList" class="form-tags-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-filter-bar">
+            <input type="text" id="searchInput" class="search-input" placeholder="Поиск проекта по названию..." />
+            
+            <div class="custom-multiselect-container" id="filterDropdown">
+                <div class="custom-select multiselect-header" id="filterHeader">Теги</div>
+                <div class="multiselect-dropdown" id="filterOptions">
+                    <label class="multi-option"><input type="checkbox" value="favorite"> Любимые</label>
+                    <label class="multi-option"><input type="checkbox" value="only_aristo"> <span id="filterLabelUser1">Оценено</span></label>
+                    <label class="multi-option"><input type="checkbox" value="only_fliri"> <span id="filterLabelUser2">Оценено</span></label>
+                    <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.2); margin: 6px 0;">
+                    <label class="multi-option"><input type="checkbox" value="Фильм"> Фильм</label>
+                    <label class="multi-option"><input type="checkbox" value="Сериал"> Сериал</label>
+                    <label class="multi-option"><input type="checkbox" value="Мультфильм"> Мультфильм</label>
+                    <label class="multi-option"><input type="checkbox" value="Мультсериал"> Мультсериал</label>
+                    <label class="multi-option"><input type="checkbox" value="Аниме"> Аниме</label>
+                    <label class="multi-option"><input type="checkbox" value="Марвел"> Марвел</label>
+                    <label class="multi-option"><input type="checkbox" value="Не марвел"> Не марвел</label>
+                    <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.2); margin: 6px 0;">
+                    <label class="multi-option"><input type="checkbox" value="Фантастика"> Фантастика</label>
+                    <label class="multi-option"><input type="checkbox" value="Комедия"> Комедия</label>
+                    <label class="multi-option"><input type="checkbox" value="Драма"> Драма</label>
+                    <label class="multi-option"><input type="checkbox" value="Экшен"> Экшен</label>
+                    <label class="multi-option"><input type="checkbox" value="Хоррор"> Хоррор</label>
+                    <label class="multi-option"><input type="checkbox" value="Фэнтези"> Фэнтези</label>
+                    <label class="multi-option"><input type="checkbox" value="Приключения"> Приключения</label>
+                    <label class="multi-option"><input type="checkbox" value="Детектив"> Детектив</label>
+                </div>
+            </div>
+
+            <select id="sortSelect" class="custom-select sort-select">
+                <option value="desc" selected>Сначала выше оценка</option>
+                <option value="asc">Сначала ниже оценка</option>
+                <option value="asc_alpha">Алфавит А-Я</option>
+                <option value="desc_alpha">Алфавит Я-А</option>
+            </select>
+        </div>
+
+        <div id="movieContainer" class="movie-list"></div>
+    </div>
+</div>
+
+<script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    const SUPABASE_URL = 'https://qpaxvnldkcaffbqhwiwj.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwYXh2bmxka2NhZmZicWh3aXdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5MjQ1NzUsImV4cCI6MjEwMzUwMDU3NX0.L-VDWW98Vi2G1oAlLRYTEq13v12LCILGgGWma9WSIOI';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const defaultPoster = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22600%22%20height%3D%22300%22%20viewBox%3D%220%200%20600%20300%22%3E%3Crect%20fill%3D%22%232a2a2a%22%20width%3D%22600%22%20height%3D%22300%22%2F%3E%3Ctext%20fill%3D%22%23888888%22%20font-size%3D%2220%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%3EНет%20постера%3C%2Ftext%3E%3C%2Fsvg%3E';
+
+    let allMoviesRaw = [];
+    let allWatchlistRaw = [];
+    let registeredUsers = {};
+    let allHalls = [];
+    let allInvites = [];
+    let allNotifications = [];
+    let currentHallId = null;
+    let pendingDeleteHall = null;
+
+    let currentFormTags = [];
+    let currentWatchTags = [];
+    let editingMovieTags = [];
+    
+    let searchQuery = '';
+    let selectedFilterTags = [];
+    let watchlistFilterTag = '';
+    let sortOrder = 'desc';
+    let editingMovieId = null;
+    let addingSeasonMovieId = null; 
+    let activeSeasonView = {};      
+    let editingSeasonInfo = null;
+    let animatingSeasonMovieId = null;
+    let pendingScrollMovieId = null;
+    let activeScrollAnimationId = null;
+
+    // --- АВТОРИЗАЦИЯ, ВАЛИДАЦИЯ АНГЛИЙСКОГО ЯЗЫКА И СКРЫТЫЕ ТЕГИ ---
+    let currentUser = localStorage.getItem('agregatoristo_current_user') || null;
+    let authMode = 'login';
+
+    // Регулярные выражения для проверки английских символов (логин и пароль)
+    const ENGLISH_LOGIN_REGEX = /^[A-Za-z0-9_.-]+$/;
+    const ENGLISH_PASSWORD_REGEX = /^[\x21-\x7E]+$/;
+
+    function sanitizeEnglishLoginInput(str) {
+        return String(str || '').replace(/[^A-Za-z0-9_.-]/g, '').slice(0, 32);
+    }
+
+    function sanitizeEnglishPasswordInput(str) {
+        return String(str || '').replace(/[^\x21-\x7E]/g, '').slice(0, 32);
+    }
+
+    // Проверка, является ли тег скрытым системным (__fav_..., __hall_..., hall_...)
+    function isHiddenSystemTag(tag) {
+        if (!tag) return false;
+        const clean = String(tag).trim().replace(/^#+/, '');
+        return (
+            clean.startsWith('__fav_') ||
+            clean.startsWith('__hall_') ||
+            clean.startsWith('hall_') ||
+            clean.includes('__fav_') ||
+            clean.includes('__hall_')
+        );
+    }
+
+    function isHallSystemTag(tag) {
+        if (!tag) return false;
+        const clean = String(tag).trim().replace(/^#+/, '');
+        return clean.startsWith('__hall_') || clean.startsWith('hall_') || clean.includes('__hall_');
+    }
+
+    function isFavSystemTag(tag) {
+        if (!tag) return false;
+        const clean = String(tag).trim().replace(/^#+/, '');
+        return clean.startsWith('__fav_');
+    }
+
+    function normalizeFavTag(tag) {
+        return String(tag).trim().replace(/^#+/, '');
+    }
+
+    function sortPairAlphabetically(u1, u2) {
+        return [String(u1).trim(), String(u2).trim()].sort((a, b) =>
+            a.localeCompare(b, 'en', { sensitivity: 'base' })
+        );
+    }
+
+    function makeHallId(u1, u2) {
+        const [p1, p2] = sortPairAlphabetically(u1, u2);
+        return `hall_${p1}__${p2}`;
+    }
+
+    // Единый и неизменный тег зала, состоящий строго из ников обоих участников
+    function makeCanonicalHallTag(u1, u2) {
+        const [p1, p2] = sortPairAlphabetically(u1, u2);
+        return `__hall_${p1}__${p2}`;
+    }
+
+    function getCanonicalHallTagForHall(hall) {
+        if (!hall || !Array.isArray(hall.users) || hall.users.length < 2) return '';
+        return makeCanonicalHallTag(hall.users[0], hall.users[1]);
+    }
+
+    // Проверяет, относится ли любой (даже старый) тег зала к данной паре участников
+    function doesTagMatchHall(tag, hall) {
+        if (!tag || !hall || !Array.isArray(hall.users) || hall.users.length < 2) return false;
+        const [p1, p2] = sortPairAlphabetically(hall.users[0], hall.users[1]);
+        const clean = String(tag).trim().replace(/^#+/, '');
+        const canonical = `__hall_${p1}__${p2}`;
+        if (clean.toLowerCase() === canonical.toLowerCase()) return true;
+
+        // Поддержка ранее созданных записей вида __hall_hall_User1__User2 для автоматической миграции к единому тегу
+        const stripped = clean.replace(/^(__hall_|hall_)+/i, '');
+        const parts = stripped.split('__').map(s => s.trim()).filter(Boolean);
+        if (parts.length === 2) {
+            const [tp1, tp2] = sortPairAlphabetically(parts[0], parts[1]);
+            return tp1.toLowerCase() === p1.toLowerCase() && tp2.toLowerCase() === p2.toLowerCase();
+        }
+        return false;
+    }
+
+    function isUserInHall(hall, username) {
+        if (!hall || !username || !Array.isArray(hall.users)) return false;
+        return hall.users.some(u => u.toLowerCase() === username.toLowerCase());
+    }
+
+    function getUserHalls() {
+        if (!currentUser) return [];
+        return allHalls.filter(h => isUserInHall(h, currentUser));
+    }
+
+    function getCurrentHall() {
+        if (!currentUser || !currentHallId) return null;
+        return allHalls.find(h => h.id === currentHallId && isUserInHall(h, currentUser)) || null;
+    }
+
+    function getHallParticipants() {
+        const hall = getCurrentHall();
+        if (!hall) return { user1: 'Игрок 1', user2: 'Игрок 2', friend: '' };
+        const [user1, user2] = sortPairAlphabetically(hall.users[0], hall.users[1]);
+        const friend = user1.toLowerCase() === currentUser.toLowerCase() ? user2 : user1;
+        return { user1, user2, friend };
+    }
+
+    function canEditSite() {
+        return Boolean(currentUser && getCurrentHall());
+    }
+
+    function findExistingUsername(inputNick) {
+        if (!inputNick) return null;
+        const trimmed = inputNick.trim().toLowerCase();
+        for (const login of Object.keys(registeredUsers)) {
+            if (login.toLowerCase() === trimmed) return login;
+        }
+        return null;
+    }
+
+    function getMoviesForCurrentHall() {
+        const hall = getCurrentHall();
+        if (!hall) return [];
+        return allMoviesRaw.filter(m => {
+            const rawTags = m.rawTags || [];
+            return rawTags.some(t => doesTagMatchHall(t, hall));
+        });
+    }
+
+    function getWatchlistForCurrentHall() {
+        const hall = getCurrentHall();
+        if (!hall) return [];
+        return allWatchlistRaw.filter(item => {
+            const rawTags = item.rawTags || [];
+            return rawTags.some(t => doesTagMatchHall(t, hall));
+        });
+    }
+
+    // Нормализует теги залов в БД, чтобы у каждого проекта и элемента списка был ровно 1 тег вида __hall_User1__User2 без дублей и вариаций
+    async function normalizeAllHallTagsInDb() {
+        for (const m of allMoviesRaw) {
+            const rawTags = m.rawTags || [];
+            const hallTags = rawTags.filter(t => isHallSystemTag(t));
+            if (hallTags.length === 0) continue;
+
+            let matchedHall = null;
+            for (const h of allHalls) {
+                if (hallTags.some(t => doesTagMatchHall(t, h))) {
+                    matchedHall = h;
+                    break;
+                }
+            }
+
+            let canonicalHallTag = null;
+            if (matchedHall) {
+                canonicalHallTag = getCanonicalHallTagForHall(matchedHall);
+            } else {
+                const stripped = String(hallTags[0]).trim().replace(/^#+/, '').replace(/^(__hall_|hall_)+/i, '');
+                const parts = stripped.split('__').filter(Boolean);
+                if (parts.length === 2) {
+                    canonicalHallTag = makeCanonicalHallTag(parts[0], parts[1]);
+                }
+            }
+
+            if (!canonicalHallTag) continue;
+
+            const favTags = Array.from(new Set(rawTags.filter(t => isFavSystemTag(t)).map(normalizeFavTag)));
+            const visibleTags = Array.from(new Set(
+                rawTags
+                    .map(t => String(t).trim().replace(/^#+/, ''))
+                    .filter(t => t && !isHiddenSystemTag(t))
+            ));
+
+            const normalizedRaw = [...visibleTags, ...favTags, canonicalHallTag];
+            const isDifferent =
+                normalizedRaw.length !== rawTags.length ||
+                normalizedRaw.some((val, idx) => val !== rawTags[idx]);
+
+            m.tags = visibleTags;
+            m.rawTags = normalizedRaw;
+
+            if (isDifferent) {
+                try {
+                    await supabase.from('movies').upsert({
+                        id: m.id,
+                        title: m.title,
+                        poster: m.poster,
+                        rating_aristo: m.ratingAristo,
+                        rating_fliri: m.ratingFliri,
+                        tags: normalizedRaw,
+                        is_favorite: m.isFavorite,
+                        seasons: m.seasons
+                    });
+                } catch (e) {}
+            }
+        }
+    }
+
+    function updateHallDynamicLabels() {
+        const hall = getCurrentHall();
+        if (!hall) return;
+        const { user1, user2 } = getHallParticipants();
+
+        const statsLabel1 = document.getElementById('statsLabelUser1');
+        const statsLabel2 = document.getElementById('statsLabelFliri');
+        if (statsLabel1) statsLabel1.textContent = `Оценено ${user1}:`;
+        if (statsLabel2) statsLabel2.textContent = `Оценено ${user2}:`;
+
+        const filterLabel1 = document.getElementById('filterLabelUser1');
+        const filterLabel2 = document.getElementById('filterLabelUser2');
+        if (filterLabel1) filterLabel1.textContent = `Оценено ${user1}`;
+        if (filterLabel2) filterLabel2.textContent = `Оценено ${user2}`;
+
+        const select1 = document.getElementById('newRatingAristo');
+        const select2 = document.getElementById('newRatingFliri');
+        const opt1 = document.getElementById('newRatingUser1Placeholder');
+        const opt2 = document.getElementById('newRatingUser2Placeholder');
+        if (opt1) opt1.textContent = `Оценка ${user1}`;
+        if (opt2) opt2.textContent = `Оценка ${user2}`;
+        if (select1 && select1._refreshCustomDropdown) select1._refreshCustomDropdown();
+        if (select2 && select2._refreshCustomDropdown) select2._refreshCustomDropdown();
+    }
+
+    function renderHallsSidebar() {
+        const hallsList = document.getElementById('hallsList');
+        if (!hallsList) return;
+        hallsList.innerHTML = '';
+
+        const userHalls = getUserHalls();
+        if (userHalls.length === 0) {
+            hallsList.innerHTML = '<div class="no-halls-hint">У вас пока нет залов</div>';
+            return;
+        }
+
+        userHalls.forEach(hall => {
+            const [u1, u2] = sortPairAlphabetically(hall.users[0], hall.users[1]);
+            const friend = u1.toLowerCase() === currentUser.toLowerCase() ? u2 : u1;
+
+            const itemRow = document.createElement('div');
+            itemRow.className = 'hall-item-row';
+
+            const btn = document.createElement('button');
+            btn.className = `btn-hall-switch ${hall.id === currentHallId ? 'active' : ''}`;
+            btn.textContent = `Зал с ${friend}`;
+            btn.title = `Переключиться на зал с ${friend}`;
+            btn.onclick = () => {
+                if (currentHallId !== hall.id) {
+                    currentHallId = hall.id;
+                    localStorage.setItem(`agregatoristo_active_hall_${currentUser}`, currentHallId);
+                    editingMovieId = null;
+                    addingSeasonMovieId = null;
+                    editingSeasonInfo = null;
+                    updateAuthUI();
+                    renderWatchlist();
+                    renderMoviesAnimated();
+                }
+            };
+
+            const delBtn = document.createElement('button');
+            delBtn.className = 'btn-hall-delete';
+            delBtn.title = `Удалить зал с ${friend}`;
+            delBtn.textContent = '✕';
+            delBtn.onclick = (e) => {
+                e.stopPropagation();
+                openDeleteHallModal(hall, friend);
+            };
+
+            itemRow.appendChild(btn);
+            itemRow.appendChild(delBtn);
+            hallsList.appendChild(itemRow);
+        });
+    }
+
+    // --- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ УДАЛЕНИЯ ЗАЛА ---
+    function openDeleteHallModal(hall, friendName) {
+        pendingDeleteHall = hall;
+        const textEl = document.getElementById('deleteHallConfirmText');
+        if (textEl) {
+            textEl.innerHTML = `Вы действительно хотите удалить <strong>«Зал с ${friendName}»</strong>?<br><span style="font-size: 0.82rem; color: #aaa;">Это действие требует подтверждения: все проекты и оценки в этом зале будут безвозвратно удалены.</span>`;
+        }
+        document.getElementById('deleteHallModal').classList.add('show');
+    }
+
+    async function confirmDeleteHall() {
+        if (!pendingDeleteHall) return;
+        const hallToDelete = pendingDeleteHall;
+        pendingDeleteHall = null;
+        document.getElementById('deleteHallModal').classList.remove('show');
+
+        try {
+            await supabase.from('watchlist').delete().eq('id', hallToDelete.id);
+        } catch (err) {
+            console.error('Ошибка удаления зала:', err);
+        }
+
+        const moviesToDelete = allMoviesRaw.filter(m =>
+            (m.rawTags || []).some(t => doesTagMatchHall(t, hallToDelete))
+        );
+
+        for (const m of moviesToDelete) {
+            try {
+                await supabase.from('movies').delete().eq('id', m.id);
+            } catch (e) {}
+        }
+
+        const watchToDelete = allWatchlistRaw.filter(item =>
+            (item.rawTags || []).some(t => doesTagMatchHall(t, hallToDelete))
+        );
+
+        for (const w of watchToDelete) {
+            try {
+                await supabase.from('watchlist').delete().eq('id', w.id);
+            } catch (e) {}
+        }
+
+        allHalls = allHalls.filter(h => h.id !== hallToDelete.id);
+        allMoviesRaw = allMoviesRaw.filter(m => !moviesToDelete.some(d => d.id === m.id));
+        allWatchlistRaw = allWatchlistRaw.filter(w => !watchToDelete.some(d => d.id === w.id));
+
+        if (currentHallId === hallToDelete.id) {
+            const remaining = getUserHalls();
+            currentHallId = remaining.length > 0 ? remaining[0].id : null;
+            if (currentHallId) {
+                localStorage.setItem(`agregatoristo_active_hall_${currentUser}`, currentHallId);
+            } else {
+                localStorage.removeItem(`agregatoristo_active_hall_${currentUser}`);
+            }
+        }
+
+        updateAuthUI();
+        renderWatchlist();
+        renderMoviesAnimated();
+    }
+
+    // --- УДАЛЕНИЕ ПРОФИЛЯ ЧЕРЕЗ ВВОД ПАРОЛЯ ---
+    const deleteProfileModal = document.getElementById('deleteProfileModal');
+    const deleteProfilePasswordInput = document.getElementById('deleteProfilePasswordInput');
+    const deleteProfileError = document.getElementById('deleteProfileError');
+    const confirmDeleteProfileBtn = document.getElementById('confirmDeleteProfileBtn');
+
+    function resetDeleteProfileModalState() {
+        if (deleteProfilePasswordInput) deleteProfilePasswordInput.value = '';
+        if (deleteProfileError) deleteProfileError.textContent = '';
+        if (confirmDeleteProfileBtn) {
+            confirmDeleteProfileBtn.disabled = false;
+            confirmDeleteProfileBtn.textContent = 'Удалить профиль';
+        }
+    }
+
+    function openDeleteProfileModal() {
+        if (!currentUser) return;
+        document.getElementById('deleteProfileNameDisplay').textContent = currentUser;
+        resetDeleteProfileModalState();
+        deleteProfileModal.classList.add('show');
+        if (deleteProfilePasswordInput) deleteProfilePasswordInput.focus();
+    }
+
+    async function handleConfirmProfileDeletion() {
+        if (!currentUser) return;
+        const enteredPassword = deleteProfilePasswordInput ? deleteProfilePasswordInput.value : '';
+        if (!enteredPassword) {
+            if (deleteProfileError) deleteProfileError.textContent = 'Введите пароль от профиля';
+            return;
+        }
+
+        try {
+            const { data } = await supabase.from('watchlist').select('*');
+            if (data) parseWatchlistTableData(data);
+        } catch (err) {}
+
+        const actualLogin = findExistingUsername(currentUser) || currentUser;
+        const correctPassword = registeredUsers[actualLogin];
+
+        if (enteredPassword !== correctPassword) {
+            if (deleteProfileError) deleteProfileError.textContent = 'Неверный пароль';
+            return;
+        }
+
+        await executeProfileDeletion();
+    }
+
+    async function executeProfileDeletion() {
+        if (!currentUser) return;
+        const userToDelete = currentUser;
+
+        if (confirmDeleteProfileBtn) {
+            confirmDeleteProfileBtn.disabled = true;
+            confirmDeleteProfileBtn.textContent = 'Удаление...';
+        }
+
+        try {
+            // 1. Удаляем запись аккаунта из БД
+            await supabase.from('watchlist').delete().eq('id', `user_${userToDelete}`);
+
+            // 2. Удаляем все залы пользователя и связанные с ними проекты
+            const userHalls = allHalls.filter(h => isUserInHall(h, userToDelete));
+            for (const hall of userHalls) {
+                await supabase.from('watchlist').delete().eq('id', hall.id);
+
+                const hallMovies = allMoviesRaw.filter(m =>
+                    (m.rawTags || []).some(t => doesTagMatchHall(t, hall))
+                );
+                for (const m of hallMovies) {
+                    await supabase.from('movies').delete().eq('id', m.id);
+                }
+
+                const hallWatch = allWatchlistRaw.filter(w =>
+                    (w.rawTags || []).some(t => doesTagMatchHall(t, hall))
+                );
+                for (const w of hallWatch) {
+                    await supabase.from('watchlist').delete().eq('id', w.id);
+                }
+            }
+
+            // 3. Удаляем приглашения и уведомления пользователя
+            const userInvites = allInvites.filter(
+                inv => inv.from.toLowerCase() === userToDelete.toLowerCase() || inv.to.toLowerCase() === userToDelete.toLowerCase()
+            );
+            for (const inv of userInvites) {
+                await supabase.from('watchlist').delete().eq('id', inv.id);
+            }
+
+            const userNotifs = allNotifications.filter(
+                n => n.from.toLowerCase() === userToDelete.toLowerCase() || n.to.toLowerCase() === userToDelete.toLowerCase()
+            );
+            for (const n of userNotifs) {
+                await supabase.from('watchlist').delete().eq('id', n.id);
+            }
+        } catch (err) {
+            console.error('Ошибка при удалении профиля из БД:', err);
+        }
+
+        delete registeredUsers[userToDelete];
+        localStorage.removeItem('agregatoristo_current_user');
+        localStorage.removeItem(`agregatoristo_active_hall_${userToDelete}`);
+        localStorage.removeItem(`agregatoristo_favs_${userToDelete}`);
+
+        currentUser = null;
+        currentHallId = null;
+        editingMovieId = null;
+        addingSeasonMovieId = null;
+        editingSeasonInfo = null;
+
+        resetDeleteProfileModalState();
+        deleteProfileModal.classList.remove('show');
+
+        // Перезагружаем актуальное состояние из БД
+        try {
+            const { data: moviesData } = await supabase.from('movies').select('*');
+            const { data: watchlistData } = await supabase.from('watchlist').select('*');
+            if (moviesData) allMoviesRaw = moviesData.map(mapFromDbMovie);
+            if (watchlistData) parseWatchlistTableData(watchlistData);
+        } catch (e) {}
+
+        updateAuthUI();
+        renderWatchlist();
+        renderMoviesDOM();
+    }
+
+    // --- СИСТЕМА УВЕДОМЛЕНИЙ В ПРАВОМ ВЕРХНЕМ УГЛУ ---
+    function isTargetUser(targetNick) {
+        if (!currentUser || !targetNick) return false;
+        return targetNick.toLowerCase() === currentUser.toLowerCase();
+    }
+
+    async function createProjectNotification(movieTitle) {
+        const hall = getCurrentHall();
+        if (!hall || !currentUser) return;
+        const { friend } = getHallParticipants();
+        if (!friend) return;
+
+        const notifId = `notif_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+        const payload = {
+            type: 'new_movie',
+            from: currentUser,
+            to: friend,
+            movieTitle: movieTitle,
+            hallId: hall.id,
+            createdAt: Date.now()
+        };
+
+        allNotifications.unshift({
+            id: notifId,
+            ...payload
+        });
+        renderTopNotifications();
+
+        try {
+            await supabase.from('watchlist').upsert({
+                id: notifId,
+                title: JSON.stringify(payload),
+                priority: 'user_notif',
+                tags: []
+            });
+        } catch (err) {
+            console.error('Ошибка отправки уведомления о фильме:', err);
+        }
+    }
+
+    async function deleteNotificationById(notifId) {
+        try {
+            await supabase.from('watchlist').delete().eq('id', notifId);
+        } catch (err) {
+            console.error('Ошибка удаления уведомления:', err);
+        }
+        allNotifications = allNotifications.filter(n => n.id !== notifId);
+        renderTopNotifications();
+    }
+
+    async function clearAllUserNotifications() {
+        const myNotifs = allNotifications.filter(n => isTargetUser(n.to));
+        for (const n of myNotifs) {
+            try {
+                await supabase.from('watchlist').delete().eq('id', n.id);
+            } catch (e) {}
+        }
+        allNotifications = allNotifications.filter(n => !isTargetUser(n.to));
+        renderTopNotifications();
+    }
+
+    function renderTopNotifications() {
+        const wrapper = document.getElementById('topRightNotifications');
+        const badge = document.getElementById('notifBadge');
+        const list = document.getElementById('notifList');
+        if (!wrapper || !badge || !list) return;
+
+        if (!currentUser) {
+            wrapper.style.display = 'none';
+            return;
+        }
+
+        wrapper.style.display = 'block';
+        list.innerHTML = '';
+
+        const incomingInvites = allInvites.filter(inv => isTargetUser(inv.to));
+        const incomingNotifs = allNotifications
+            .filter(n => isTargetUser(n.to))
+            .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+        const totalCount = incomingInvites.length + incomingNotifs.length;
+        if (totalCount > 0) {
+            badge.style.display = 'inline-flex';
+            badge.textContent = totalCount;
+        } else {
+            badge.style.display = 'none';
+        }
+
+        if (totalCount === 0) {
+            list.innerHTML = '<div class="notif-empty">У вас нет новых уведомлений</div>';
+            return;
+        }
+
+        incomingInvites.forEach(inv => {
+            const item = document.createElement('div');
+            item.className = 'notif-card invite-type';
+            item.innerHTML = `
+                <div class="notif-card-text">
+                    Пользователь <strong>${inv.from}</strong> предлагает вам оценивать фильмы вместе
+                </div>
+                <div class="notif-card-actions">
+                    <button class="btn-accept-invite">Принять</button>
+                    <button class="btn-decline-invite">Отклонить</button>
+                </div>
+            `;
+            item.querySelector('.btn-accept-invite').onclick = (e) => {
+                e.stopPropagation();
+                acceptInvite(inv);
+            };
+            item.querySelector('.btn-decline-invite').onclick = (e) => {
+                e.stopPropagation();
+                declineInvite(inv);
+            };
+            list.appendChild(item);
+        });
+
+        incomingNotifs.forEach(notif => {
+            const item = document.createElement('div');
+            item.className = 'notif-card movie-type';
+            item.innerHTML = `
+                <div class="notif-card-row">
+                    <div class="notif-card-text">
+                        <strong>${notif.from}</strong> посмотрел новый проект <strong>${notif.movieTitle}</strong>
+                    </div>
+                    <button class="btn-dismiss-notif" title="Скрыть">✕</button>
+                </div>
+            `;
+            item.querySelector('.btn-dismiss-notif').onclick = (e) => {
+                e.stopPropagation();
+                deleteNotificationById(notif.id);
+            };
+            item.onclick = () => {
+                if (notif.hallId && allHalls.some(h => h.id === notif.hallId)) {
+                    currentHallId = notif.hallId;
+                    localStorage.setItem(`agregatoristo_active_hall_${currentUser}`, currentHallId);
+                    updateAuthUI();
+                    renderWatchlist();
+                    renderMoviesAnimated();
+                }
+            };
+            list.appendChild(item);
+        });
+    }
+
+    function updateAuthUI() {
+        const guestStateBox = document.getElementById('guestStateBox');
+        const inviteStateBox = document.getElementById('inviteStateBox');
+        const hallContentWrapper = document.getElementById('hallContentWrapper');
+        const watchlistSidebar = document.getElementById('watchlistSidebar');
+        const statsSidebar = document.getElementById('statsSidebar');
+        const statsBlock = document.getElementById('statsBlock');
+        const siteSubtitle = document.getElementById('siteSubtitle');
+
+        const userDisplay = document.getElementById('authUserDisplay');
+        const openAuthBtn = document.getElementById('openAuthBtn');
+        const authActionsRow = document.getElementById('authActionsRow');
+        const openFormBtn = document.getElementById('openFormBtn');
+
+        if (!currentUser) {
+            guestStateBox.style.display = 'flex';
+            inviteStateBox.style.display = 'none';
+            hallContentWrapper.style.display = 'none';
+            watchlistSidebar.style.display = 'none';
+            statsSidebar.style.display = 'none';
+            if (authActionsRow) authActionsRow.style.display = 'none';
+            if (siteSubtitle) siteSubtitle.style.display = 'block';
+            renderTopNotifications();
+            return;
+        }
+
+        guestStateBox.style.display = 'none';
+        statsSidebar.style.display = 'flex';
+        userDisplay.textContent = currentUser;
+        openAuthBtn.style.display = 'none';
+        if (authActionsRow) authActionsRow.style.display = 'flex';
+
+        const userHalls = getUserHalls();
+        const savedHallId = localStorage.getItem(`agregatoristo_active_hall_${currentUser}`);
+
+        if (userHalls.length > 0) {
+            if (!currentHallId || !userHalls.some(h => h.id === currentHallId)) {
+                const foundSaved = userHalls.find(h => h.id === savedHallId);
+                currentHallId = foundSaved ? foundSaved.id : userHalls[0].id;
+                localStorage.setItem(`agregatoristo_active_hall_${currentUser}`, currentHallId);
+            }
+        } else {
+            currentHallId = null;
+        }
+
+        renderHallsSidebar();
+        renderTopNotifications();
+
+        if (!currentHallId) {
+            inviteStateBox.style.display = 'flex';
+            hallContentWrapper.style.display = 'none';
+            watchlistSidebar.style.display = 'none';
+            statsBlock.style.display = 'none';
+            if (siteSubtitle) siteSubtitle.style.display = 'block';
+        } else {
+            inviteStateBox.style.display = 'none';
+            hallContentWrapper.style.display = 'flex';
+            watchlistSidebar.style.display = 'flex';
+            statsBlock.style.display = 'flex';
+            openFormBtn.style.display = 'flex';
+            if (siteSubtitle) siteSubtitle.style.display = 'block';
+            updateHallDynamicLabels();
+        }
+    }
+
+    // --- ОТПРАВКА, ПРИНЯТИЕ И ОТКЛОНЕНИЕ ПРИГЛАШЕНИЙ ---
+    async function sendHallInvite(rawTargetNick, statusEl, inputEl) {
+        statusEl.className = 'invite-status';
+        if (!currentUser) return;
+
+        const targetNick = rawTargetNick.trim();
+        if (!targetNick) {
+            statusEl.textContent = 'Введите ник пользователя';
+            statusEl.classList.add('error');
+            return;
+        }
+
+        try {
+            const { data } = await supabase.from('watchlist').select('*');
+            if (data) parseWatchlistTableData(data);
+        } catch (err) {
+            console.warn('Не удалось обновить список пользователей из БД:', err);
+        }
+
+        const matchedUser = findExistingUsername(targetNick);
+
+        if (!matchedUser || matchedUser.toLowerCase() === currentUser.toLowerCase()) {
+            statusEl.textContent = 'Такого пользователя не существует';
+            statusEl.classList.add('error');
+            return;
+        }
+
+        const hallId = makeHallId(currentUser, matchedUser);
+        const existingHall = allHalls.find(h => h.id === hallId);
+        if (existingHall) {
+            currentHallId = hallId;
+            localStorage.setItem(`agregatoristo_active_hall_${currentUser}`, currentHallId);
+            document.getElementById('newHallModal').classList.remove('show');
+            updateAuthUI();
+            renderWatchlist();
+            renderMoviesAnimated();
+            return;
+        }
+
+        const inviteId = `invite_${currentUser}__${matchedUser}`;
+        const newInviteObj = {
+            id: inviteId,
+            title: JSON.stringify({ from: currentUser, to: matchedUser }),
+            priority: 'hall_invite',
+            tags: []
+        };
+
+        try {
+            await supabase.from('watchlist').upsert(newInviteObj);
+        } catch (err) {
+            console.error('Ошибка отправки приглашения:', err);
+        }
+
+        if (!allInvites.some(i => i.id === inviteId)) {
+            allInvites.push({ id: inviteId, from: currentUser, to: matchedUser });
+        }
+
+        statusEl.textContent = 'Приглашение отправлено';
+        statusEl.classList.add('success');
+        if (inputEl) inputEl.value = '';
+    }
+
+    async function acceptInvite(invite) {
+        const [u1, u2] = sortPairAlphabetically(invite.from, invite.to);
+        const hallId = makeHallId(u1, u2);
+        const canonicalHallTag = makeCanonicalHallTag(u1, u2);
+
+        const hallRecord = {
+            id: hallId,
+            title: JSON.stringify({ users: [u1, u2], tag: canonicalHallTag }),
+            priority: 'hall_room',
+            tags: [canonicalHallTag]
+        };
+
+        try {
+            await supabase.from('watchlist').upsert(hallRecord);
+            await supabase.from('watchlist').delete().eq('id', invite.id);
+            await supabase.from('watchlist').delete().eq('id', `invite_${invite.to}__${invite.from}`);
+        } catch (err) {
+            console.error('Ошибка при принятии приглашения:', err);
+        }
+
+        if (!allHalls.some(h => h.id === hallId)) {
+            allHalls.push({ id: hallId, users: [u1, u2], tag: canonicalHallTag });
+        }
+        allInvites = allInvites.filter(i => i.id !== invite.id);
+
+        currentHallId = hallId;
+        localStorage.setItem(`agregatoristo_active_hall_${currentUser}`, currentHallId);
+
+        updateAuthUI();
+        renderWatchlist();
+        renderMoviesAnimated();
+    }
+
+    async function declineInvite(invite) {
+        try {
+            await supabase.from('watchlist').delete().eq('id', invite.id);
+        } catch (err) {
+            console.error('Ошибка при отклонении приглашения:', err);
+        }
+        allInvites = allInvites.filter(i => i.id !== invite.id);
+        renderTopNotifications();
+    }
+
+    // --- ПРИВЯЗКА ИЗБРАННОГО К АККАУНТУ ---
+    function getLocalUserFavs(username) {
+        if (!username) return [];
+        try {
+            return JSON.parse(localStorage.getItem(`agregatoristo_favs_${username}`) || '[]');
+        } catch {
+            return [];
+        }
+    }
+
+    function setLocalUserFav(username, movieId, isFav) {
+        if (!username) return;
+        let favs = getLocalUserFavs(username);
+        if (isFav && !favs.includes(movieId)) favs.push(movieId);
+        if (!isFav) favs = favs.filter(id => id !== movieId);
+        localStorage.setItem(`agregatoristo_favs_${username}`, JSON.stringify(favs));
+    }
+
+    function isMovieFavoriteForUser(movie) {
+        if (!currentUser) return false;
+        const favTag = `__fav_${currentUser}`;
+        if (movie.rawTags && movie.rawTags.some(t => normalizeFavTag(t) === favTag)) return true;
+        const localFavs = getLocalUserFavs(currentUser);
+        return localFavs.includes(movie.id);
+    }
+
+    async function toggleFavoriteForCurrentUser(movie) {
+        if (!currentUser) {
+            openAuthModal();
+            return;
+        }
+        const favTag = `__fav_${currentUser}`;
+        if (!movie.rawTags) movie.rawTags = [...(movie.tags || [])];
+        const currentlyFav = isMovieFavoriteForUser(movie);
+
+        if (currentlyFav) {
+            movie.rawTags = movie.rawTags.filter(t => normalizeFavTag(t) !== favTag);
+            setLocalUserFav(currentUser, movie.id, false);
+        } else {
+            if (!movie.rawTags.some(t => normalizeFavTag(t) === favTag)) {
+                movie.rawTags.push(favTag);
+            }
+            setLocalUserFav(currentUser, movie.id, true);
+        }
+
+        if (canEditSite()) {
+            await saveMovieToDb(movie);
+        }
+        renderMoviesAnimated();
+    }
+
+    // --- КАСТОМНЫЕ ВЫПАДАЮЩИЕ СПИСКИ ---
+    function syncDropdownZIndex() {
+        document.querySelectorAll('.movie-card').forEach(card => {
+            if (card.querySelector('.multiselect-dropdown.show')) {
+                card.classList.add('dropdown-open');
+            } else {
+                card.classList.remove('dropdown-open');
+            }
+        });
+        document.querySelectorAll('.rating-row').forEach(row => {
+            if (row.querySelector('.multiselect-dropdown.show')) {
+                row.classList.add('dropdown-row-open');
+            } else {
+                row.classList.remove('dropdown-row-open');
+            }
+        });
+    }
+
+    function closeAllDropdowns(exceptList = null) {
+        document.querySelectorAll('.multiselect-dropdown.show').forEach(dd => {
+            if (dd !== exceptList) dd.classList.remove('show');
+        });
+        syncDropdownZIndex();
+    }
+
+    function upgradeSelectToCustomDropdown(selectEl) {
+        if (!selectEl || selectEl.dataset.upgraded === 'true') return;
+        selectEl.dataset.upgraded = 'true';
+        selectEl.style.display = 'none';
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'custom-dropdown-wrapper';
+        if (selectEl.classList.contains('sort-select')) wrapper.classList.add('sort-select-wrapper');
+        if (selectEl.classList.contains('aristo-select') || selectEl.classList.contains('fliri-select')) {
+            wrapper.classList.add('rating-dropdown-wrapper');
+        }
+
+        const header = document.createElement('div');
+        header.className = 'custom-select multiselect-header custom-dropdown-header';
+        if (selectEl.classList.contains('tag-picker')) header.classList.add('tag-picker');
+
+        const updateHeaderLabel = () => {
+            const selectedOpt = selectEl.options[selectEl.selectedIndex] || selectEl.options[0];
+            header.textContent = selectedOpt ? selectedOpt.textContent : '';
+            if (selectEl.disabled) {
+                header.classList.add('disabled');
+            } else {
+                header.classList.remove('disabled');
+            }
+        };
+
+        const list = document.createElement('div');
+        list.className = 'multiselect-dropdown custom-dropdown-list';
+
+        const buildOptions = () => {
+            list.innerHTML = '';
+            Array.from(selectEl.options).forEach((opt, idx) => {
+                if (opt.disabled && opt.value === '') return;
+                const item = document.createElement('div');
+                item.className = 'multi-option custom-dropdown-option';
+                if (idx === selectEl.selectedIndex) item.classList.add('selected');
+                item.textContent = opt.textContent;
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (selectEl.disabled) return;
+                    selectEl.selectedIndex = idx;
+                    selectEl.value = opt.value;
+                    list.classList.remove('show');
+                    syncDropdownZIndex();
+                    selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+                    updateHeaderLabel();
+                    buildOptions();
+                });
+                list.appendChild(item);
+            });
+        };
+
+        updateHeaderLabel();
+        buildOptions();
+
+        header.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (selectEl.disabled) return;
+            closeAllDropdowns(list);
+            buildOptions();
+            list.classList.toggle('show');
+            syncDropdownZIndex();
+        });
+
+        selectEl._refreshCustomDropdown = () => {
+            updateHeaderLabel();
+            buildOptions();
+        };
+
+        selectEl.parentNode.insertBefore(wrapper, selectEl);
+        wrapper.appendChild(selectEl);
+        wrapper.appendChild(header);
+        wrapper.appendChild(list);
+    }
+
+    function upgradeAllSelects(root = document) {
+        root.querySelectorAll('select').forEach(upgradeSelectToCustomDropdown);
+    }
+
+    function isSeriesLike(movie) {
+        if (!movie || !movie.tags) return false;
+        return movie.tags.includes('Сериал') || movie.tags.includes('Аниме') || movie.tags.includes('Мультсериал');
+    }
+
+    function getSeriesAverages(movie) {
+        if (!movie.seasons || movie.seasons.length === 0) return { aristo: movie.ratingAristo, fliri: movie.ratingFliri };
+        
+        let aSum = 0, aCount = 0, fSum = 0, fCount = 0;
+        movie.seasons.forEach(s => {
+            const a = parseFloat(s.ratingAristo);
+            const f = parseFloat(s.ratingFliri);
+            if (!isNaN(a)) { aSum += a; aCount++; }
+            if (!isNaN(f)) { fSum += f; fCount++; }
+        });
+
+        return {
+            aristo: aCount > 0 ? (aSum / aCount).toString() : '',
+            fliri: fCount > 0 ? (fSum / fCount).toString() : ''
+        };
+    }
+
+    const priorityColors = { highest: '#a855f7', high: '#3b82f6', normal: '#22c55e', low: '#ef4444' };
+    const priorityNames = { highest: 'Высочайший', high: 'Высокий', normal: 'Обычный', low: 'Низкий' };
+
+    function parseWatchlistTableData(rawWatchlist) {
+        const cleanWatchlist = [];
+        const dbUsers = {};
+        const dbHalls = [];
+        const dbInvites = [];
+        const dbNotifs = [];
+
+        (rawWatchlist || []).forEach(item => {
+            const idStr = String(item.id || '');
+            if (idStr.startsWith('user_')) {
+                const login = idStr.replace('user_', '');
+                dbUsers[login] = item.title;
+            } else if (idStr.startsWith('hall_')) {
+                try {
+                    const parsed = JSON.parse(item.title);
+                    if (parsed && Array.isArray(parsed.users) && parsed.users.length === 2) {
+                        const [u1, u2] = sortPairAlphabetically(parsed.users[0], parsed.users[1]);
+                        const canonicalHallId = makeHallId(u1, u2);
+                        const canonicalTag = makeCanonicalHallTag(u1, u2);
+                        if (!dbHalls.some(h => h.id === canonicalHallId)) {
+                            dbHalls.push({ id: canonicalHallId, users: [u1, u2], tag: canonicalTag });
+                        }
+                    }
+                } catch {}
+            } else if (idStr.startsWith('invite_')) {
+                try {
+                    const parsed = JSON.parse(item.title);
+                    if (parsed && parsed.from && parsed.to) {
+                        dbInvites.push({ id: idStr, from: parsed.from, to: parsed.to });
+                    }
+                } catch {}
+            } else if (idStr.startsWith('notif_')) {
+                try {
+                    const parsed = JSON.parse(item.title);
+                    if (parsed && parsed.from && parsed.to && parsed.movieTitle) {
+                        dbNotifs.push({
+                            id: idStr,
+                            from: parsed.from,
+                            to: parsed.to,
+                            movieTitle: parsed.movieTitle,
+                            hallId: parsed.hallId,
+                            createdAt: parsed.createdAt || 0
+                        });
+                    }
+                } catch {}
+            } else {
+                const rawTags = item.tags || [];
+                const visibleTags = rawTags
+                    .map(t => String(t).trim().replace(/^#+/, ''))
+                    .filter(t => t && !isHiddenSystemTag(t));
+                cleanWatchlist.push({
+                    ...item,
+                    tags: visibleTags,
+                    rawTags: rawTags
+                });
+            }
+        });
+
+        registeredUsers = dbUsers;
+        allHalls = dbHalls;
+        allInvites = dbInvites;
+        allNotifications = dbNotifs;
+        allWatchlistRaw = cleanWatchlist;
+    }
+
+    async function initApp() {
+        upgradeAllSelects();
+        updateAuthUI();
+
+        try {
+            const { data: moviesData } = await supabase.from('movies').select('*');
+            const { data: watchlistData } = await supabase.from('watchlist').select('*');
+
+            if (watchlistData) parseWatchlistTableData(watchlistData);
+            if (moviesData) allMoviesRaw = moviesData.map(mapFromDbMovie);
+
+            // Если сохранённый в браузере пользователь был удалён из БД, выходим из аккаунта
+            if (currentUser && !findExistingUsername(currentUser)) {
+                currentUser = null;
+                currentHallId = null;
+                localStorage.removeItem('agregatoristo_current_user');
+            }
+
+            await normalizeAllHallTagsInDb();
+
+            updateAuthUI();
+            renderWatchlist();
+            renderMoviesDOM();
+
+            supabase.channel('global-sync')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'movies' }, async () => {
+                    const { data } = await supabase.from('movies').select('*');
+                    if (data) {
+                        allMoviesRaw = data.map(mapFromDbMovie);
+                        renderMoviesAnimated();
+                    }
+                })
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'watchlist' }, async () => {
+                    const { data } = await supabase.from('watchlist').select('*');
+                    if (data) {
+                        const prevHallCount = getUserHalls().length;
+                        parseWatchlistTableData(data);
+                        if (currentUser && !findExistingUsername(currentUser)) {
+                            currentUser = null;
+                            currentHallId = null;
+                            localStorage.removeItem('agregatoristo_current_user');
+                        }
+                        const newHallCount = getUserHalls().length;
+                        updateAuthUI();
+                        renderWatchlist();
+                        if (newHallCount !== prevHallCount) {
+                            renderMoviesAnimated();
+                        }
+                    }
+                })
+                .subscribe();
+        } catch (err) {
+            console.error('Ошибка инициализации приложения:', err);
+        }
+    }
+
+    function mapFromDbMovie(m) {
+        const rawTags = m.tags || [];
+        const visibleTags = Array.from(new Set(
+            rawTags
+                .map(t => String(t).trim().replace(/^#+/, ''))
+                .filter(t => t && !isHiddenSystemTag(t))
+        ));
+        return {
+            id: m.id,
+            title: m.title,
+            poster: m.poster,
+            ratingAristo: m.rating_aristo,
+            ratingFliri: m.rating_fliri,
+            tags: visibleTags,
+            rawTags: rawTags,
+            isFavorite: m.is_favorite,
+            seasons: m.seasons || []
+        };
+    }
+
+    async function saveMovieToDb(movie) {
+        const hall = getCurrentHall();
+        if (!canEditSite() || !hall) return;
+
+        // Строго один канонический тег зала из ников обоих участников (без вариаций)
+        const canonicalHallTag = getCanonicalHallTagForHall(hall);
+
+        const favTags = Array.from(new Set(
+            (movie.rawTags || [])
+                .filter(t => isFavSystemTag(t))
+                .map(normalizeFavTag)
+        ));
+
+        const cleanVisibleTags = Array.from(new Set(
+            (movie.tags || [])
+                .map(t => String(t).trim().replace(/^#+/, ''))
+                .filter(t => t && !isHiddenSystemTag(t))
+        ));
+
+        const combinedTags = [...cleanVisibleTags, ...favTags, canonicalHallTag];
+        movie.tags = cleanVisibleTags;
+        movie.rawTags = combinedTags;
+
+        const idx = allMoviesRaw.findIndex(m => m.id === movie.id);
+        if (idx !== -1) allMoviesRaw[idx] = movie;
+        else allMoviesRaw.push(movie);
+
+        await supabase.from('movies').upsert({
+            id: movie.id,
+            title: movie.title,
+            poster: movie.poster,
+            rating_aristo: movie.ratingAristo,
+            rating_fliri: movie.ratingFliri,
+            tags: combinedTags,
+            is_favorite: movie.isFavorite,
+            seasons: movie.seasons
+        });
+    }
+
+    async function deleteMovieFromDb(id) {
+        if (!canEditSite()) return;
+        allMoviesRaw = allMoviesRaw.filter(m => m.id !== id);
+        await supabase.from('movies').delete().eq('id', id);
+    }
+
+    async function saveWatchItemToDb(item) {
+        const hall = getCurrentHall();
+        if (!canEditSite() || !hall) return;
+        const canonicalHallTag = getCanonicalHallTagForHall(hall);
+        const cleanTags = Array.from(new Set(
+            (item.tags || [])
+                .map(t => String(t).trim().replace(/^#+/, ''))
+                .filter(t => t && !isHiddenSystemTag(t))
+        ));
+        const dbItem = {
+            id: item.id,
+            title: item.title,
+            priority: item.priority,
+            tags: [...cleanTags, canonicalHallTag]
+        };
+        await supabase.from('watchlist').upsert(dbItem);
+    }
+
+    async function deleteWatchItemFromDb(id) {
+        if (!canEditSite()) return;
+        await supabase.from('watchlist').delete().eq('id', id);
+    }
+
+    const priorityOrder = { highest: 1, high: 2, normal: 3, low: 4 };
+
+    function renderWatchlist() {
+        const container = document.getElementById('watchlistItems');
+        if (!container) return;
+        container.innerHTML = '';
+
+        let filteredWatchlist = getWatchlistForCurrentHall();
+        if (watchlistFilterTag) {
+            filteredWatchlist = filteredWatchlist.filter(item => item.tags && item.tags.includes(watchlistFilterTag));
+        }
+
+        filteredWatchlist.sort((a, b) => {
+            const pA = priorityOrder[a.priority] || 99;
+            const pB = priorityOrder[b.priority] || 99;
+            if (pA !== pB) return pA - pB;
+            return a.title.localeCompare(b.title, 'ru', { sensitivity: 'base' });
+        });
+
+        if (filteredWatchlist.length === 0) {
+            container.innerHTML = '<div style="color: #666; font-size: 0.8rem; text-align: center; padding: 10px;">Список пуст</div>';
+            return;
+        }
+
+        const userCanEdit = canEditSite();
+
+        filteredWatchlist.forEach((item) => {
+            const card = document.createElement('div');
+            card.className = 'watchlist-card';
+            card.style.borderColor = priorityColors[item.priority] || '#ffffff';
+
+            const visibleItemTags = (item.tags || []).filter(t => !isHiddenSystemTag(t));
+            const tagsHtml = (visibleItemTags.length > 0)
+                ? `<div class="movie-tags">${visibleItemTags.map(t => `<span class="tag-item">#${t}</span>`).join('')}</div>`
+                : '';
+
+            const delBtnHtml = userCanEdit ? `<button class="btn-del-watchlist" title="Удалить">✕</button>` : '';
+
+            card.innerHTML = `
+                <div class="watchlist-card-info">
+                    <span class="watchlist-card-title" title="${item.title}">${item.title}</span>
+                    <span class="watchlist-card-priority" style="color: ${priorityColors[item.priority] || '#aaa'}">
+                        ${priorityNames[item.priority] || 'Обычный'}
+                    </span>
+                    ${tagsHtml}
+                </div>
+                ${delBtnHtml}
+            `;
+            if (userCanEdit) {
+                card.querySelector('.btn-del-watchlist').onclick = async () => await deleteWatchItemFromDb(item.id);
+            }
+            container.appendChild(card);
+        });
+    }
+
+    function renderWatchFormTags() {
+        const container = document.getElementById('watchFormTagsList');
+        if (!container) return;
+        container.innerHTML = currentWatchTags.map((tag, idx) => `<span class="form-tag-chip" data-idx="${idx}">#${tag} ✕</span>`).join('');
+        container.querySelectorAll('.form-tag-chip').forEach(chip => {
+            chip.onclick = () => {
+                const idx = parseInt(chip.getAttribute('data-idx'));
+                currentWatchTags.splice(idx, 1);
+                renderWatchFormTags();
+            };
+        });
+    }
+
+    const watchTagPicker = document.getElementById('watchTagPicker');
+    if (watchTagPicker) {
+        watchTagPicker.addEventListener('change', (e) => {
+            const val = e.target.value;
+            if (val && !currentWatchTags.includes(val)) {
+                currentWatchTags.push(val);
+                renderWatchFormTags();
+            }
+            watchTagPicker.selectedIndex = 0;
+            if (watchTagPicker._refreshCustomDropdown) watchTagPicker._refreshCustomDropdown();
+        });
+    }
+
+    document.getElementById('watchlistFilterSelect')?.addEventListener('change', (e) => {
+        watchlistFilterTag = e.target.value;
+        renderWatchlist();
+    });
+
+    document.getElementById('addWatchlistBtn').onclick = async () => {
+        if (!canEditSite()) return;
+        const input = document.getElementById('watchTitle');
+        const prioritySelect = document.getElementById('watchPriority');
+        const title = input.value.trim();
+        if (title) {
+            await saveWatchItemToDb({ id: Date.now().toString(), title: title, priority: prioritySelect.value, tags: [...currentWatchTags] });
+            input.value = '';
+            currentWatchTags = [];
+            renderWatchFormTags();
+            // Разворачиваем список при добавлении нового элемента
+            document.getElementById('watchlistItems').classList.remove('collapsed');
+            document.getElementById('watchlistArrow').classList.remove('rotated');
+        }
+    };
+
+    function generateRatingOptions(selectedValue) {
+        const values = ["", "11", "10.5", "10", "9.5", "9", "8.5", "8", "7.5", "7", "6.5", "6", "5.5", "5", "4.5", "4", "3.5", "3", "2.5", "2", "1.5", "1", "0.5", "0"];
+        return values.map(val => {
+            const label = val === "" ? "Без оценки" : val;
+            const selected = String(val) === String(selectedValue) ? "selected" : "";
+            return `<option value="${val}" ${selected}>${label}</option>`;
+        }).join('');
+    }
+
+    function getAverageScore(aristo, fliri) {
+        const a = parseFloat(aristo);
+        const f = parseFloat(fliri);
+        if (!isNaN(a) && !isNaN(f)) {
+            const avg = (a + f) / 2;
+            return Number.isInteger(avg) ? avg.toString() : avg.toFixed(1);
+        } else if (!isNaN(a)) return a.toString();
+        else if (!isNaN(f)) return f.toString();
+        return null;
+    }
+
+    function getAverageScoreNum(aristo, fliri) {
+        const avgStr = getAverageScore(aristo, fliri);
+        return avgStr !== null ? parseFloat(avgStr) : -1;
+    }
+
+    function getRatingColor(aristo, fliri) {
+        const avg = getAverageScore(aristo, fliri);
+        if (avg === null) return '#ffffff';
+        const val = parseFloat(avg);
+        if (val >= 11) return '#a855f7';
+        if (val >= 10) return '#3b82f6';
+        if (val >= 8.5) return '#22c55e';
+        if (val >= 7) return '#eab308';
+        if (val >= 5.5) return '#f97316';
+        if (val >= 0) return '#ef4444';
+        return '#ffffff';
+    }
+
+    function getBorderClass(aristo, fliri) {
+        const avg = getAverageScore(aristo, fliri);
+        if (avg === null) return 'border-white';
+        const val = parseFloat(avg);
+        if (val >= 11) return 'border-purple';
+        if (val >= 10) return 'border-blue';
+        if (val >= 8.5) return 'border-green';
+        if (val >= 7) return 'border-yellow';
+        if (val >= 5.5) return 'border-orange';
+        if (val >= 0) return 'border-red';
+        return 'border-white';
+    }
+
+    function renderFormTags() {
+        const container = document.getElementById('formTagsList');
+        container.innerHTML = currentFormTags.map((tag, idx) => `<span class="form-tag-chip" data-idx="${idx}">#${tag} ✕</span>`).join('');
+        container.querySelectorAll('.form-tag-chip').forEach(chip => {
+            chip.onclick = () => {
+                const idx = parseInt(chip.getAttribute('data-idx'));
+                currentFormTags.splice(idx, 1);
+                renderFormTags();
+            };
+        });
+    }
+
+    function resetAddForm() {
+        document.getElementById('newTitle').value = '';
+        document.getElementById('newPoster').value = '';
+        const rA = document.getElementById('newRatingAristo');
+        const rF = document.getElementById('newRatingFliri');
+        rA.value = '';
+        rF.value = '';
+        if (rA._refreshCustomDropdown) rA._refreshCustomDropdown();
+        if (rF._refreshCustomDropdown) rF._refreshCustomDropdown();
+        currentFormTags = [];
+        renderFormTags();
+        document.getElementById('addFormContainer').style.display = 'none';
+    }
+
+    function animateWindowScrollToCard(targetCard, duration = 450) {
+        if (!targetCard) return;
+        if (activeScrollAnimationId) {
+            cancelAnimationFrame(activeScrollAnimationId);
+            activeScrollAnimationId = null;
+        }
+
+        const startScrollY = window.scrollY;
+        const startTime = performance.now();
+
+        const currentRect = targetCard.getBoundingClientRect();
+        const computedStyle = window.getComputedStyle(targetCard);
+        let currentTranslateY = 0;
+        if (computedStyle.transform && computedStyle.transform !== 'none') {
+            const matrix = new DOMMatrixReadOnly(computedStyle.transform);
+            currentTranslateY = matrix.m42;
+        }
+
+        const finalCardTopDoc = startScrollY + (currentRect.top - currentTranslateY);
+        const targetScrollY = Math.max(
+            0,
+            finalCardTopDoc - (window.innerHeight / 2) + (currentRect.height / 2)
+        );
+
+        const distance = targetScrollY - startScrollY;
+        if (Math.abs(distance) < 2) return;
+
+        const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+        function step(now) {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = easeOutCubic(progress);
+            window.scrollTo(0, startScrollY + distance * eased);
+
+            if (progress < 1) {
+                activeScrollAnimationId = requestAnimationFrame(step);
+            } else {
+                activeScrollAnimationId = null;
+            }
+        }
+
+        activeScrollAnimationId = requestAnimationFrame(step);
+    }
+
+    function renderMoviesAnimated() {
+        const container = document.getElementById('movieContainer');
+        if (!container) return;
+        const cards = Array.from(container.children);
+        
+        const firstPositions = new Map();
+        const oldOrder = [];
+        cards.forEach(card => {
+            if (card.dataset.id) {
+                firstPositions.set(card.dataset.id, card.getBoundingClientRect());
+                oldOrder.push(card.dataset.id);
+            }
+        });
+
+        renderMoviesDOM();
+
+        const newCards = Array.from(container.children);
+        const newOrder = newCards.map(c => c.dataset.id).filter(Boolean);
+
+        let movedCardId = pendingScrollMovieId;
+        if (!movedCardId && oldOrder.length === newOrder.length && oldOrder.length > 0) {
+            let maxDelta = 0;
+            newCards.forEach(card => {
+                const id = card.dataset.id;
+                if (!id || !firstPositions.has(id)) return;
+                const oldIdx = oldOrder.indexOf(id);
+                const newIdx = newOrder.indexOf(id);
+                if (oldIdx !== newIdx) {
+                    const delta = Math.abs(firstPositions.get(id).top - card.getBoundingClientRect().top);
+                    if (delta > maxDelta) {
+                        maxDelta = delta;
+                        movedCardId = id;
+                    }
+                }
+            });
+        }
+
+        newCards.forEach((card) => {
+            const id = card.dataset.id;
+            if (!id || !firstPositions.has(id)) return;
+            const firstPos = firstPositions.get(id);
+            const lastPos = card.getBoundingClientRect();
+            const deltaY = firstPos.top - lastPos.top;
+
+            if (deltaY !== 0) {
+                card.style.transform = `translateY(${deltaY}px)`;
+                card.style.transition = 'none';
+                requestAnimationFrame(() => {
+                    card.style.transition = 'transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)';
+                    card.style.transform = '';
+                });
+            }
+        });
+
+        if (movedCardId) {
+            const targetCard = container.querySelector(`.movie-card[data-id="${movedCardId}"]`);
+            pendingScrollMovieId = null;
+            if (targetCard) {
+                requestAnimationFrame(() => {
+                    animateWindowScrollToCard(targetCard, 450);
+                });
+            }
+        }
+    }
+
+    function applyPosterEdgeTransparency(imgEl) {
+        if (!imgEl) return;
+        const stage = imgEl.parentElement;
+        if (!stage) return;
+
+        const stageW = stage.clientWidth;
+        const stageH = stage.clientHeight;
+        const iw = imgEl.naturalWidth;
+        const ih = imgEl.naturalHeight;
+
+        if (!stageW || !stageH || !iw || !ih) return;
+
+        const scale = Math.min(stageW / iw, stageH / ih);
+        const renderedW = Math.max(1, Math.round(iw * scale));
+        const renderedH = Math.max(1, Math.round(ih * scale));
+
+        imgEl.style.width = `${renderedW}px`;
+        imgEl.style.height = `${renderedH}px`;
+
+        const edgeFadePx = Math.min(32, Math.round(renderedW * 0.25));
+        const s1 = Math.round(edgeFadePx * 0.3);
+        const s2 = Math.round(edgeFadePx * 0.65);
+
+        const horizGradient = `linear-gradient(to right,
+            transparent 0px,
+            rgba(0, 0, 0, 0.22) ${s1}px,
+            rgba(0, 0, 0, 0.68) ${s2}px,
+            rgba(0, 0, 0, 1) ${edgeFadePx}px,
+            rgba(0, 0, 0, 1) calc(100% - ${edgeFadePx}px),
+            rgba(0, 0, 0, 0.68) calc(100% - ${s2}px),
+            rgba(0, 0, 0, 0.22) calc(100% - ${s1}px),
+            transparent 100%
+        )`;
+
+        if (renderedH < stageH - 3) {
+            const vFadePx = Math.min(28, Math.round(renderedH * 0.22));
+            const vs1 = Math.round(vFadePx * 0.3);
+            const vs2 = Math.round(vFadePx * 0.65);
+            const vertGradient = `linear-gradient(to bottom,
+                transparent 0px,
+                rgba(0, 0, 0, 0.22) ${vs1}px,
+                rgba(0, 0, 0, 0.68) ${vs2}px,
+                rgba(0, 0, 0, 1) ${vFadePx}px,
+                rgba(0, 0, 0, 1) calc(100% - ${vFadePx}px),
+                rgba(0, 0, 0, 0.68) calc(100% - ${vs2}px),
+                rgba(0, 0, 0, 0.22) calc(100% - ${vs1}px),
+                transparent 100%
+            )`;
+            imgEl.style.webkitMaskImage = `${horizGradient}, ${vertGradient}`;
+            imgEl.style.webkitMaskComposite = 'source-in';
+            imgEl.style.maskImage = `${horizGradient}, ${vertGradient}`;
+            imgEl.style.maskComposite = 'intersect';
+        } else {
+            imgEl.style.webkitMaskImage = horizGradient;
+            imgEl.style.webkitMaskComposite = 'source-over';
+            imgEl.style.maskImage = horizGradient;
+            imgEl.style.maskComposite = 'add';
+        }
+    }
+
+    function bindPosterEdgeTransparency(card) {
+        const imgEl = card.querySelector('.movie-fg-poster');
+        if (!imgEl) return;
+
+        const update = () => applyPosterEdgeTransparency(imgEl);
+
+        imgEl.addEventListener('load', update);
+        if (imgEl.complete && imgEl.naturalWidth > 0) {
+            requestAnimationFrame(update);
+        }
+    }
+
+    window.addEventListener('resize', () => {
+        document.querySelectorAll('.movie-fg-poster').forEach(imgEl => {
+            applyPosterEdgeTransparency(imgEl);
+        });
+    });
+
+    function renderStats(hallMovies) {
+        let countUser1 = 0;
+        let countUser2 = 0;
+
+        hallMovies.forEach(movie => {
+            const avgs = getSeriesAverages(movie);
+            if (avgs.aristo !== '' && avgs.aristo !== null && avgs.aristo !== undefined) countUser1++;
+            if (avgs.fliri !== '' && avgs.fliri !== null && avgs.fliri !== undefined) countUser2++;
+        });
+
+        document.getElementById('countTotal').textContent = hallMovies.length;
+        document.getElementById('countAristo').textContent = countUser1;
+        document.getElementById('countFliri').textContent = countUser2;
+    }
+
+    function renderMoviesDOM() {
+        const container = document.getElementById('movieContainer');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const hall = getCurrentHall();
+        if (!hall) {
+            renderStats([]);
+            return;
+        }
+
+        const { user1, user2 } = getHallParticipants();
+        updateHallDynamicLabels();
+
+        const hallMovies = getMoviesForCurrentHall();
+        renderStats(hallMovies);
+
+        const onlyAristoSelected = selectedFilterTags.includes('only_aristo');
+        const onlyFliriSelected = selectedFilterTags.includes('only_fliri');
+        const showAristoRow = !onlyFliriSelected || onlyAristoSelected;
+        const showFliriRow = !onlyAristoSelected || onlyFliriSelected;
+
+        let filteredMovies = hallMovies.filter(movie => {
+            const matchesSearch = movie.title.toLowerCase().includes(searchQuery.toLowerCase());
+            let matchesTag = true;
+
+            const baseAvgs = getSeriesAverages(movie);
+            const hasAristo = baseAvgs.aristo !== '' && baseAvgs.aristo !== null && baseAvgs.aristo !== undefined;
+            const hasFliri = baseAvgs.fliri !== '' && baseAvgs.fliri !== null && baseAvgs.fliri !== undefined;
+
+            if (selectedFilterTags.length > 0) {
+                matchesTag = selectedFilterTags.every(tag => {
+                    if (tag === 'favorite') return isMovieFavoriteForUser(movie);
+                    if (tag === 'only_aristo') return hasAristo; 
+                    if (tag === 'only_fliri') return hasFliri;   
+                    return movie.tags && movie.tags.includes(tag);
+                });
+            }
+
+            return matchesSearch && matchesTag;
+        });
+
+        const getEffectiveRatingsForSort = (m) => {
+            const avgs = getSeriesAverages(m);
+            const effAristo = showAristoRow ? avgs.aristo : '';
+            const effFliri = showFliriRow ? avgs.fliri : '';
+            return { aristo: effAristo, fliri: effFliri };
+        };
+
+        if (sortOrder === 'desc' || sortOrder === 'asc') {
+            filteredMovies.sort((a, b) => {
+                const aAvg = getEffectiveRatingsForSort(a);
+                const bAvg = getEffectiveRatingsForSort(b);
+                const diff = getAverageScoreNum(bAvg.aristo, bAvg.fliri) - getAverageScoreNum(aAvg.aristo, aAvg.fliri);
+                if (diff !== 0) return sortOrder === 'desc' ? diff : -diff;
+                return a.title.localeCompare(b.title, 'ru', { sensitivity: 'base' });
+            });
+        } else if (sortOrder === 'asc_alpha') {
+            filteredMovies.sort((a, b) => a.title.localeCompare(b.title, 'ru', { sensitivity: 'base' }));
+        } else if (sortOrder === 'desc_alpha') {
+            filteredMovies.sort((a, b) => b.title.localeCompare(a.title, 'ru', { sensitivity: 'base' }));
+        }
+
+        if (filteredMovies.length === 0) {
+            container.innerHTML = '<div class="no-results">Фильмы не найдены</div>';
+            return;
+        }
+
+        const actionBtnStyle = "background: #111; color: #fff; border: 1px solid #555; border-radius: 20px; padding: 6px 16px; font-size: 0.85rem; cursor: pointer; transition: 0.2s; font-family: inherit;";
+        const deleteBtnStyle = "background: #ef4444; color: #fff; border: none; border-radius: 20px; padding: 6px 16px; font-size: 0.85rem; cursor: pointer; transition: 0.2s; font-family: inherit;";
+        const userCanEdit = canEditSite();
+
+        filteredMovies.forEach((movie) => {
+            if (!movie.seasons) movie.seasons = []; 
+
+            const isSeries = isSeriesLike(movie);
+            const viewIndex = activeSeasonView[movie.id] || 0; 
+            const seriesAverages = getSeriesAverages(movie);
+            const isFav = isMovieFavoriteForUser(movie);
+
+            if (userCanEdit && editingMovieId === movie.id) {
+                const card = document.createElement('div');
+                card.className = `movie-card border-white`;
+                card.dataset.id = movie.id;
+                card.innerHTML = `
+                    <div class="edit-mode-container">
+                        <div style="font-weight: bold; margin-bottom: 10px; color: #fff;">Редактирование проекта</div>
+                        <div class="edit-inputs-group">
+                            <input type="text" class="edit-title-input" value="${movie.title}" placeholder="Название фильма" />
+                            <input type="url" class="edit-poster-input" value="${movie.poster || ''}" placeholder="Ссылка на постер" />
+                            <div class="tags-form-group">
+                                <select class="custom-select edit-tag-picker tag-picker">
+                                    <option value="" disabled selected>+ Добавить тег</option>
+                                    <option value="Фильм">Фильм</option>
+                                    <option value="Сериал">Сериал</option>
+                                    <option value="Мультфильм">Мультфильм</option>
+                                    <option value="Мультсериал">Мультсериал</option>
+                                    <option value="Аниме">Аниме</option>
+                                    <option value="Марвел">Марвел</option>
+                                    <option value="Не марвел">Не марвел</option>
+                                    <option value="Фантастика">Фантастика</option>
+                                    <option value="Комедия">Комедия</option>
+                                    <option value="Драма">Драма</option>
+                                    <option value="Экшен">Экшен</option>
+                                    <option value="Хоррор">Хоррор</option>
+                                    <option value="Фэнтези">Фэнтези</option>
+                                    <option value="Приключения">Приключения</option>
+                                    <option value="Детектив">Детектив</option>
+                                </select>
+                                <div class="edit-tags-list form-tags-list"></div>
+                            </div>
+                        </div>
+                        <div class="edit-mode-buttons" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
+                            <button class="btn-save-edit" style="${actionBtnStyle}">Сохранить</button>
+                            <button class="btn-cancel-edit" style="${actionBtnStyle}">Отмена</button>
+                            <button class="btn-delete-edit" style="${deleteBtnStyle}">Удалить проект</button>
+                        </div>
+                    </div>
+                `;
+                const editTagsList = card.querySelector('.edit-tags-list');
+                const editTagPicker = card.querySelector('.edit-tag-picker');
+                const renderEditTags = () => {
+                    editTagsList.innerHTML = editingMovieTags
+                        .filter(t => !isHiddenSystemTag(t))
+                        .map((tag, idx) => `<span class="form-tag-chip edit-chip-item" data-idx="${idx}">#${tag} ✕</span>`)
+                        .join('');
+                    editTagsList.querySelectorAll('.edit-chip-item').forEach(chip => {
+                        chip.addEventListener('click', () => {
+                            editingMovieTags.splice(parseInt(chip.getAttribute('data-idx')), 1);
+                            renderEditTags();
+                        });
+                    });
+                };
+                renderEditTags();
+                editTagPicker.addEventListener('change', (e) => {
+                    if (e.target.value && !editingMovieTags.includes(e.target.value)) {
+                        editingMovieTags.push(e.target.value);
+                        renderEditTags();
+                    }
+                    editTagPicker.selectedIndex = 0;
+                    if (editTagPicker._refreshCustomDropdown) editTagPicker._refreshCustomDropdown();
+                });
+                card.querySelector('.btn-save-edit').addEventListener('click', async () => {
+                    movie.title = card.querySelector('.edit-title-input').value.trim() || 'Новый проект';
+                    movie.poster = card.querySelector('.edit-poster-input').value.trim();
+                    movie.tags = editingMovieTags.filter(t => !isHiddenSystemTag(t));
+                    editingMovieId = null;
+                    editingMovieTags = [];
+                    await saveMovieToDb(movie);
+                    renderMoviesAnimated();
+                });
+                card.querySelector('.btn-cancel-edit').addEventListener('click', () => { editingMovieId = null; editingMovieTags = []; renderMoviesAnimated(); });
+                card.querySelector('.btn-delete-edit').addEventListener('click', async () => {
+                    if (confirm(`Удалить проект "${movie.title}"?`)) { editingMovieId = null; await deleteMovieFromDb(movie.id); renderMoviesAnimated(); }
+                });
+                upgradeAllSelects(card);
+                container.appendChild(card);
+                return;
+            }
+
+            if (userCanEdit && editingSeasonInfo && editingSeasonInfo.movieId === movie.id) {
+                const sIdx = editingSeasonInfo.seasonIndex;
+                const season = movie.seasons[sIdx];
+                const card = document.createElement('div');
+                card.className = `movie-card border-white`;
+                card.dataset.id = movie.id;
+                card.innerHTML = `
+                    <div class="edit-mode-container">
+                        <div style="font-weight: bold; margin-bottom: 10px; color: #fff;">Редактирование сезона: ${movie.title}</div>
+                        <div class="edit-inputs-group">
+                            <input type="text" class="edit-season-num" value="${season.seasonNumber}" placeholder="Номер сезона" />
+                            <input type="url" class="edit-season-poster" value="${season.poster || ''}" placeholder="Ссылка на постер сезона" />
+                        </div>
+                        <div class="edit-mode-buttons" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
+                            <button class="btn-save-season-edit" style="${actionBtnStyle}">Сохранить</button>
+                            <button class="btn-cancel-season-edit" style="${actionBtnStyle}">Отмена</button>
+                            <button class="btn-delete-season" style="${deleteBtnStyle}">Удалить сезон</button>
+                        </div>
+                    </div>
+                `;
+                card.querySelector('.btn-save-season-edit').addEventListener('click', async () => {
+                    season.seasonNumber = card.querySelector('.edit-season-num').value.trim();
+                    season.poster = card.querySelector('.edit-season-poster').value.trim();
+                    editingSeasonInfo = null;
+                    await saveMovieToDb(movie);
+                    renderMoviesAnimated();
+                });
+                card.querySelector('.btn-cancel-season-edit').addEventListener('click', () => { editingSeasonInfo = null; renderMoviesAnimated(); });
+                card.querySelector('.btn-delete-season').addEventListener('click', async () => {
+                    if (confirm(`Удалить сезон ${season.seasonNumber}?`)) {
+                        movie.seasons.splice(sIdx, 1);
+                        activeSeasonView[movie.id] = 0; 
+                        editingSeasonInfo = null;
+                        await saveMovieToDb(movie);
+                        renderMoviesAnimated();
+                    }
+                });
+                container.appendChild(card);
+                return;
+            }
+
+            if (userCanEdit && addingSeasonMovieId === movie.id) {
+                const card = document.createElement('div');
+                card.className = `movie-card border-white`;
+                card.dataset.id = movie.id;
+                card.innerHTML = `
+                    <div class="edit-mode-container">
+                        <div style="margin-bottom: 10px; font-weight: bold; color: #fff;">Добавить сезон к: ${movie.title}</div>
+                        <div class="edit-inputs-group">
+                            <input type="text" class="add-season-num" placeholder="Номер сезона (например: 1)" />
+                            <input type="url" class="add-season-poster" placeholder="Ссылка на постер сезона" />
+                        </div>
+                        <div class="edit-mode-buttons" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
+                            <button class="btn-save-season" style="${actionBtnStyle}">Добавить сезон</button>
+                            <button class="btn-cancel-season" style="${actionBtnStyle}">Отмена</button>
+                        </div>
+                    </div>
+                `;
+                card.querySelector('.btn-save-season').addEventListener('click', async () => {
+                    const sNum = card.querySelector('.add-season-num').value.trim() || `${movie.seasons.length + 1}`;
+                    const sPoster = card.querySelector('.add-season-poster').value.trim();
+                    movie.seasons.push({ seasonNumber: sNum, poster: sPoster, ratingAristo: "", ratingFliri: "" });
+                    addingSeasonMovieId = null;
+                    activeSeasonView[movie.id] = movie.seasons.length; 
+                    await saveMovieToDb(movie);
+                    renderMoviesAnimated();
+                });
+                card.querySelector('.btn-cancel-season').addEventListener('click', () => { addingSeasonMovieId = null; renderMoviesAnimated(); });
+                container.appendChild(card);
+                return;
+            }
+
+            let displayTitle = movie.title;
+            let displayPoster = (movie.poster && movie.poster.trim() !== '') ? movie.poster.trim() : defaultPoster;
+            let displayAristo = movie.ratingAristo;
+            let displayFliri = movie.ratingFliri;
+            let showRatings = true;
+            let isSeasonView = false;
+
+            if (isSeries) {
+                displayAristo = seriesAverages.aristo;
+                displayFliri = seriesAverages.fliri;
+
+                if (viewIndex === 0) {
+                    showRatings = false; 
+                } else if (movie.seasons[viewIndex - 1]) {
+                    isSeasonView = true;
+                    const season = movie.seasons[viewIndex - 1];
+                    displayTitle = `${movie.title}. Сезон ${season.seasonNumber}`;
+                    displayPoster = (season.poster && season.poster.trim() !== '') ? season.poster.trim() : defaultPoster;
+                    displayAristo = season.ratingAristo;
+                    displayFliri = season.ratingFliri;
+                }
+            }
+
+            const rawCardAristo = isSeries ? seriesAverages.aristo : displayAristo;
+            const rawCardFliri = isSeries ? seriesAverages.fliri : displayFliri;
+
+            const cardScoreAristo = showAristoRow ? rawCardAristo : '';
+            const cardScoreFliri = showFliriRow ? rawCardFliri : '';
+            const effectiveDisplayAristo = showAristoRow ? displayAristo : '';
+            const effectiveDisplayFliri = showFliriRow ? displayFliri : '';
+
+            const borderClass = getBorderClass(cardScoreAristo, cardScoreFliri);
+            const scoreColor = isFav ? '#eab308' : getRatingColor(cardScoreAristo, cardScoreFliri);
+            
+            const avgScore = getAverageScore(effectiveDisplayAristo, effectiveDisplayFliri);
+            const avgText = avgScore !== null ? `${avgScore}/10` : '—/10';
+
+            // Отображаем исключительно видимые пользовательские теги (скрывая все __fav_ и __hall_)
+            const cleanDisplayTags = (movie.tags || [])
+                .map(t => String(t).trim().replace(/^#+/, ''))
+                .filter(t => t && !isHiddenSystemTag(t));
+
+            const tagsHtml = (!isSeasonView && cleanDisplayTags.length > 0) 
+                ? `<div class="movie-tags">${cleanDisplayTags.map(t => `<span class="tag-item">#${t}</span>`).join('')}</div>` : '';
+
+            const favButton = !isSeasonView ? `<button class="btn-card-corner btn-favorite ${isFav ? 'active' : ''}" style="position: absolute; top: 10px; right: 10px; z-index: 20;" title="Избранное">★</button>` : '';
+            const addSeasonBtn = (isSeries && userCanEdit) ? `<button class="btn-card-corner btn-add-season" style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); z-index: 20; font-size: 14px;" title="Добавить сезон">➕</button>` : '';
+            const editBtn = userCanEdit ? `<button class="btn-card-corner btn-edit" style="position: absolute; bottom: 10px; right: 10px; z-index: 20;" title="Редактировать">✏️</button>` : '';
+
+            const arrowsHtml = (isSeries && movie.seasons.length > 0) ? `
+                <div style="position: absolute; bottom: 10px; right: 32%; transform: translateX(50%); display: flex; justify-content: center; gap: 15px; z-index: 15;">
+                    <button class="season-nav-btn prev-season" style="background: rgba(0,0,0,0.8); border: 1px solid #555; color: white; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); transition: 0.2s; ${viewIndex > 0 ? '' : 'visibility: hidden; pointer-events: none;'}">◀</button>
+                    <button class="season-nav-btn next-season" style="background: rgba(0,0,0,0.8); border: 1px solid #555; color: white; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); transition: 0.2s; ${viewIndex < movie.seasons.length ? '' : 'visibility: hidden; pointer-events: none;'}">▶</button>
+                </div>
+            ` : '';
+
+            const disabledAttr = userCanEdit ? '' : 'disabled';
+
+            const aristoRowHtml = showAristoRow ? `
+                <div class="rating-row">
+                    <span class="rating-label" title="${user1}">${user1}:</span>
+                    <select class="aristo-select custom-select" ${disabledAttr}>${generateRatingOptions(displayAristo)}</select>
+                </div>
+            ` : '';
+
+            const fliriRowHtml = showFliriRow ? `
+                <div class="rating-row">
+                    <span class="rating-label" title="${user2}">${user2}:</span>
+                    <select class="fliri-select custom-select" ${disabledAttr}>${generateRatingOptions(displayFliri)}</select>
+                </div>
+            ` : '';
+
+            const ratingsHtml = showRatings ? `
+                <div class="ratings-block">
+                    ${aristoRowHtml}
+                    ${fliriRowHtml}
+                </div>
+            ` : `<div style="text-align: center; color: rgba(255,255,255,0.5); font-size: 0.85rem; margin: 10px 0;">Оценки ставятся отдельным сезонам</div>`;
+
+            const card = document.createElement('div');
+            card.className = `movie-card ${borderClass} ${isFav ? 'favorite-card' : ''}`;
+            card.dataset.id = movie.id;
+
+            const fadeClass = (animatingSeasonMovieId === movie.id) ? 'fade-in-content' : '';
+
+            card.innerHTML = `
+                <div class="favorite-border-shell"></div>
+                <div class="movie-card-clip">
+                    <img class="movie-bg-blur ${fadeClass}" src="${displayPoster}" alt="" onerror="this.src='${defaultPoster}'">
+                    <div class="blur-overlay"></div>
+                    <div class="movie-poster-stage ${fadeClass}">
+                        <img class="movie-fg-poster" src="${displayPoster}" alt="${displayTitle}" onerror="this.src='${defaultPoster}'">
+                    </div>
+                </div>
+                ${favButton}
+                ${addSeasonBtn}
+                ${editBtn}
+                ${arrowsHtml}
+                <div class="movie-card-content ${fadeClass}">
+                    <div class="movie-left-content">
+                        <div class="movie-info-top">
+                            <div class="movie-title">${displayTitle}</div>
+                            <div class="movie-avg-rating" style="color: ${scoreColor}; border-color: ${scoreColor};">${avgText}</div>
+                        </div>
+                        <div class="movie-bottom-group">
+                            ${ratingsHtml}
+                            ${tagsHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            card.querySelector('.aristo-select')?.addEventListener('change', async (e) => {
+                if (!canEditSite()) return;
+                if (isSeasonView) movie.seasons[viewIndex - 1].ratingAristo = e.target.value;
+                else movie.ratingAristo = e.target.value;
+                pendingScrollMovieId = movie.id;
+                renderMoviesAnimated();
+                await saveMovieToDb(movie);
+            });
+            card.querySelector('.fliri-select')?.addEventListener('change', async (e) => {
+                if (!canEditSite()) return;
+                if (isSeasonView) movie.seasons[viewIndex - 1].ratingFliri = e.target.value;
+                else movie.ratingFliri = e.target.value;
+                pendingScrollMovieId = movie.id;
+                renderMoviesAnimated();
+                await saveMovieToDb(movie);
+            });
+
+            if (!isSeasonView) {
+                card.querySelector('.btn-favorite')?.addEventListener('click', async () => {
+                    await toggleFavoriteForCurrentUser(movie);
+                });
+            }
+
+            card.querySelector('.btn-edit')?.addEventListener('click', () => {
+                if (!canEditSite()) return;
+                if (isSeasonView) {
+                    editingSeasonInfo = { movieId: movie.id, seasonIndex: viewIndex - 1 };
+                } else {
+                    editingMovieId = movie.id;
+                    editingMovieTags = (movie.tags || []).filter(t => !isHiddenSystemTag(t));
+                }
+                renderMoviesAnimated();
+            });
+
+            if (isSeries) {
+                card.querySelector('.btn-add-season')?.addEventListener('click', () => {
+                    if (!canEditSite()) return;
+                    addingSeasonMovieId = movie.id;
+                    renderMoviesAnimated();
+                });
+
+                const fadeAndSwitchSeason = (newIndex) => {
+                    const elementsToFade = card.querySelectorAll('.movie-bg-blur, .movie-poster-stage, .movie-card-content');
+                    elementsToFade.forEach(el => el.classList.add('fade-out-content'));
+                    
+                    setTimeout(() => {
+                        activeSeasonView[movie.id] = newIndex;
+                        animatingSeasonMovieId = movie.id;
+                        renderMoviesAnimated();
+                        
+                        setTimeout(() => animatingSeasonMovieId = null, 180); 
+                    }, 120);
+                };
+
+                card.querySelector('.prev-season')?.addEventListener('click', () => {
+                    if (viewIndex > 0) fadeAndSwitchSeason(viewIndex - 1);
+                });
+                card.querySelector('.next-season')?.addEventListener('click', () => {
+                    if (viewIndex < movie.seasons.length) fadeAndSwitchSeason(viewIndex + 1);
+                });
+            }
+
+            upgradeAllSelects(card);
+            container.appendChild(card);
+            bindPosterEdgeTransparency(card);
+        });
+    }
+
+    // --- СОБЫТИЯ МОДАЛЬНОГО ОКНА АВТОРИЗАЦИИ, УДАЛЕНИЯ И НОВОГО ЗАЛА ---
+    const authModal = document.getElementById('authModal');
+    const authModalTitle = document.getElementById('authModalTitle');
+    const tabLogin = document.getElementById('tabLogin');
+    const tabRegister = document.getElementById('tabRegister');
+    const authLoginInput = document.getElementById('authLoginInput');
+    const authPasswordInput = document.getElementById('authPasswordInput');
+    const authError = document.getElementById('authError');
+    const authSubmitBtn = document.getElementById('authSubmitBtn');
+    const mainFriendNickInput = document.getElementById('mainFriendNickInput');
+    const modalFriendNickInput = document.getElementById('modalFriendNickInput');
+
+    // Разрешаем ввод логина и пароля только на английском языке
+    authLoginInput.addEventListener('input', () => {
+        const cleaned = sanitizeEnglishLoginInput(authLoginInput.value);
+        if (authLoginInput.value !== cleaned) {
+            authLoginInput.value = cleaned;
+            authError.textContent = 'Логин можно вводить только на английском языке (A-Z, 0-9, _ . -)';
+        }
+    });
+
+    authPasswordInput.addEventListener('input', () => {
+        const cleaned = sanitizeEnglishPasswordInput(authPasswordInput.value);
+        if (authPasswordInput.value !== cleaned) {
+            authPasswordInput.value = cleaned;
+            authError.textContent = 'Пароль можно вводить только на английском языке';
+        }
+    });
+
+    if (deleteProfilePasswordInput) {
+        deleteProfilePasswordInput.addEventListener('input', () => {
+            const cleaned = sanitizeEnglishPasswordInput(deleteProfilePasswordInput.value);
+            if (deleteProfilePasswordInput.value !== cleaned) {
+                deleteProfilePasswordInput.value = cleaned;
+            }
+            if (deleteProfileError) deleteProfileError.textContent = '';
+        });
+        deleteProfilePasswordInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleConfirmProfileDeletion();
+        });
+    }
+
+    [mainFriendNickInput, modalFriendNickInput].forEach(inp => {
+        if (!inp) return;
+        inp.addEventListener('input', () => {
+            const cleaned = sanitizeEnglishLoginInput(inp.value);
+            if (inp.value !== cleaned) {
+                inp.value = cleaned;
+            }
+        });
+    });
+
+    function setAuthMode(mode) {
+        authMode = mode;
+        authError.textContent = '';
+        if (mode === 'login') {
+            tabLogin.classList.add('active');
+            tabRegister.classList.remove('active');
+            authModalTitle.textContent = 'Вход в аккаунт';
+            authSubmitBtn.textContent = 'Войти';
+        } else {
+            tabLogin.classList.remove('active');
+            tabRegister.classList.add('active');
+            authModalTitle.textContent = 'Регистрация';
+            authSubmitBtn.textContent = 'Зарегистрироваться';
+        }
+    }
+
+    function openAuthModal() {
+        authLoginInput.value = '';
+        authPasswordInput.value = '';
+        authError.textContent = '';
+        setAuthMode('login');
+        authModal.classList.add('show');
+        authLoginInput.focus();
+    }
+
+    document.getElementById('openAuthBtn').addEventListener('click', openAuthModal);
+    document.getElementById('guestAuthBtn').addEventListener('click', openAuthModal);
+    document.getElementById('closeAuthModal').addEventListener('click', () => authModal.classList.remove('show'));
+    tabLogin.addEventListener('click', () => setAuthMode('login'));
+    tabRegister.addEventListener('click', () => setAuthMode('register'));
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        currentUser = null;
+        currentHallId = null;
+        localStorage.removeItem('agregatoristo_current_user');
+        editingMovieId = null;
+        addingSeasonMovieId = null;
+        editingSeasonInfo = null;
+        document.getElementById('notifDropdown').classList.remove('show');
+        updateAuthUI();
+    });
+
+    document.getElementById('deleteProfileBtn').addEventListener('click', openDeleteProfileModal);
+    document.getElementById('closeDeleteProfileModal').addEventListener('click', () => {
+        deleteProfileModal.classList.remove('show');
+        resetDeleteProfileModalState();
+    });
+    document.getElementById('cancelDeleteProfileBtn').addEventListener('click', () => {
+        deleteProfileModal.classList.remove('show');
+        resetDeleteProfileModalState();
+    });
+    document.getElementById('confirmDeleteProfileBtn').addEventListener('click', handleConfirmProfileDeletion);
+
+    authSubmitBtn.addEventListener('click', async () => {
+        const login = authLoginInput.value.trim();
+        const password = authPasswordInput.value;
+
+        if (!login || !password) {
+            authError.textContent = 'Введите логин и пароль';
+            return;
+        }
+
+        if (!ENGLISH_LOGIN_REGEX.test(login)) {
+            authError.textContent = 'Логин должен содержать только английские буквы и цифры';
+            return;
+        }
+
+        if (!ENGLISH_PASSWORD_REGEX.test(password)) {
+            authError.textContent = 'Пароль должен содержать только английские символы';
+            return;
+        }
+
+        if (login.length > 32 || password.length > 32) {
+            authError.textContent = 'Логин и пароль не могут быть длиннее 32 символов';
+            return;
+        }
+
+        // Синхронизируем список аккаунтов напрямую с базой данных
+        try {
+            const { data } = await supabase.from('watchlist').select('*');
+            if (data) parseWatchlistTableData(data);
+        } catch (err) {
+            authError.textContent = 'Ошибка соединения с базой данных';
+            return;
+        }
+
+        if (authMode === 'register') {
+            const existing = findExistingUsername(login);
+            if (existing && registeredUsers[existing]) {
+                authError.textContent = 'Пользователь с таким логином уже существует в базе данных';
+                return;
+            }
+
+            try {
+                const { error } = await supabase.from('watchlist').upsert({
+                    id: `user_${login}`,
+                    title: password,
+                    priority: 'user_account',
+                    tags: []
+                });
+                if (error) {
+                    authError.textContent = 'Не удалось сохранить аккаунт в базу данных';
+                    return;
+                }
+            } catch (err) {
+                authError.textContent = 'Ошибка записи аккаунта в базу данных';
+                return;
+            }
+
+            registeredUsers[login] = password;
+            currentUser = login;
+            localStorage.setItem('agregatoristo_current_user', login);
+            authModal.classList.remove('show');
+            document.getElementById('mainInviteStatus').textContent = '';
+            updateAuthUI();
+            renderWatchlist();
+            renderMoviesAnimated();
+        } else {
+            const actualLogin = findExistingUsername(login);
+            if (!actualLogin || registeredUsers[actualLogin] !== password) {
+                authError.textContent = 'Неверный логин или пароль';
+                return;
+            }
+            currentUser = actualLogin;
+            localStorage.setItem('agregatoristo_current_user', actualLogin);
+            authModal.classList.remove('show');
+            document.getElementById('mainInviteStatus').textContent = '';
+            updateAuthUI();
+            renderWatchlist();
+            renderMoviesAnimated();
+        }
+    });
+
+    // События кнопки уведомлений в правом верхнем углу
+    const notifToggleBtn = document.getElementById('notifToggleBtn');
+    const notifDropdown = document.getElementById('notifDropdown');
+
+    notifToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        notifDropdown.classList.toggle('show');
+    });
+
+    document.getElementById('clearAllNotifsBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        clearAllUserNotifications();
+    });
+
+    // События модального окна удаления зала
+    const deleteHallModal = document.getElementById('deleteHallModal');
+    document.getElementById('closeDeleteHallModal').addEventListener('click', () => {
+        pendingDeleteHall = null;
+        deleteHallModal.classList.remove('show');
+    });
+    document.getElementById('cancelDeleteHallBtn').addEventListener('click', () => {
+        pendingDeleteHall = null;
+        deleteHallModal.classList.remove('show');
+    });
+    document.getElementById('confirmDeleteHallBtn').addEventListener('click', confirmDeleteHall);
+
+    // События приглашения друга с главного экрана и из модального окна "Новый зал"
+    const mainInviteStatus = document.getElementById('mainInviteStatus');
+    document.getElementById('mainSendInviteBtn').addEventListener('click', () => {
+        sendHallInvite(mainFriendNickInput.value, mainInviteStatus, mainFriendNickInput);
+    });
+    mainFriendNickInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendHallInvite(mainFriendNickInput.value, mainInviteStatus, mainFriendNickInput);
+    });
+
+    const newHallModal = document.getElementById('newHallModal');
+    const modalInviteStatus = document.getElementById('modalInviteStatus');
+
+    document.getElementById('openNewHallModalBtn').addEventListener('click', () => {
+        modalFriendNickInput.value = '';
+        modalInviteStatus.textContent = '';
+        modalInviteStatus.className = 'invite-status';
+        newHallModal.classList.add('show');
+        modalFriendNickInput.focus();
+    });
+
+    document.getElementById('closeNewHallModal').addEventListener('click', () => {
+        newHallModal.classList.remove('show');
+    });
+
+    document.getElementById('modalSendInviteBtn').addEventListener('click', () => {
+        sendHallInvite(modalFriendNickInput.value, modalInviteStatus, modalFriendNickInput);
+    });
+    modalFriendNickInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendHallInvite(modalFriendNickInput.value, modalInviteStatus, modalFriendNickInput);
+    });
+
+    // --- ФИЛЬТРЫ И ПОИСК ---
+    const filterHeader = document.getElementById('filterHeader');
+    const filterOptions = document.getElementById('filterOptions');
+
+    filterHeader.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeAllDropdowns(filterOptions);
+        filterOptions.classList.toggle('show');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.custom-multiselect-container') && !e.target.closest('.custom-dropdown-wrapper')) {
+            closeAllDropdowns();
+        }
+        if (!e.target.closest('#topRightNotifications')) {
+            notifDropdown.classList.remove('show');
+        }
+    });
+
+    filterOptions.addEventListener('change', (e) => {
+        if (e.target.type === 'checkbox') {
+            if (e.target.checked) {
+                selectedFilterTags.push(e.target.value);
+            } else {
+                selectedFilterTags = selectedFilterTags.filter(t => t !== e.target.value);
+            }
+            
+            if (selectedFilterTags.length > 0) {
+                filterHeader.textContent = `Теги (${selectedFilterTags.length})`;
+                filterHeader.style.borderColor = '#ffffff';
+            } else {
+                filterHeader.textContent = 'Теги';
+                filterHeader.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+            }
+            
+            renderMoviesAnimated();
+        }
+    });
+
+    const openFormBtn = document.getElementById('openFormBtn');
+    const addFormContainer = document.getElementById('addFormContainer');
+    const tagPicker = document.getElementById('tagPicker');
+
+    openFormBtn.onclick = function() {
+        if (!canEditSite()) return;
+        if (addFormContainer.style.display === 'block') {
+            resetAddForm();
+        } else {
+            addFormContainer.style.display = 'block';
+            document.getElementById('newTitle').focus();
+        }
+    };
+
+    tagPicker.addEventListener('change', (e) => {
+        const val = e.target.value;
+        if (val && !currentFormTags.includes(val)) {
+            currentFormTags.push(val);
+            renderFormTags();
+        }
+        tagPicker.selectedIndex = 0;
+        if (tagPicker._refreshCustomDropdown) tagPicker._refreshCustomDropdown();
+    });
+
+    document.getElementById('confirmBtn').onclick = async function() {
+        if (!canEditSite()) return;
+        const titleInput = document.getElementById('newTitle');
+        const posterInput = document.getElementById('newPoster');
+        const ratingAristoInput = document.getElementById('newRatingAristo');
+        const ratingFliriInput = document.getElementById('newRatingFliri');
+
+        let title = titleInput.value.trim();
+        const poster = posterInput.value.trim();
+        if (!title) title = 'Новый фильм';
+
+        const hall = getCurrentHall();
+        const canonicalHallTag = hall ? getCanonicalHallTagForHall(hall) : '';
+
+        const newMovie = {
+            id: Date.now().toString(),
+            title: title,
+            poster: poster,
+            ratingAristo: ratingAristoInput.value,
+            ratingFliri: ratingFliriInput.value,
+            tags: [...currentFormTags],
+            rawTags: canonicalHallTag ? [...currentFormTags, canonicalHallTag] : [...currentFormTags],
+            isFavorite: false,
+            seasons: []
+        };
+
+        pendingScrollMovieId = newMovie.id;
+        await saveMovieToDb(newMovie);
+        await createProjectNotification(title);
+        resetAddForm();
+        renderMoviesAnimated();
+    };
+
+    document.getElementById('cancelFormBtn').onclick = resetAddForm;
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            authModal.classList.remove('show');
+            newHallModal.classList.remove('show');
+            deleteHallModal.classList.remove('show');
+            deleteProfileModal.classList.remove('show');
+            resetDeleteProfileModalState();
+            notifDropdown.classList.remove('show');
+            closeAllDropdowns();
+            if (addFormContainer.style.display === 'block') resetAddForm();
+            if (editingMovieId !== null) {
+                editingMovieId = null;
+                editingMovieTags = [];
+                renderMoviesAnimated();
+            }
+        }
+    });
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        searchQuery = e.target.value;
+        renderMoviesAnimated();
+    });
+
+    document.getElementById('sortSelect').addEventListener('change', (e) => {
+        sortOrder = e.target.value;
+        renderMoviesAnimated();
+    });
+
+    const toggleWatchlistItems = () => {
+        document.getElementById('watchlistItems').classList.toggle('collapsed');
+        document.getElementById('watchlistArrow').classList.toggle('rotated');
+    };
+
+    document.getElementById('watchlistToggle').addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleWatchlistItems();
+    });
+
+    document.getElementById('watchlistTitleText').addEventListener('click', toggleWatchlistItems);
+
+    document.getElementById('watchlistAddToggleBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const formBlock = document.getElementById('watchlistFormBlock');
+        const addBtn = document.getElementById('watchlistAddToggleBtn');
+        const isCollapsed = formBlock.classList.toggle('collapsed');
+        addBtn.classList.toggle('active', !isCollapsed);
+        if (!isCollapsed) {
+            document.getElementById('watchTitle')?.focus();
+        }
+    });
+
+    initApp();
+</script>
+
+</body>
+</html>
