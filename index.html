@@ -314,7 +314,10 @@
         <div id="addFormContainer" class="add-form-container">
             <div class="form-inputs">
                 <div class="form-row-main">
-                    <input type="text" id="newTitle" placeholder="Название фильма" />
+                    <div class="title-autocomplete-wrapper" id="titleAutocompleteWrapper">
+                        <input type="text" id="newTitle" placeholder="Название фильма" autocomplete="off" />
+                        <div id="titleAutocompleteList" class="title-autocomplete-dropdown"></div>
+                    </div>
                     <input type="url" id="newPoster" placeholder="Ссылка на постер" />
                     <button id="confirmBtn" class="btn-confirm" title="Подтвердить добавление">✓</button>
                 </div>
@@ -440,6 +443,9 @@
     let pendingDeleteHall = null;
 
     let currentFormTags = [];
+    let currentFormSeasonsTemplate = [];
+    let currentAutocompleteMatches = [];
+    let activeAutocompleteIndex = -1;
     let currentWatchTags = [];
     let editingMovieTags = [];
     
@@ -654,6 +660,210 @@
         return allWatchlistRaw.filter(item => {
             const rawTags = item.rawTags || [];
             return rawTags.some(t => doesTagMatchHall(t, hall));
+        });
+    }
+
+    // --- ПОИСК СОВПАДЕНИЙ В БАЗЕ ДАННЫХ И АВТОЗАПОЛНЕНИЕ В ФОРМЕ ДОБАВЛЕНИЯ ---
+    function normalizeSearchComparison(str) {
+        return String(str || '')
+            .toLowerCase()
+            .replace(/ё/g, 'е')
+            .trim();
+    }
+
+    function getDatabaseMovieSuggestions(queryText) {
+        const cleanQuery = normalizeSearchComparison(queryText);
+        if (!cleanQuery) return [];
+
+        const groupedByTitle = new Map();
+
+        allMoviesRaw.forEach(movie => {
+            const rawTitle = (movie.title || '').trim();
+            if (!rawTitle) return;
+            const normTitle = normalizeSearchComparison(rawTitle);
+            if (!normTitle.includes(cleanQuery)) return;
+
+            const cleanVisibleTags = Array.from(new Set(
+                (movie.tags || [])
+                    .map(t => String(t).trim().replace(/^#+/, ''))
+                    .filter(t => t && !isHiddenSystemTag(t))
+            ));
+
+            const cleanPoster = (movie.poster || '').trim();
+            const cleanSeasons = Array.isArray(movie.seasons)
+                ? movie.seasons.map(s => ({
+                    seasonNumber: s.seasonNumber || '',
+                    poster: s.poster || '',
+                    ratingAristo: '',
+                    ratingFliri: ''
+                }))
+                : [];
+
+            if (!groupedByTitle.has(normTitle)) {
+                groupedByTitle.set(normTitle, {
+                    title: rawTitle,
+                    poster: cleanPoster,
+                    tags: cleanVisibleTags,
+                    seasons: cleanSeasons
+                });
+            } else {
+                const existing = groupedByTitle.get(normTitle);
+                if (!existing.poster && cleanPoster) {
+                    existing.poster = cleanPoster;
+                }
+                if (cleanVisibleTags.length > existing.tags.length) {
+                    existing.tags = Array.from(new Set([...existing.tags, ...cleanVisibleTags]));
+                } else {
+                    cleanVisibleTags.forEach(t => {
+                        if (!existing.tags.includes(t)) existing.tags.push(t);
+                    });
+                }
+                if (cleanSeasons.length > existing.seasons.length) {
+                    existing.seasons = cleanSeasons;
+                }
+            }
+        });
+
+        const results = Array.from(groupedByTitle.values());
+        results.sort((a, b) => {
+            const normA = normalizeSearchComparison(a.title);
+            const normB = normalizeSearchComparison(b.title);
+            const aStarts = normA.startsWith(cleanQuery);
+            const bStarts = normB.startsWith(cleanQuery);
+            if (aStarts !== bStarts) return aStarts ? -1 : 1;
+            return a.title.localeCompare(b.title, 'ru', { sensitivity: 'base' });
+        });
+
+        return results.slice(0, 10);
+    }
+
+    function hideTitleAutocomplete() {
+        const dropdown = document.getElementById('titleAutocompleteList');
+        if (dropdown) {
+            dropdown.classList.remove('show');
+            dropdown.innerHTML = '';
+        }
+        currentAutocompleteMatches = [];
+        activeAutocompleteIndex = -1;
+    }
+
+    function applyAutocompleteSuggestion(item) {
+        if (!item) return;
+        const titleInput = document.getElementById('newTitle');
+        const posterInput = document.getElementById('newPoster');
+        const rA = document.getElementById('newRatingAristo');
+        const rF = document.getElementById('newRatingFliri');
+
+        if (titleInput) titleInput.value = item.title || '';
+        if (posterInput) posterInput.value = item.poster || '';
+
+        // Подтягиваем только обычные теги проекта (без тегов зала и без избранного)
+        currentFormTags = Array.from(new Set(
+            (item.tags || [])
+                .map(t => String(t).trim().replace(/^#+/, ''))
+                .filter(t => t && !isHiddenSystemTag(t))
+        ));
+        renderFormTags();
+
+        // Сохраняем шаблон сезонов (номера и постеры без оценок), если это сериал
+        currentFormSeasonsTemplate = Array.isArray(item.seasons)
+            ? item.seasons.map(s => ({
+                seasonNumber: s.seasonNumber,
+                poster: s.poster || '',
+                ratingAristo: '',
+                ratingFliri: ''
+            }))
+            : [];
+
+        // Оценки не подтягиваем, чтобы пользователь сам выставил оценки для своего зала
+        if (rA) {
+            rA.value = '';
+            if (rA._refreshCustomDropdown) rA._refreshCustomDropdown();
+        }
+        if (rF) {
+            rF.value = '';
+            if (rF._refreshCustomDropdown) rF._refreshCustomDropdown();
+        }
+
+        hideTitleAutocomplete();
+    }
+
+    function renderTitleAutocomplete(queryText) {
+        const dropdown = document.getElementById('titleAutocompleteList');
+        if (!dropdown) return;
+
+        const suggestions = getDatabaseMovieSuggestions(queryText);
+        currentAutocompleteMatches = suggestions;
+        activeAutocompleteIndex = -1;
+
+        if (suggestions.length === 0) {
+            hideTitleAutocomplete();
+            return;
+        }
+
+        dropdown.innerHTML = '';
+
+        suggestions.forEach((item, idx) => {
+            const row = document.createElement('div');
+            row.className = 'autocomplete-item';
+            row.dataset.idx = idx;
+
+            const thumbSrc = item.poster && item.poster.trim() !== '' ? item.poster.trim() : defaultPoster;
+
+            const img = document.createElement('img');
+            img.className = 'autocomplete-poster-thumb';
+            img.src = thumbSrc;
+            img.alt = item.title;
+            img.onerror = function() {
+                this.src = defaultPoster;
+            };
+
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'autocomplete-info';
+
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'autocomplete-title';
+            titleDiv.textContent = item.title;
+            infoDiv.appendChild(titleDiv);
+
+            if (item.tags && item.tags.length > 0) {
+                const tagsDiv = document.createElement('div');
+                tagsDiv.className = 'autocomplete-tags';
+                item.tags.forEach(tag => {
+                    const badge = document.createElement('span');
+                    badge.className = 'autocomplete-tag-badge';
+                    badge.textContent = `#${tag}`;
+                    tagsDiv.appendChild(badge);
+                });
+                infoDiv.appendChild(tagsDiv);
+            }
+
+            row.appendChild(img);
+            row.appendChild(infoDiv);
+
+            row.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                applyAutocompleteSuggestion(item);
+            });
+
+            dropdown.appendChild(row);
+        });
+
+        dropdown.classList.add('show');
+    }
+
+    function updateAutocompleteActiveItem() {
+        const dropdown = document.getElementById('titleAutocompleteList');
+        if (!dropdown) return;
+        const items = dropdown.querySelectorAll('.autocomplete-item');
+        items.forEach((el, i) => {
+            if (i === activeAutocompleteIndex) {
+                el.classList.add('active');
+                el.scrollIntoView({ block: 'nearest' });
+            } else {
+                el.classList.remove('active');
+            }
         });
     }
 
@@ -2113,7 +2323,9 @@
         if (rA._refreshCustomDropdown) rA._refreshCustomDropdown();
         if (rF._refreshCustomDropdown) rF._refreshCustomDropdown();
         currentFormTags = [];
+        currentFormSeasonsTemplate = [];
         renderFormTags();
+        hideTitleAutocomplete();
         document.getElementById('addFormContainer').style.display = 'none';
     }
 
@@ -3018,6 +3230,9 @@
         if (!e.target.closest('#topRightThemes')) {
             themeDropdown.classList.remove('show');
         }
+        if (!e.target.closest('#titleAutocompleteWrapper')) {
+            hideTitleAutocomplete();
+        }
     });
 
     filterOptions.addEventListener('change', (e) => {
@@ -3043,6 +3258,42 @@
     const openFormBtn = document.getElementById('openFormBtn');
     const addFormContainer = document.getElementById('addFormContainer');
     const tagPicker = document.getElementById('tagPicker');
+    const newTitleInput = document.getElementById('newTitle');
+
+    newTitleInput.addEventListener('input', (e) => {
+        currentFormSeasonsTemplate = [];
+        renderTitleAutocomplete(e.target.value);
+    });
+
+    newTitleInput.addEventListener('focus', (e) => {
+        if (e.target.value.trim().length > 0) {
+            renderTitleAutocomplete(e.target.value);
+        }
+    });
+
+    newTitleInput.addEventListener('keydown', (e) => {
+        const dropdown = document.getElementById('titleAutocompleteList');
+        const isDropdownOpen = dropdown && dropdown.classList.contains('show') && currentAutocompleteMatches.length > 0;
+        if (!isDropdownOpen) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            activeAutocompleteIndex = (activeAutocompleteIndex + 1) % currentAutocompleteMatches.length;
+            updateAutocompleteActiveItem();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            activeAutocompleteIndex = (activeAutocompleteIndex - 1 + currentAutocompleteMatches.length) % currentAutocompleteMatches.length;
+            updateAutocompleteActiveItem();
+        } else if (e.key === 'Enter') {
+            if (activeAutocompleteIndex >= 0 && currentAutocompleteMatches[activeAutocompleteIndex]) {
+                e.preventDefault();
+                applyAutocompleteSuggestion(currentAutocompleteMatches[activeAutocompleteIndex]);
+            }
+        } else if (e.key === 'Escape') {
+            e.stopPropagation();
+            hideTitleAutocomplete();
+        }
+    });
 
     openFormBtn.onclick = function() {
         if (!canEditSite()) return;
@@ -3078,16 +3329,29 @@
         const hall = getCurrentHall();
         const canonicalHallTag = hall ? getCanonicalHallTagForHall(hall) : '';
 
+        const cleanTags = currentFormTags
+            .map(t => String(t).trim().replace(/^#+/, ''))
+            .filter(t => t && !isHiddenSystemTag(t));
+
+        const initialSeasons = Array.isArray(currentFormSeasonsTemplate) && currentFormSeasonsTemplate.length > 0
+            ? currentFormSeasonsTemplate.map(s => ({
+                seasonNumber: s.seasonNumber,
+                poster: s.poster || '',
+                ratingAristo: '',
+                ratingFliri: ''
+            }))
+            : [];
+
         const newMovie = {
             id: Date.now().toString(),
             title: title,
             poster: poster,
             ratingAristo: ratingAristoInput.value,
             ratingFliri: ratingFliriInput.value,
-            tags: [...currentFormTags],
-            rawTags: canonicalHallTag ? [...currentFormTags, canonicalHallTag] : [...currentFormTags],
+            tags: [...cleanTags],
+            rawTags: canonicalHallTag ? [...cleanTags, canonicalHallTag] : [...cleanTags],
             isFavorite: false,
-            seasons: []
+            seasons: initialSeasons
         };
 
         pendingScrollMovieId = newMovie.id;
@@ -3106,6 +3370,7 @@
             resetDeleteProfileModalState();
             notifDropdown.classList.remove('show');
             themeDropdown.classList.remove('show');
+            hideTitleAutocomplete();
             closeAllDropdowns();
             if (addFormContainer.style.display === 'block') resetAddForm();
             if (editingMovieId !== null) {
