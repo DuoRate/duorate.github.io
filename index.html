@@ -3,25 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DuoRate</title>
-	<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KICA8cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzAwMDAwMCIvPgogIDxwYXRoIGQ9Ik01MCAxNSBMODAgODAgTDIwIDgwIFoiIGZpbGw9IiNmZmZmZmYiLz4KICA8Y2lyY2xlIGN4PSI1MCIgY3k9IjYwIiByPSIxNSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjUiIGZpbGw9Im5vbmUiLz4KPC9zdmc+Cg==">
+    <title>DuoRate — Совместная оценка фильмов и сериалов вместе с другом</title>
+    <meta name="description" content="Совместная оценка фильмов и сериалов вместе с другом">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="DuoRate">
+    <meta property="og:title" content="DuoRate">
+    <meta property="og:description" content="Совместная оценка фильмов и сериалов вместе с другом">
+    <meta property="og:image" content="/favicon.svg">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="DuoRate">
+    <meta name="twitter:description" content="Совместная оценка фильмов и сериалов вместе с другом">
+
+    <!-- Иконки для поисковых систем (Яндекс, Google) и вкладок браузера -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KICA8cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzAwMDAwMCIvPgogIDxwYXRoIGQ9Ik01MCAxNSBMODAgODAgTDIwIDgwIFoiIGZpbGw9IiNmZmZmZmYiLz4KICA8Y2lyY2xlIGN4PSI1MCIgY3k9IjYwIiByPSIxNSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjUiIGZpbGw9Im5vbmUiLz4KPC9zdmc+Cg==">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "DuoRate",
+      "description": "Совместная оценка фильмов и сериалов вместе с другом"
+    }
+    </script>
+
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- Кнопка и выпадающее меню уведомлений в правом верхнем углу -->
-<div id="topRightNotifications" class="top-notifications-wrapper" style="display: none;">
-    <button id="notifToggleBtn" class="btn-notif-bell" title="Уведомления">
-        <span>🔔</span>
-        <span class="notif-btn-text">Уведомления</span>
-        <span id="notifBadge" class="notif-badge" style="display: none;">0</span>
-    </button>
-    <div id="notifDropdown" class="notif-dropdown">
-        <div class="notif-dropdown-header">
-            <span>Уведомления для вас</span>
-            <button id="clearAllNotifsBtn" class="btn-clear-notifs" title="Очистить просмотренные">Очистить</button>
+<!-- Панель в правом верхнем углу: Темы (только в зале) и Уведомления -->
+<div class="top-right-bar">
+    <div id="topRightThemes" class="top-themes-wrapper" style="display: none;">
+        <button id="themeToggleBtn" class="btn-notif-bell" title="Выбор темы оформления зала">
+            <span>🎨</span>
+            <span class="notif-btn-text">Темы</span>
+        </button>
+        <div id="themeDropdown" class="theme-dropdown">
+            <div class="notif-dropdown-header">
+                <span>Тема этого зала</span>
+            </div>
+            <div class="theme-options-list">
+                <button class="theme-option-btn active" data-theme="standard">
+                    <span>Стандартная</span>
+                    <span class="theme-preview-dots">
+                        <span style="background: #000000; border: 1px solid #ffffff;"></span>
+                        <span style="background: #ffffff; border: 1px solid #444444;"></span>
+                    </span>
+                </button>
+                <button class="theme-option-btn" data-theme="pickme">
+                    <span>Пикми</span>
+                    <span class="theme-preview-dots">
+                        <span style="background: #ff69b4; border: 1px solid #ffffff;"></span>
+                        <span style="background: #fff0f6; border: 1px solid #ff69b4;"></span>
+                    </span>
+                </button>
+            </div>
         </div>
-        <div id="notifList" class="notif-list"></div>
+    </div>
+
+    <div id="topRightNotifications" class="top-notifications-wrapper" style="display: none;">
+        <button id="notifToggleBtn" class="btn-notif-bell" title="Уведомления">
+            <span>🔔</span>
+            <span class="notif-btn-text">Уведомления</span>
+            <span id="notifBadge" class="notif-badge" style="display: none;">0</span>
+        </button>
+        <div id="notifDropdown" class="notif-dropdown">
+            <div class="notif-dropdown-header">
+                <span>Уведомления для вас</span>
+                <button id="clearAllNotifsBtn" class="btn-clear-notifs" title="Очистить просмотренные">Очистить</button>
+            </div>
+            <div id="notifList" class="notif-list"></div>
+        </div>
     </div>
 </div>
 
@@ -99,7 +153,25 @@
     </div>
 </div>
 
+<!-- Левая панель: Статистика (сверху) и Нужно посмотреть (снизу) -->
 <div class="watchlist-sidebar" id="watchlistSidebar" style="display: none;">
+    <div id="statsBlock" class="stats-block-wrapper" style="display: none;">
+        <div class="stats-title">Статистика</div>
+        <div class="stats-item total">
+            <span class="stats-label">Всего проектов:</span>
+            <span class="stats-value" id="countTotal">0</span>
+        </div>
+        <div class="stats-item aristo">
+            <span class="stats-label" id="statsLabelUser1">Оценено:</span>
+            <span class="stats-value" id="countAristo">0</span>
+        </div>
+        <div class="stats-item fliri">
+            <span class="stats-label" id="statsLabelFliri">Оценено:</span>
+            <span class="stats-value" id="countFliri">0</span>
+        </div>
+        <hr class="sidebar-divider">
+    </div>
+
     <div class="watchlist-title" style="justify-content: space-between;">
         <span id="watchlistTitleText" style="cursor: pointer; flex: 1;">Нужно посмотреть</span>
         <div class="watchlist-header-controls">
@@ -161,6 +233,7 @@
     <div id="watchlistItems" class="watchlist-items collapsed"></div>
 </div>
 
+<!-- Правая панель: Профиль (всегда) и Оценочные залы (только внутри открытого зала) -->
 <div class="stats-sidebar" id="statsSidebar" style="display: none;">
     <div class="auth-panel">
         <div id="authUserDisplay" class="auth-user-display">Гость</div>
@@ -171,54 +244,70 @@
         </div>
     </div>
 
-    <div id="hallsSection" class="halls-section">
-        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.15); margin: 4px 0;">
+    <div id="hallsSection" class="halls-section" style="display: none;">
+        <hr class="sidebar-divider">
         <div class="stats-title">Оценочные залы</div>
         <div id="hallsList" class="halls-list"></div>
         <button id="openNewHallModalBtn" class="btn-new-hall">+ Новый зал</button>
     </div>
-
-    <div id="statsBlock" class="stats-block-wrapper" style="display: none;">
-        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.15); margin: 4px 0;">
-        <div class="stats-title">Статистика</div>
-        <div class="stats-item total">
-            <span class="stats-label">Всего проектов:</span>
-            <span class="stats-value" id="countTotal">0</span>
-        </div>
-        <div class="stats-item aristo">
-            <span class="stats-label" id="statsLabelUser1">Оценено:</span>
-            <span class="stats-value" id="countAristo">0</span>
-        </div>
-        <div class="stats-item fliri">
-            <span class="stats-label" id="statsLabelFliri">Оценено:</span>
-            <span class="stats-value" id="countFliri">0</span>
-        </div>
-    </div>
 </div>
 
 <div class="container">
+    <!-- Шапка сайта: клик по названию DuoRate возвращает на главную из открытого зала -->
     <div class="site-header">
-        <h1>DuoRate</h1>
-        <p id="siteSubtitle" class="site-subtitle">Совместная оценка просмотренным фильмам, сериалам и др.</p>
+        <h1 id="siteLogoBtn" class="site-logo-clickable" title="На главную страницу">DuoRate</h1>
+        <p id="siteSubtitle" class="site-subtitle">Совместная оценка фильмов и сериалов вместе с другом</p>
     </div>
 
-    <!-- 1. Состояние для неавторизованного пользователя -->
-    <div id="guestStateBox" class="center-state-box" style="display: none;">
-        <p class="center-state-text">Авторизуйтесь, чтобы оценивать проекты вместе с друзьями</p>
-        <button id="guestAuthBtn" class="btn-state-action">Авторизация / Регистрация</button>
-    </div>
-
-    <!-- 2. Состояние после авторизации, когда нет активного зала -->
-    <div id="inviteStateBox" class="center-state-box" style="display: none;">
-        <p class="center-state-text">Предложите другу оценивать вместе</p>
-        <div class="invite-inline-form">
-            <input type="text" id="mainFriendNickInput" placeholder="Вводите ник друга (англ.)" maxlength="32" autocomplete="off" />
-            <button id="mainSendInviteBtn" class="btn-state-action">Пригласить</button>
+    <!-- ГЛАВНАЯ СТРАНИЦА -->
+    <div id="homePageWrapper" class="home-page-wrapper">
+        <!-- Отдельный блок с описанием и плавно движущимися плашками проектов из зала Aristo и Fliri -->
+        <div class="home-showcase-block">
+            <h2 class="home-main-heading">Оценивай проекты вместе с друзьями</h2>
+            <div class="home-marquee-viewport">
+                <div id="homeMarqueeTrack" class="home-marquee-track"></div>
+            </div>
         </div>
-        <div id="mainInviteStatus" class="invite-status"></div>
+
+        <!-- Отдельный блок с последовательностью действий -->
+        <div class="home-hero-section">
+            <div class="home-steps-row">
+                <div id="stepCreateHallCard" class="home-step-card">
+                    <div class="home-step-title">Создай зал</div>
+                    <div class="home-step-desc">Введи логин друга</div>
+                </div>
+                <div class="home-step-arrow">⟶</div>
+                <div id="stepRateTogetherCard" class="home-step-card">
+                    <div class="home-step-title">Оценивайте вместе</div>
+                    <div class="home-step-desc">Синхронно + приватно</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Если у пользователя уже есть залы, они отображаются блочками здесь -->
+        <div id="homeHallsBlock" class="home-halls-block" style="display: none;">
+            <div class="home-halls-heading">Ваши оценочные залы</div>
+            <div id="homeHallsGrid" class="home-halls-grid"></div>
+        </div>
+
+        <!-- 1. Состояние для неавторизованного пользователя на главной -->
+        <div id="guestStateBox" class="center-state-box" style="display: none;">
+            <p class="center-state-text">Авторизуйтесь, чтобы оценивать проекты вместе с друзьями</p>
+            <button id="guestAuthBtn" class="btn-state-action btn-guest-auth">Авторизация / Регистрация</button>
+        </div>
+
+        <!-- 2. Форма приглашения друга на главной для авторизованного пользователя -->
+        <div id="inviteStateBox" class="center-state-box" style="display: none;">
+            <p class="center-state-text">Предложите другу оценивать вместе</p>
+            <div class="invite-inline-form">
+                <input type="text" id="mainFriendNickInput" placeholder="Вводите ник друга (англ.)" maxlength="32" autocomplete="off" />
+                <button id="mainSendInviteBtn" class="btn-state-action">Пригласить</button>
+            </div>
+            <div id="mainInviteStatus" class="invite-status"></div>
+        </div>
     </div>
 
-    <!-- 3. Полный функционал оценочного зала -->
+    <!-- 3. Полный функционал открытого оценочного зала -->
     <div id="hallContentWrapper" class="hall-content-wrapper" style="display: none;">
         <button id="openFormBtn" class="btn-open-form">Добавить проект</button>
 
@@ -228,7 +317,6 @@
                     <input type="text" id="newTitle" placeholder="Название фильма" />
                     <input type="url" id="newPoster" placeholder="Ссылка на постер" />
                     <button id="confirmBtn" class="btn-confirm" title="Подтвердить добавление">✓</button>
-                    <button id="cancelFormBtn" class="btn-cancel-form" title="Отменить создание">✕</button>
                 </div>
                 
                 <div class="tags-form-group">
@@ -288,7 +376,7 @@
                     <label class="multi-option"><input type="checkbox" value="favorite"> Любимые</label>
                     <label class="multi-option"><input type="checkbox" value="only_aristo"> <span id="filterLabelUser1">Оценено</span></label>
                     <label class="multi-option"><input type="checkbox" value="only_fliri"> <span id="filterLabelUser2">Оценено</span></label>
-                    <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.2); margin: 6px 0;">
+                    <hr class="dropdown-divider">
                     <label class="multi-option"><input type="checkbox" value="Фильм"> Фильм</label>
                     <label class="multi-option"><input type="checkbox" value="Сериал"> Сериал</label>
                     <label class="multi-option"><input type="checkbox" value="Мультфильм"> Мультфильм</label>
@@ -296,7 +384,7 @@
                     <label class="multi-option"><input type="checkbox" value="Аниме"> Аниме</label>
                     <label class="multi-option"><input type="checkbox" value="Марвел"> Марвел</label>
                     <label class="multi-option"><input type="checkbox" value="Не марвел"> Не марвел</label>
-                    <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.2); margin: 6px 0;">
+                    <hr class="dropdown-divider">
                     <label class="multi-option"><input type="checkbox" value="Фантастика"> Фантастика</label>
                     <label class="multi-option"><input type="checkbox" value="Комедия"> Комедия</label>
                     <label class="multi-option"><input type="checkbox" value="Драма"> Драма</label>
@@ -329,6 +417,19 @@
 
     const defaultPoster = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22600%22%20height%3D%22300%22%20viewBox%3D%220%200%20600%20300%22%3E%3Crect%20fill%3D%22%232a2a2a%22%20width%3D%22600%22%20height%3D%22300%22%2F%3E%3Ctext%20fill%3D%22%23888888%22%20font-size%3D%2220%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%3EНет%20постера%3C%2Ftext%3E%3C%2Fsvg%3E';
 
+    const SHOWCASE_TITLES = [
+        'Достать ножи',
+        'Дэдпул',
+        'Одни из нас',
+        'Очень Странные Дела',
+        'Борат',
+        'Омерзительная восьмёрка',
+        'Американский пирог: Все в сборе',
+        'Джентльмены',
+        'Мир Юрского Периода',
+        'Сверхъестественное'
+    ];
+
     let allMoviesRaw = [];
     let allWatchlistRaw = [];
     let registeredUsers = {};
@@ -354,11 +455,70 @@
     let pendingScrollMovieId = null;
     let activeScrollAnimationId = null;
 
+    // --- УПРАВЛЕНИЕ ТЕМАМИ ОФОРМЛЕНИЯ ДЛЯ КАЖДОГО ЗАЛА ОТДЕЛЬНО ---
+    let currentTheme = 'standard';
+
+    function getHallTheme(hallId) {
+        if (!hallId) return 'standard';
+        const hallObj = allHalls.find(h => h.id === hallId);
+        if (hallObj && hallObj.theme) {
+            return hallObj.theme === 'pickme' ? 'pickme' : 'standard';
+        }
+        const saved = localStorage.getItem(`duorate_hall_theme_${hallId}`);
+        return saved === 'pickme' ? 'pickme' : 'standard';
+    }
+
+    async function setCurrentHallTheme(themeName) {
+        const hall = getCurrentHall();
+        if (!hall) return;
+        const normalized = themeName === 'pickme' ? 'pickme' : 'standard';
+        hall.theme = normalized;
+        localStorage.setItem(`duorate_hall_theme_${hall.id}`, normalized);
+        syncActivePageTheme();
+        renderHomeHallsList();
+        renderMoviesDOM();
+
+        try {
+            const [u1, u2] = sortPairAlphabetically(hall.users[0], hall.users[1]);
+            const canonicalHallTag = makeCanonicalHallTag(u1, u2);
+            await supabase.from('watchlist').upsert({
+                id: hall.id,
+                title: JSON.stringify({ users: [u1, u2], tag: canonicalHallTag, theme: normalized }),
+                priority: 'hall_room',
+                tags: [canonicalHallTag]
+            });
+        } catch (err) {
+            console.error('Ошибка сохранения темы зала:', err);
+        }
+    }
+
+    function syncActivePageTheme() {
+        if (!currentHallId) {
+            currentTheme = 'standard';
+            document.body.classList.remove('theme-pickme');
+        } else {
+            currentTheme = getHallTheme(currentHallId);
+            if (currentTheme === 'pickme') {
+                document.body.classList.add('theme-pickme');
+            } else {
+                document.body.classList.remove('theme-pickme');
+            }
+        }
+
+        document.querySelectorAll('.theme-option-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.theme === currentTheme);
+        });
+
+        const filterHeader = document.getElementById('filterHeader');
+        if (filterHeader && selectedFilterTags.length > 0) {
+            filterHeader.style.borderColor = currentTheme === 'pickme' ? '#ff69b4' : '#ffffff';
+        }
+    }
+
     // --- АВТОРИЗАЦИЯ, ВАЛИДАЦИЯ АНГЛИЙСКОГО ЯЗЫКА И СКРЫТЫЕ ТЕГИ ---
     let currentUser = localStorage.getItem('agregatoristo_current_user') || null;
     let authMode = 'login';
 
-    // Регулярные выражения для проверки английских символов (логин и пароль)
     const ENGLISH_LOGIN_REGEX = /^[A-Za-z0-9_.-]+$/;
     const ENGLISH_PASSWORD_REGEX = /^[\x21-\x7E]+$/;
 
@@ -370,7 +530,6 @@
         return String(str || '').replace(/[^\x21-\x7E]/g, '').slice(0, 32);
     }
 
-    // Проверка, является ли тег скрытым системным (__fav_..., __hall_..., hall_...)
     function isHiddenSystemTag(tag) {
         if (!tag) return false;
         const clean = String(tag).trim().replace(/^#+/, '');
@@ -410,7 +569,6 @@
         return `hall_${p1}__${p2}`;
     }
 
-    // Единый и неизменный тег зала, состоящий строго из ников обоих участников
     function makeCanonicalHallTag(u1, u2) {
         const [p1, p2] = sortPairAlphabetically(u1, u2);
         return `__hall_${p1}__${p2}`;
@@ -421,7 +579,6 @@
         return makeCanonicalHallTag(hall.users[0], hall.users[1]);
     }
 
-    // Проверяет, относится ли любой (даже старый) тег зала к данной паре участников
     function doesTagMatchHall(tag, hall) {
         if (!tag || !hall || !Array.isArray(hall.users) || hall.users.length < 2) return false;
         const [p1, p2] = sortPairAlphabetically(hall.users[0], hall.users[1]);
@@ -429,7 +586,6 @@
         const canonical = `__hall_${p1}__${p2}`;
         if (clean.toLowerCase() === canonical.toLowerCase()) return true;
 
-        // Поддержка ранее созданных записей вида __hall_hall_User1__User2 для автоматической миграции к единому тегу
         const stripped = clean.replace(/^(__hall_|hall_)+/i, '');
         const parts = stripped.split('__').map(s => s.trim()).filter(Boolean);
         if (parts.length === 2) {
@@ -475,13 +631,21 @@
         return null;
     }
 
-    function getMoviesForCurrentHall() {
-        const hall = getCurrentHall();
+    function getMoviesForHall(hall) {
         if (!hall) return [];
         return allMoviesRaw.filter(m => {
             const rawTags = m.rawTags || [];
             return rawTags.some(t => doesTagMatchHall(t, hall));
         });
+    }
+
+    function getMoviesForCurrentHall() {
+        return getMoviesForHall(getCurrentHall());
+    }
+
+    function getRatedMoviesCountForHall(hall) {
+        const movies = getMoviesForHall(hall);
+        return movies.filter(m => !isMovieUnrated(m)).length;
     }
 
     function getWatchlistForCurrentHall() {
@@ -493,7 +657,256 @@
         });
     }
 
-    // Нормализует теги залов в БД, чтобы у каждого проекта и элемента списка был ровно 1 тег вида __hall_User1__User2 без дублей и вариаций
+    // --- БЕГУЩАЯ СТРОКА ПРОЕКТОВ ИЗ ЗАЛА ARISTO И FLIRI НА ГЛАВНОЙ ---
+    function normalizeShowcaseTitle(str) {
+        return String(str || '')
+            .toLowerCase()
+            .replace(/ё/g, 'е')
+            .replace(/[^a-zа-я0-9]/gi, '');
+    }
+
+    function getShowcaseMoviesFromAristoFliri() {
+        const aristoFliriHall = {
+            id: 'hall_Aristo__Fliri',
+            users: ['Aristo', 'Fliri'],
+            tag: '__hall_Aristo__Fliri'
+        };
+
+        const hallMovies = allMoviesRaw.filter(m => {
+            const rawTags = m.rawTags || [];
+            if (rawTags.some(t => doesTagMatchHall(t, aristoFliriHall))) return true;
+            return !rawTags.some(t => isHallSystemTag(t));
+        });
+
+        const selected = [];
+        SHOWCASE_TITLES.forEach(targetTitle => {
+            const normTarget = normalizeShowcaseTitle(targetTitle);
+            let found = hallMovies.find(m => normalizeShowcaseTitle(m.title) === normTarget);
+            if (!found) {
+                found = allMoviesRaw.find(m => normalizeShowcaseTitle(m.title) === normTarget);
+            }
+            if (found) {
+                selected.push(found);
+            } else {
+                selected.push({
+                    id: `showcase_${normTarget}`,
+                    title: targetTitle,
+                    poster: '',
+                    ratingAristo: '',
+                    ratingFliri: '',
+                    tags: [],
+                    rawTags: [],
+                    isFavorite: false,
+                    seasons: []
+                });
+            }
+        });
+
+        return selected;
+    }
+
+    function createShowcaseCardElement(movie) {
+        const isSeries = isSeriesLike(movie);
+        const seriesAverages = getSeriesAverages(movie);
+        const rawCardAristo = isSeries ? seriesAverages.aristo : movie.ratingAristo;
+        const rawCardFliri = isSeries ? seriesAverages.fliri : movie.ratingFliri;
+
+        const isFav = Boolean(
+            movie.isFavorite ||
+            (movie.rawTags && movie.rawTags.some(t => isFavSystemTag(t)))
+        );
+
+        const borderClass = getBorderClass(rawCardAristo, rawCardFliri, 'standard');
+        const scoreColor = isFav ? '#eab308' : getRatingColor(rawCardAristo, rawCardFliri, 'standard');
+        const avgScore = getAverageScore(rawCardAristo, rawCardFliri);
+        const avgText = avgScore !== null ? `${avgScore}/10` : '—/10';
+
+        const displayPoster = (movie.poster && movie.poster.trim() !== '') ? movie.poster.trim() : defaultPoster;
+
+        const cleanDisplayTags = (movie.tags || [])
+            .map(t => String(t).trim().replace(/^#+/, ''))
+            .filter(t => t && !isHiddenSystemTag(t));
+
+        const tagsHtml = cleanDisplayTags.length > 0
+            ? `<div class="movie-tags">${cleanDisplayTags.map(t => `<span class="tag-item">#${t}</span>`).join('')}</div>`
+            : '';
+
+        const favStarHtml = isFav
+            ? `<div class="btn-card-corner btn-favorite active showcase-corner-star" style="position: absolute; top: 12px; right: 12px; z-index: 20; pointer-events: none;">★</div>`
+            : '';
+
+        const card = document.createElement('div');
+        card.className = `movie-card showcase-marquee-card ${borderClass} ${isFav ? 'favorite-card' : ''}`;
+
+        card.innerHTML = `
+            <div class="favorite-border-shell"></div>
+            <div class="movie-card-clip">
+                <img class="movie-bg-blur" src="${displayPoster}" alt="" onerror="this.src='${defaultPoster}'">
+                <div class="blur-overlay"></div>
+                <div class="movie-poster-stage">
+                    <img class="movie-fg-poster" src="${displayPoster}" alt="${movie.title}" onerror="this.src='${defaultPoster}'">
+                </div>
+            </div>
+            ${favStarHtml}
+            <div class="movie-card-content">
+                <div class="movie-left-content">
+                    <div class="movie-info-top">
+                        <div class="movie-title">${movie.title}</div>
+                        <div class="movie-avg-rating" style="color: ${scoreColor}; border-color: ${scoreColor};">${avgText}</div>
+                    </div>
+                    <div class="movie-bottom-group">
+                        ${tagsHtml}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        bindPosterEdgeTransparency(card);
+        return card;
+    }
+
+    function renderHomeShowcaseMarquee() {
+        const track = document.getElementById('homeMarqueeTrack');
+        if (!track) return;
+        track.innerHTML = '';
+
+        const showcaseMovies = getShowcaseMoviesFromAristoFliri();
+        const doubledMovies = [...showcaseMovies, ...showcaseMovies];
+
+        doubledMovies.forEach(movie => {
+            const cardEl = createShowcaseCardElement(movie);
+            track.appendChild(cardEl);
+        });
+    }
+
+    // --- НАВИГАЦИЯ МЕЖДУ ГЛАВНОЙ СТРАНИЦЕЙ И ОТКРЫТЫМ ЗАЛОМ ---
+    function openHallById(hallId) {
+        if (!currentUser) return;
+        const targetHall = allHalls.find(h => h.id === hallId && isUserInHall(h, currentUser));
+        if (!targetHall) return;
+
+        currentHallId = targetHall.id;
+        editingMovieId = null;
+        addingSeasonMovieId = null;
+        editingSeasonInfo = null;
+        updateAuthUI();
+        renderWatchlist();
+        renderMoviesAnimated();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goToHomePage() {
+        if (currentHallId === null) return;
+        currentHallId = null;
+        editingMovieId = null;
+        addingSeasonMovieId = null;
+        editingSeasonInfo = null;
+        resetAddForm();
+        updateAuthUI();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openCreateHallModalAction() {
+        if (!currentUser) {
+            openAuthModal();
+            return;
+        }
+        const modalFriendNickInput = document.getElementById('modalFriendNickInput');
+        const modalInviteStatus = document.getElementById('modalInviteStatus');
+        const newHallModal = document.getElementById('newHallModal');
+        if (modalFriendNickInput) modalFriendNickInput.value = '';
+        if (modalInviteStatus) {
+            modalInviteStatus.textContent = '';
+            modalInviteStatus.className = 'invite-status';
+        }
+        if (newHallModal) newHallModal.classList.add('show');
+        if (modalFriendNickInput) modalFriendNickInput.focus();
+    }
+
+    document.getElementById('siteLogoBtn').addEventListener('click', () => {
+        goToHomePage();
+    });
+
+    // Действия по клику на карточки шагов на главной странице
+    document.getElementById('stepCreateHallCard').addEventListener('click', () => {
+        openCreateHallModalAction();
+    });
+
+    document.getElementById('stepRateTogetherCard').addEventListener('click', () => {
+        if (!currentUser) {
+            openAuthModal();
+            return;
+        }
+        const userHalls = getUserHalls();
+        if (userHalls.length === 0) {
+            openCreateHallModalAction();
+            return;
+        }
+
+        let bestHall = userHalls[0];
+        let maxRatedCount = -1;
+        let maxTotalCount = -1;
+
+        userHalls.forEach(hall => {
+            const ratedCount = getRatedMoviesCountForHall(hall);
+            const totalCount = getMoviesForHall(hall).length;
+            if (ratedCount > maxRatedCount || (ratedCount === maxRatedCount && totalCount > maxTotalCount)) {
+                maxRatedCount = ratedCount;
+                maxTotalCount = totalCount;
+                bestHall = hall;
+            }
+        });
+
+        if (bestHall) {
+            openHallById(bestHall.id);
+        }
+    });
+
+    // Рендер карточек существующих залов пользователя на главной странице
+    function renderHomeHallsList() {
+        const homeHallsBlock = document.getElementById('homeHallsBlock');
+        const homeHallsGrid = document.getElementById('homeHallsGrid');
+        if (!homeHallsBlock || !homeHallsGrid) return;
+
+        if (!currentUser) {
+            homeHallsBlock.style.display = 'none';
+            homeHallsGrid.innerHTML = '';
+            return;
+        }
+
+        const userHalls = getUserHalls();
+        if (userHalls.length === 0) {
+            homeHallsBlock.style.display = 'none';
+            homeHallsGrid.innerHTML = '';
+            return;
+        }
+
+        homeHallsBlock.style.display = 'flex';
+        homeHallsGrid.innerHTML = '';
+
+        userHalls.forEach(hall => {
+            const [u1, u2] = sortPairAlphabetically(hall.users[0], hall.users[1]);
+            const friend = u1.toLowerCase() === currentUser.toLowerCase() ? u2 : u1;
+            const moviesCount = getMoviesForHall(hall).length;
+            const hallTheme = getHallTheme(hall.id);
+
+            const card = document.createElement('div');
+            card.className = `home-hall-card ${hallTheme === 'pickme' ? 'hall-theme-pickme' : 'hall-theme-standard'}`;
+            card.innerHTML = `
+                <div class="home-hall-card-info">
+                    <div class="home-hall-card-title">Зал с ${friend}</div>
+                    <div class="home-hall-card-sub">Проектов в зале: ${moviesCount}</div>
+                </div>
+            `;
+
+            card.addEventListener('click', () => {
+                openHallById(hall.id);
+            });
+
+            homeHallsGrid.appendChild(card);
+        });
+    }
+
     async function normalizeAllHallTagsInDb() {
         for (const m of allMoviesRaw) {
             const rawTags = m.rawTags || [];
@@ -599,18 +1012,9 @@
             const btn = document.createElement('button');
             btn.className = `btn-hall-switch ${hall.id === currentHallId ? 'active' : ''}`;
             btn.textContent = `Зал с ${friend}`;
-            btn.title = `Переключиться на зал с ${friend}`;
+            btn.title = `Открыть зал с ${friend}`;
             btn.onclick = () => {
-                if (currentHallId !== hall.id) {
-                    currentHallId = hall.id;
-                    localStorage.setItem(`agregatoristo_active_hall_${currentUser}`, currentHallId);
-                    editingMovieId = null;
-                    addingSeasonMovieId = null;
-                    editingSeasonInfo = null;
-                    updateAuthUI();
-                    renderWatchlist();
-                    renderMoviesAnimated();
-                }
+                openHallById(hall.id);
             };
 
             const delBtn = document.createElement('button');
@@ -673,15 +1077,10 @@
         allHalls = allHalls.filter(h => h.id !== hallToDelete.id);
         allMoviesRaw = allMoviesRaw.filter(m => !moviesToDelete.some(d => d.id === m.id));
         allWatchlistRaw = allWatchlistRaw.filter(w => !watchToDelete.some(d => d.id === w.id));
+        localStorage.removeItem(`duorate_hall_theme_${hallToDelete.id}`);
 
         if (currentHallId === hallToDelete.id) {
-            const remaining = getUserHalls();
-            currentHallId = remaining.length > 0 ? remaining[0].id : null;
-            if (currentHallId) {
-                localStorage.setItem(`agregatoristo_active_hall_${currentUser}`, currentHallId);
-            } else {
-                localStorage.removeItem(`agregatoristo_active_hall_${currentUser}`);
-            }
+            currentHallId = null;
         }
 
         updateAuthUI();
@@ -746,13 +1145,12 @@
         }
 
         try {
-            // 1. Удаляем запись аккаунта из БД
             await supabase.from('watchlist').delete().eq('id', `user_${userToDelete}`);
 
-            // 2. Удаляем все залы пользователя и связанные с ними проекты
             const userHalls = allHalls.filter(h => isUserInHall(h, userToDelete));
             for (const hall of userHalls) {
                 await supabase.from('watchlist').delete().eq('id', hall.id);
+                localStorage.removeItem(`duorate_hall_theme_${hall.id}`);
 
                 const hallMovies = allMoviesRaw.filter(m =>
                     (m.rawTags || []).some(t => doesTagMatchHall(t, hall))
@@ -769,7 +1167,6 @@
                 }
             }
 
-            // 3. Удаляем приглашения и уведомления пользователя
             const userInvites = allInvites.filter(
                 inv => inv.from.toLowerCase() === userToDelete.toLowerCase() || inv.to.toLowerCase() === userToDelete.toLowerCase()
             );
@@ -801,7 +1198,6 @@
         resetDeleteProfileModalState();
         deleteProfileModal.classList.remove('show');
 
-        // Перезагружаем актуальное состояние из БД
         try {
             const { data: moviesData } = await supabase.from('movies').select('*');
             const { data: watchlistData } = await supabase.from('watchlist').select('*');
@@ -947,11 +1343,7 @@
             };
             item.onclick = () => {
                 if (notif.hallId && allHalls.some(h => h.id === notif.hallId)) {
-                    currentHallId = notif.hallId;
-                    localStorage.setItem(`agregatoristo_active_hall_${currentUser}`, currentHallId);
-                    updateAuthUI();
-                    renderWatchlist();
-                    renderMoviesAnimated();
+                    openHallById(notif.hallId);
                 }
             };
             list.appendChild(item);
@@ -959,31 +1351,45 @@
     }
 
     function updateAuthUI() {
+        const homePageWrapper = document.getElementById('homePageWrapper');
         const guestStateBox = document.getElementById('guestStateBox');
         const inviteStateBox = document.getElementById('inviteStateBox');
         const hallContentWrapper = document.getElementById('hallContentWrapper');
         const watchlistSidebar = document.getElementById('watchlistSidebar');
         const statsSidebar = document.getElementById('statsSidebar');
         const statsBlock = document.getElementById('statsBlock');
+        const hallsSection = document.getElementById('hallsSection');
         const siteSubtitle = document.getElementById('siteSubtitle');
+        const topRightThemes = document.getElementById('topRightThemes');
+        const themeDropdown = document.getElementById('themeDropdown');
 
         const userDisplay = document.getElementById('authUserDisplay');
         const openAuthBtn = document.getElementById('openAuthBtn');
         const authActionsRow = document.getElementById('authActionsRow');
         const openFormBtn = document.getElementById('openFormBtn');
 
+        // Если пользователь не авторизован — показываем главную страницу в режиме гостя
         if (!currentUser) {
+            currentHallId = null;
+            syncActivePageTheme();
+            if (topRightThemes) topRightThemes.style.display = 'none';
+            if (themeDropdown) themeDropdown.classList.remove('show');
+            homePageWrapper.style.display = 'flex';
             guestStateBox.style.display = 'flex';
             inviteStateBox.style.display = 'none';
             hallContentWrapper.style.display = 'none';
             watchlistSidebar.style.display = 'none';
             statsSidebar.style.display = 'none';
+            if (hallsSection) hallsSection.style.display = 'none';
             if (authActionsRow) authActionsRow.style.display = 'none';
             if (siteSubtitle) siteSubtitle.style.display = 'block';
+            renderHomeHallsList();
+            renderHomeShowcaseMarquee();
             renderTopNotifications();
             return;
         }
 
+        // Пользователь авторизован
         guestStateBox.style.display = 'none';
         statsSidebar.style.display = 'flex';
         userDisplay.textContent = currentUser;
@@ -991,33 +1397,41 @@
         if (authActionsRow) authActionsRow.style.display = 'flex';
 
         const userHalls = getUserHalls();
-        const savedHallId = localStorage.getItem(`agregatoristo_active_hall_${currentUser}`);
-
-        if (userHalls.length > 0) {
-            if (!currentHallId || !userHalls.some(h => h.id === currentHallId)) {
-                const foundSaved = userHalls.find(h => h.id === savedHallId);
-                currentHallId = foundSaved ? foundSaved.id : userHalls[0].id;
-                localStorage.setItem(`agregatoristo_active_hall_${currentUser}`, currentHallId);
-            }
-        } else {
+        if (currentHallId && !userHalls.some(h => h.id === currentHallId)) {
             currentHallId = null;
         }
 
+        syncActivePageTheme();
         renderHallsSidebar();
+        renderHomeHallsList();
+        renderHomeShowcaseMarquee();
         renderTopNotifications();
 
         if (!currentHallId) {
+            // Мы находимся на ГЛАВНОЙ СТРАНИЦЕ:
+            // - Тема всегда стандартная, кнопки тем нет
+            // - В правой панели отображается только профиль (список залов скрыт)
+            if (topRightThemes) topRightThemes.style.display = 'none';
+            if (themeDropdown) themeDropdown.classList.remove('show');
+            homePageWrapper.style.display = 'flex';
             inviteStateBox.style.display = 'flex';
             hallContentWrapper.style.display = 'none';
             watchlistSidebar.style.display = 'none';
             statsBlock.style.display = 'none';
+            if (hallsSection) hallsSection.style.display = 'none';
             if (siteSubtitle) siteSubtitle.style.display = 'block';
         } else {
+            // Мы находимся ВНУТРИ ОТКРЫТОГО ЗАЛА:
+            // - Показываем кнопку тем для этого зала
+            // - В правой панели под профилем отображается список «Оценочные залы» для быстрого перехода
+            if (topRightThemes) topRightThemes.style.display = 'block';
+            homePageWrapper.style.display = 'none';
             inviteStateBox.style.display = 'none';
             hallContentWrapper.style.display = 'flex';
             watchlistSidebar.style.display = 'flex';
             statsBlock.style.display = 'flex';
             openFormBtn.style.display = 'flex';
+            if (hallsSection) hallsSection.style.display = 'flex';
             if (siteSubtitle) siteSubtitle.style.display = 'block';
             updateHallDynamicLabels();
         }
@@ -1053,12 +1467,8 @@
         const hallId = makeHallId(currentUser, matchedUser);
         const existingHall = allHalls.find(h => h.id === hallId);
         if (existingHall) {
-            currentHallId = hallId;
-            localStorage.setItem(`agregatoristo_active_hall_${currentUser}`, currentHallId);
             document.getElementById('newHallModal').classList.remove('show');
-            updateAuthUI();
-            renderWatchlist();
-            renderMoviesAnimated();
+            openHallById(hallId);
             return;
         }
 
@@ -1092,7 +1502,7 @@
 
         const hallRecord = {
             id: hallId,
-            title: JSON.stringify({ users: [u1, u2], tag: canonicalHallTag }),
+            title: JSON.stringify({ users: [u1, u2], tag: canonicalHallTag, theme: 'standard' }),
             priority: 'hall_room',
             tags: [canonicalHallTag]
         };
@@ -1106,16 +1516,11 @@
         }
 
         if (!allHalls.some(h => h.id === hallId)) {
-            allHalls.push({ id: hallId, users: [u1, u2], tag: canonicalHallTag });
+            allHalls.push({ id: hallId, users: [u1, u2], tag: canonicalHallTag, theme: 'standard' });
         }
         allInvites = allInvites.filter(i => i.id !== invite.id);
 
-        currentHallId = hallId;
-        localStorage.setItem(`agregatoristo_active_hall_${currentUser}`, currentHallId);
-
-        updateAuthUI();
-        renderWatchlist();
-        renderMoviesAnimated();
+        openHallById(hallId);
     }
 
     async function declineInvite(invite) {
@@ -1285,11 +1690,15 @@
 
     function isSeriesLike(movie) {
         if (!movie || !movie.tags) return false;
-        return movie.tags.includes('Сериал') || movie.tags.includes('Аниме') || movie.tags.includes('Мультсериал');
+        if (movie.tags.includes('Сериал') || movie.tags.includes('Мультсериал')) return true;
+        if (movie.tags.includes('Аниме') && movie.tags.includes('Фильм')) return false;
+        return movie.tags.includes('Аниме');
     }
 
     function getSeriesAverages(movie) {
-        if (!movie.seasons || movie.seasons.length === 0) return { aristo: movie.ratingAristo, fliri: movie.ratingFliri };
+        if (!isSeriesLike(movie) || !movie.seasons || movie.seasons.length === 0) {
+            return { aristo: movie.ratingAristo, fliri: movie.ratingFliri };
+        }
         
         let aSum = 0, aCount = 0, fSum = 0, fCount = 0;
         movie.seasons.forEach(s => {
@@ -1303,6 +1712,13 @@
             aristo: aCount > 0 ? (aSum / aCount).toString() : '',
             fliri: fCount > 0 ? (fSum / fCount).toString() : ''
         };
+    }
+
+    function isMovieUnrated(movie) {
+        const avgs = getSeriesAverages(movie);
+        const a = parseFloat(avgs.aristo);
+        const f = parseFloat(avgs.fliri);
+        return isNaN(a) && isNaN(f);
     }
 
     const priorityColors = { highest: '#a855f7', high: '#3b82f6', normal: '#22c55e', low: '#ef4444' };
@@ -1327,8 +1743,11 @@
                         const [u1, u2] = sortPairAlphabetically(parsed.users[0], parsed.users[1]);
                         const canonicalHallId = makeHallId(u1, u2);
                         const canonicalTag = makeCanonicalHallTag(u1, u2);
+                        const savedLocalTheme = localStorage.getItem(`duorate_hall_theme_${canonicalHallId}`);
+                        const hallTheme = parsed.theme === 'pickme' || (!parsed.theme && savedLocalTheme === 'pickme') ? 'pickme' : 'standard';
+                        localStorage.setItem(`duorate_hall_theme_${canonicalHallId}`, hallTheme);
                         if (!dbHalls.some(h => h.id === canonicalHallId)) {
-                            dbHalls.push({ id: canonicalHallId, users: [u1, u2], tag: canonicalTag });
+                            dbHalls.push({ id: canonicalHallId, users: [u1, u2], tag: canonicalTag, theme: hallTheme });
                         }
                     }
                 } catch {}
@@ -1384,7 +1803,6 @@
             if (watchlistData) parseWatchlistTableData(watchlistData);
             if (moviesData) allMoviesRaw = moviesData.map(mapFromDbMovie);
 
-            // Если сохранённый в браузере пользователь был удалён из БД, выходим из аккаунта
             if (currentUser && !findExistingUsername(currentUser)) {
                 currentUser = null;
                 currentHallId = null;
@@ -1402,6 +1820,8 @@
                     const { data } = await supabase.from('movies').select('*');
                     if (data) {
                         allMoviesRaw = data.map(mapFromDbMovie);
+                        renderHomeHallsList();
+                        renderHomeShowcaseMarquee();
                         renderMoviesAnimated();
                     }
                 })
@@ -1420,6 +1840,8 @@
                         renderWatchlist();
                         if (newHallCount !== prevHallCount) {
                             renderMoviesAnimated();
+                        } else if (currentHallId) {
+                            renderMoviesDOM();
                         }
                     }
                 })
@@ -1453,7 +1875,6 @@
         const hall = getCurrentHall();
         if (!canEditSite() || !hall) return;
 
-        // Строго один канонический тег зала из ников обоих участников (без вариаций)
         const canonicalHallTag = getCanonicalHallTagForHall(hall);
 
         const favTags = Array.from(new Set(
@@ -1537,7 +1958,7 @@
         });
 
         if (filteredWatchlist.length === 0) {
-            container.innerHTML = '<div style="color: #666; font-size: 0.8rem; text-align: center; padding: 10px;">Список пуст</div>';
+            container.innerHTML = '<div class="watchlist-empty-msg">Список пуст</div>';
             return;
         }
 
@@ -1613,7 +2034,6 @@
             input.value = '';
             currentWatchTags = [];
             renderWatchFormTags();
-            // Разворачиваем список при добавлении нового элемента
             document.getElementById('watchlistItems').classList.remove('collapsed');
             document.getElementById('watchlistArrow').classList.remove('rotated');
         }
@@ -1644,9 +2064,10 @@
         return avgStr !== null ? parseFloat(avgStr) : -1;
     }
 
-    function getRatingColor(aristo, fliri) {
+    function getRatingColor(aristo, fliri, themeOverride = null) {
+        const activeTheme = themeOverride || currentTheme;
         const avg = getAverageScore(aristo, fliri);
-        if (avg === null) return '#ffffff';
+        if (avg === null) return activeTheme === 'pickme' ? '#d61f69' : '#ffffff';
         const val = parseFloat(avg);
         if (val >= 11) return '#a855f7';
         if (val >= 10) return '#3b82f6';
@@ -1654,7 +2075,7 @@
         if (val >= 7) return '#eab308';
         if (val >= 5.5) return '#f97316';
         if (val >= 0) return '#ef4444';
-        return '#ffffff';
+        return activeTheme === 'pickme' ? '#d61f69' : '#ffffff';
     }
 
     function getBorderClass(aristo, fliri) {
@@ -1948,19 +2369,34 @@
             return { aristo: effAristo, fliri: effFliri };
         };
 
-        if (sortOrder === 'desc' || sortOrder === 'asc') {
-            filteredMovies.sort((a, b) => {
+        filteredMovies.sort((a, b) => {
+            const aUnrated = isMovieUnrated(a);
+            const bUnrated = isMovieUnrated(b);
+            if (aUnrated !== bUnrated) return aUnrated ? -1 : 1;
+
+            const aFav = isMovieFavoriteForUser(a);
+            const bFav = isMovieFavoriteForUser(b);
+            if (aFav !== bFav) return aFav ? -1 : 1;
+
+            if (aUnrated && bUnrated) {
+                const idDiff = (parseInt(b.id, 10) || 0) - (parseInt(a.id, 10) || 0);
+                if (idDiff !== 0) return idDiff;
+                return a.title.localeCompare(b.title, 'ru', { sensitivity: 'base' });
+            }
+
+            if (sortOrder === 'desc' || sortOrder === 'asc') {
                 const aAvg = getEffectiveRatingsForSort(a);
                 const bAvg = getEffectiveRatingsForSort(b);
                 const diff = getAverageScoreNum(bAvg.aristo, bAvg.fliri) - getAverageScoreNum(aAvg.aristo, aAvg.fliri);
                 if (diff !== 0) return sortOrder === 'desc' ? diff : -diff;
                 return a.title.localeCompare(b.title, 'ru', { sensitivity: 'base' });
-            });
-        } else if (sortOrder === 'asc_alpha') {
-            filteredMovies.sort((a, b) => a.title.localeCompare(b.title, 'ru', { sensitivity: 'base' }));
-        } else if (sortOrder === 'desc_alpha') {
-            filteredMovies.sort((a, b) => b.title.localeCompare(a.title, 'ru', { sensitivity: 'base' }));
-        }
+            } else if (sortOrder === 'asc_alpha') {
+                return a.title.localeCompare(b.title, 'ru', { sensitivity: 'base' });
+            } else if (sortOrder === 'desc_alpha') {
+                return b.title.localeCompare(a.title, 'ru', { sensitivity: 'base' });
+            }
+            return 0;
+        });
 
         if (filteredMovies.length === 0) {
             container.innerHTML = '<div class="no-results">Фильмы не найдены</div>';
@@ -1985,7 +2421,7 @@
                 card.dataset.id = movie.id;
                 card.innerHTML = `
                     <div class="edit-mode-container">
-                        <div style="font-weight: bold; margin-bottom: 10px; color: #fff;">Редактирование проекта</div>
+                        <div class="edit-mode-header-title">Редактирование проекта</div>
                         <div class="edit-inputs-group">
                             <input type="text" class="edit-title-input" value="${movie.title}" placeholder="Название фильма" />
                             <input type="url" class="edit-poster-input" value="${movie.poster || ''}" placeholder="Ссылка на постер" />
@@ -2067,7 +2503,7 @@
                 card.dataset.id = movie.id;
                 card.innerHTML = `
                     <div class="edit-mode-container">
-                        <div style="font-weight: bold; margin-bottom: 10px; color: #fff;">Редактирование сезона: ${movie.title}</div>
+                        <div class="edit-mode-header-title">Редактирование сезона: ${movie.title}</div>
                         <div class="edit-inputs-group">
                             <input type="text" class="edit-season-num" value="${season.seasonNumber}" placeholder="Номер сезона" />
                             <input type="url" class="edit-season-poster" value="${season.poster || ''}" placeholder="Ссылка на постер сезона" />
@@ -2106,7 +2542,7 @@
                 card.dataset.id = movie.id;
                 card.innerHTML = `
                     <div class="edit-mode-container">
-                        <div style="margin-bottom: 10px; font-weight: bold; color: #fff;">Добавить сезон к: ${movie.title}</div>
+                        <div class="edit-mode-header-title">Добавить сезон к: ${movie.title}</div>
                         <div class="edit-inputs-group">
                             <input type="text" class="add-season-num" placeholder="Номер сезона (например: 1)" />
                             <input type="url" class="add-season-poster" placeholder="Ссылка на постер сезона" />
@@ -2168,7 +2604,6 @@
             const avgScore = getAverageScore(effectiveDisplayAristo, effectiveDisplayFliri);
             const avgText = avgScore !== null ? `${avgScore}/10` : '—/10';
 
-            // Отображаем исключительно видимые пользовательские теги (скрывая все __fav_ и __hall_)
             const cleanDisplayTags = (movie.tags || [])
                 .map(t => String(t).trim().replace(/^#+/, ''))
                 .filter(t => t && !isHiddenSystemTag(t));
@@ -2208,7 +2643,7 @@
                     ${aristoRowHtml}
                     ${fliriRowHtml}
                 </div>
-            ` : `<div style="text-align: center; color: rgba(255,255,255,0.5); font-size: 0.85rem; margin: 10px 0;">Оценки ставятся отдельным сезонам</div>`;
+            ` : `<div class="series-season-hint">Оценки ставятся отдельным сезонам</div>`;
 
             const card = document.createElement('div');
             card.className = `movie-card ${borderClass} ${isFav ? 'favorite-card' : ''}`;
@@ -2323,7 +2758,6 @@
     const mainFriendNickInput = document.getElementById('mainFriendNickInput');
     const modalFriendNickInput = document.getElementById('modalFriendNickInput');
 
-    // Разрешаем ввод логина и пароля только на английском языке
     authLoginInput.addEventListener('input', () => {
         const cleaned = sanitizeEnglishLoginInput(authLoginInput.value);
         if (authLoginInput.value !== cleaned) {
@@ -2440,7 +2874,6 @@
             return;
         }
 
-        // Синхронизируем список аккаунтов напрямую с базой данных
         try {
             const { data } = await supabase.from('watchlist').select('*');
             if (data) parseWatchlistTableData(data);
@@ -2474,6 +2907,7 @@
 
             registeredUsers[login] = password;
             currentUser = login;
+            currentHallId = null;
             localStorage.setItem('agregatoristo_current_user', login);
             authModal.classList.remove('show');
             document.getElementById('mainInviteStatus').textContent = '';
@@ -2487,6 +2921,7 @@
                 return;
             }
             currentUser = actualLogin;
+            currentHallId = null;
             localStorage.setItem('agregatoristo_current_user', actualLogin);
             authModal.classList.remove('show');
             document.getElementById('mainInviteStatus').textContent = '';
@@ -2496,12 +2931,28 @@
         }
     });
 
-    // События кнопки уведомлений в правом верхнем углу
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const themeDropdown = document.getElementById('themeDropdown');
     const notifToggleBtn = document.getElementById('notifToggleBtn');
     const notifDropdown = document.getElementById('notifDropdown');
 
+    themeToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        notifDropdown.classList.remove('show');
+        themeDropdown.classList.toggle('show');
+    });
+
+    document.querySelectorAll('.theme-option-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            setCurrentHallTheme(btn.dataset.theme);
+            themeDropdown.classList.remove('show');
+        });
+    });
+
     notifToggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        themeDropdown.classList.remove('show');
         notifDropdown.classList.toggle('show');
     });
 
@@ -2510,7 +2961,6 @@
         clearAllUserNotifications();
     });
 
-    // События модального окна удаления зала
     const deleteHallModal = document.getElementById('deleteHallModal');
     document.getElementById('closeDeleteHallModal').addEventListener('click', () => {
         pendingDeleteHall = null;
@@ -2522,7 +2972,6 @@
     });
     document.getElementById('confirmDeleteHallBtn').addEventListener('click', confirmDeleteHall);
 
-    // События приглашения друга с главного экрана и из модального окна "Новый зал"
     const mainInviteStatus = document.getElementById('mainInviteStatus');
     document.getElementById('mainSendInviteBtn').addEventListener('click', () => {
         sendHallInvite(mainFriendNickInput.value, mainInviteStatus, mainFriendNickInput);
@@ -2535,11 +2984,7 @@
     const modalInviteStatus = document.getElementById('modalInviteStatus');
 
     document.getElementById('openNewHallModalBtn').addEventListener('click', () => {
-        modalFriendNickInput.value = '';
-        modalInviteStatus.textContent = '';
-        modalInviteStatus.className = 'invite-status';
-        newHallModal.classList.add('show');
-        modalFriendNickInput.focus();
+        openCreateHallModalAction();
     });
 
     document.getElementById('closeNewHallModal').addEventListener('click', () => {
@@ -2570,6 +3015,9 @@
         if (!e.target.closest('#topRightNotifications')) {
             notifDropdown.classList.remove('show');
         }
+        if (!e.target.closest('#topRightThemes')) {
+            themeDropdown.classList.remove('show');
+        }
     });
 
     filterOptions.addEventListener('change', (e) => {
@@ -2582,10 +3030,10 @@
             
             if (selectedFilterTags.length > 0) {
                 filterHeader.textContent = `Теги (${selectedFilterTags.length})`;
-                filterHeader.style.borderColor = '#ffffff';
+                filterHeader.style.borderColor = currentTheme === 'pickme' ? '#ff69b4' : '#ffffff';
             } else {
                 filterHeader.textContent = 'Теги';
-                filterHeader.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                filterHeader.style.borderColor = '';
             }
             
             renderMoviesAnimated();
@@ -2649,8 +3097,6 @@
         renderMoviesAnimated();
     };
 
-    document.getElementById('cancelFormBtn').onclick = resetAddForm;
-
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             authModal.classList.remove('show');
@@ -2659,6 +3105,7 @@
             deleteProfileModal.classList.remove('show');
             resetDeleteProfileModalState();
             notifDropdown.classList.remove('show');
+            themeDropdown.classList.remove('show');
             closeAllDropdowns();
             if (addFormContainer.style.display === 'block') resetAddForm();
             if (editingMovieId !== null) {
