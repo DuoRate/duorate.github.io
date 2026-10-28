@@ -417,6 +417,10 @@
     const SUPABASE_URL = 'https://qpaxvnldkcaffbqhwiwj.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwYXh2bmxka2NhZmZicWh3aXdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5MjQ1NzUsImV4cCI6MjEwMzUwMDU3NX0.L-VDWW98Vi2G1oAlLRYTEq13v12LCILGgGWma9WSIOI';
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    // --- НАСТРОЙКИ TMDB (БАЗА ДАННЫХ LETTERBOXD) ---
+    const TMDB_API_KEY = 'e68904a99045331d9633fa7145ffe29c'; // <-- Вставьте сюда API Key (v3 auth)
+    let tmdbDebounceTimer = null;
+    let tmdbSearchAbortController = null;
 
     const defaultPoster = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22600%22%20height%3D%22300%22%20viewBox%3D%220%200%20600%20300%22%3E%3Crect%20fill%3D%22%232a2a2a%22%20width%3D%22600%22%20height%3D%22300%22%2F%3E%3Ctext%20fill%3D%22%23888888%22%20font-size%3D%2220%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%3EНет%20постера%3C%2Ftext%3E%3C%2Fsvg%3E';
 
@@ -737,45 +741,189 @@
         return results.slice(0, 10);
     }
 
+// Сопоставление ID жанров TMDB и стран с тегами вашего сайта
+    function mapTmdbToSiteTags(item, details = null) {
+        const tags = new Set();
+        const mediaType = item.media_type || (details && details.number_of_seasons ? 'tv' : 'movie');
+
+        // Собираем ID жанров из поиска или из детального запроса
+        const genreIds = item.genre_ids || (details && details.genres ? details.genres.map(g => g.id) : []);
+        const originCountries = item.origin_country || (details && details.origin_country) || [];
+        const originalLang = item.original_language || (details && details.original_language) || '';
+
+        const isAnimation = genreIds.includes(16);
+        const isAnime = isAnimation && (originCountries.includes('JP') || originalLang === 'ja');
+
+        // 1. Определяем формат проекта
+        if (isAnime) {
+            tags.add('Аниме');
+            if (mediaType === 'movie') tags.add('Фильм');
+        } else if (isAnimation) {
+            if (mediaType === 'tv') tags.add('Мультсериал');
+            else tags.add('Мультфильм');
+        } else {
+            if (mediaType === 'tv') tags.add('Сериал');
+            else tags.add('Фильм');
+        }
+
+        // 2. Сопоставляем жанры с вашими тегами
+        const genreMap = {
+            878: 'Фантастика',   // Sci-Fi (Фильмы)
+            10765: 'Фантастика', // Sci-Fi & Fantasy (Сериалы)
+            35: 'Комедия',
+            18: 'Драма',
+            28: 'Экшен',         // Action (Фильмы)
+            10759: 'Экшен',      // Action & Adventure (Сериалы)
+            27: 'Хоррор',
+            14: 'Фэнтези',
+            12: 'Приключения',
+            9648: 'Детектив',
+            80: 'Детектив'       // Криминал -> Детектив
+        };
+
+        genreIds.forEach(id => {
+            if (genreMap[id]) tags.add(genreMap[id]);
+        });
+
+        // 3. Если пришли полные детали — проверяем студию Marvel
+        if (details && Array.isArray(details.production_companies)) {
+            const isMarvel = details.production_companies.some(c =>
+                c.name && c.name.toLowerCase().includes('marvel')
+            );
+            if (isMarvel) tags.add('Марвел');
+        }
+
+        return Array.from(tags);
+    }
+
+    // Поиск проектов на русском языке с получением обложки из шапки Letterboxd (backdrop_path)
+    async function fetchLetterboxdTmdbSuggestions(queryText, signal) {
+        if (!TMDB_API_KEY || TMDB_API_KEY === 'ВАШ_КЛЮЧ_TMDB') return [];
+        const cleanQuery = queryText.trim();
+        if (cleanQuery.length < 2) return [];
+
+        try {
+            const url = `https://api.themoviedb.org/3/search/multi?api_key=${TMDB_API_KEY}&language=ru-RU&query=${encodeURIComponent(cleanQuery)}&include_adult=false`;
+            const res = await fetch(url, { signal });
+            const data = await res.json();
+
+            if (data && Array.isArray(data.results)) {
+                return data.results
+                    .filter(item => item.media_type === 'movie' || item.media_type === 'tv')
+                    .slice(0, 7)
+                    .map(item => {
+                        const ruTitle = item.title || item.name || item.original_title || item.original_name;
+                        const releaseDate = item.release_date || item.first_air_date || '';
+                        const year = releaseDate ? releaseDate.slice(0, 4) : '';
+
+                        // Берем горизонтальный кадр из шапки Letterboxd (backdrop_path),
+                        // а если его вдруг нет — обычный постер (poster_path)
+                        const headerBackdropUrl = item.backdrop_path
+                            ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}`
+                            : (item.poster_path ? `https://image.tmdb.org/t/p/w780${item.poster_path}` : '');
+
+                        const thumbUrl = item.backdrop_path
+                            ? `https://image.tmdb.org/t/p/w300${item.backdrop_path}`
+                            : (item.poster_path ? `https://image.tmdb.org/t/p/w185${item.poster_path}` : '');
+
+                        return {
+                            tmdbId: item.id,
+                            mediaType: item.media_type,
+                            title: ruTitle,
+                            year: year,
+                            poster: headerBackdropUrl,
+                            thumb: thumbUrl,
+                            tags: mapTmdbToSiteTags(item),
+                            rawItem: item,
+                            seasons: [],
+                            source: 'letterboxd'
+                        };
+                    });
+            }
+        } catch (err) {
+            if (err.name !== 'AbortError') {
+                console.warn('Ошибка запроса к TMDB:', err);
+            }
+        }
+        return [];
+    }
+
     function hideTitleAutocomplete() {
         const dropdown = document.getElementById('titleAutocompleteList');
         if (dropdown) {
             dropdown.classList.remove('show');
             dropdown.innerHTML = '';
         }
+        if (tmdbDebounceTimer) clearTimeout(tmdbDebounceTimer);
+        if (tmdbSearchAbortController) tmdbSearchAbortController.abort();
         currentAutocompleteMatches = [];
         activeAutocompleteIndex = -1;
     }
 
-    function applyAutocompleteSuggestion(item) {
+    async function applyAutocompleteSuggestion(item) {
         if (!item) return;
         const titleInput = document.getElementById('newTitle');
         const posterInput = document.getElementById('newPoster');
         const rA = document.getElementById('newRatingAristo');
         const rF = document.getElementById('newRatingFliri');
 
+        hideTitleAutocomplete();
+
         if (titleInput) titleInput.value = item.title || '';
         if (posterInput) posterInput.value = item.poster || '';
 
-        // Подтягиваем только обычные теги проекта (без тегов зала и без избранного)
+        let finalTags = item.tags || [];
+        let finalSeasons = item.seasons || [];
+
+        // Подгружаем детальные данные проекта (студию Marvel и сезоны для сериалов)
+        if (item.source === 'letterboxd' && item.tmdbId && TMDB_API_KEY && TMDB_API_KEY !== 'ВАШ_КЛЮЧ_TMDB') {
+            try {
+                const detailUrl = `https://api.themoviedb.org/3/${item.mediaType}/${item.tmdbId}?api_key=${TMDB_API_KEY}&language=ru-RU`;
+                const res = await fetch(detailUrl);
+                const details = await res.json();
+
+                if (details) {
+                    // Если в деталях есть backdrop_path, убеждаемся, что стоит максимальное качество из шапки
+                    if (details.backdrop_path && posterInput) {
+                        posterInput.value = `https://image.tmdb.org/t/p/w1280${details.backdrop_path}`;
+                    }
+                    finalTags = mapTmdbToSiteTags(item.rawItem || item, details);
+
+                    // Если это сериал, автоматически создаем сезоны (кроме 0-го сезона со спецвыпусками)
+                    if (item.mediaType === 'tv' && Array.isArray(details.seasons)) {
+                        const validSeasons = details.seasons.filter(s => s.season_number > 0);
+                        finalSeasons = validSeasons.map(s => ({
+                            seasonNumber: String(s.season_number),
+                            poster: details.backdrop_path
+                                ? `https://image.tmdb.org/t/p/w1280${details.backdrop_path}`
+                                : (s.poster_path ? `https://image.tmdb.org/t/p/w780${s.poster_path}` : item.poster),
+                            ratingAristo: '',
+                            ratingFliri: ''
+                        }));
+                    }
+                }
+            } catch (err) {
+                console.warn('Не удалось загрузить детали из TMDB:', err);
+            }
+        }
+
         currentFormTags = Array.from(new Set(
-            (item.tags || [])
+            finalTags
                 .map(t => String(t).trim().replace(/^#+/, ''))
                 .filter(t => t && !isHiddenSystemTag(t))
         ));
         renderFormTags();
 
-        // Сохраняем шаблон сезонов (номера и постеры без оценок), если это сериал
-        currentFormSeasonsTemplate = Array.isArray(item.seasons)
-            ? item.seasons.map(s => ({
+        currentFormSeasonsTemplate = Array.isArray(finalSeasons)
+            ? finalSeasons.map(s => ({
                 seasonNumber: s.seasonNumber,
                 poster: s.poster || '',
+                ratingAristo: '',
                 ratingAristo: '',
                 ratingFliri: ''
             }))
             : [];
 
-        // Оценки не подтягиваем, чтобы пользователь сам выставил оценки для своего зала
         if (rA) {
             rA.value = '';
             if (rA._refreshCustomDropdown) rA._refreshCustomDropdown();
@@ -784,20 +932,18 @@
             rF.value = '';
             if (rF._refreshCustomDropdown) rF._refreshCustomDropdown();
         }
-
-        hideTitleAutocomplete();
     }
 
-    function renderTitleAutocomplete(queryText) {
+    function drawAutocompleteItems(suggestions) {
         const dropdown = document.getElementById('titleAutocompleteList');
         if (!dropdown) return;
 
-        const suggestions = getDatabaseMovieSuggestions(queryText);
         currentAutocompleteMatches = suggestions;
         activeAutocompleteIndex = -1;
 
         if (suggestions.length === 0) {
-            hideTitleAutocomplete();
+            dropdown.classList.remove('show');
+            dropdown.innerHTML = '';
             return;
         }
 
@@ -808,7 +954,8 @@
             row.className = 'autocomplete-item';
             row.dataset.idx = idx;
 
-            const thumbSrc = item.poster && item.poster.trim() !== '' ? item.poster.trim() : defaultPoster;
+            const previewImg = item.thumb || item.poster;
+            const thumbSrc = previewImg && previewImg.trim() !== '' ? previewImg.trim() : defaultPoster;
 
             const img = document.createElement('img');
             img.className = 'autocomplete-poster-thumb';
@@ -823,20 +970,28 @@
 
             const titleDiv = document.createElement('div');
             titleDiv.className = 'autocomplete-title';
-            titleDiv.textContent = item.title;
+            titleDiv.textContent = item.year ? `${item.title} (${item.year})` : item.title;
             infoDiv.appendChild(titleDiv);
 
+            const tagsDiv = document.createElement('div');
+            tagsDiv.className = 'autocomplete-tags';
+
+            const sourceBadge = document.createElement('span');
+            sourceBadge.className = 'autocomplete-tag-badge';
+            sourceBadge.style.borderColor = item.source === 'letterboxd' ? '#00e054' : '#3b82f6';
+            sourceBadge.style.color = item.source === 'letterboxd' ? '#00e054' : '#3b82f6';
+            sourceBadge.textContent = item.source === 'letterboxd' ? 'Letterboxd' : 'В зале';
+            tagsDiv.appendChild(sourceBadge);
+
             if (item.tags && item.tags.length > 0) {
-                const tagsDiv = document.createElement('div');
-                tagsDiv.className = 'autocomplete-tags';
                 item.tags.forEach(tag => {
                     const badge = document.createElement('span');
                     badge.className = 'autocomplete-tag-badge';
                     badge.textContent = `#${tag}`;
                     tagsDiv.appendChild(badge);
                 });
-                infoDiv.appendChild(tagsDiv);
             }
+            infoDiv.appendChild(tagsDiv);
 
             row.appendChild(img);
             row.appendChild(infoDiv);
@@ -851,6 +1006,38 @@
         });
 
         dropdown.classList.add('show');
+    }
+
+    function renderTitleAutocomplete(queryText) {
+        const cleanQuery = queryText.trim();
+        if (!cleanQuery) {
+            hideTitleAutocomplete();
+            return;
+        }
+
+        // 1. Сначала мгновенно показываем совпадения из вашей базы Supabase
+        const localSuggestions = getDatabaseMovieSuggestions(cleanQuery).map(item => ({
+            ...item,
+            source: 'local'
+        }));
+        drawAutocompleteItems(localSuggestions);
+
+        // 2. Через 300 мс подгружаем фильмы и сериалы на русском из базы Letterboxd (TMDB)
+        if (tmdbDebounceTimer) clearTimeout(tmdbDebounceTimer);
+        if (tmdbSearchAbortController) tmdbSearchAbortController.abort();
+
+        if (cleanQuery.length < 2) return;
+
+        tmdbDebounceTimer = setTimeout(async () => {
+            tmdbSearchAbortController = new AbortController();
+            const externalSuggestions = await fetchLetterboxdTmdbSuggestions(cleanQuery, tmdbSearchAbortController.signal);
+
+            if (externalSuggestions.length > 0) {
+                const existingTitles = new Set(localSuggestions.map(s => normalizeSearchComparison(s.title)));
+                const uniqueExternal = externalSuggestions.filter(s => !existingTitles.has(normalizeSearchComparison(s.title)));
+                drawAutocompleteItems([...localSuggestions, ...uniqueExternal]);
+            }
+        }, 300);
     }
 
     function updateAutocompleteActiveItem() {
