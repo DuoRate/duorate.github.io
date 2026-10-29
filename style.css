@@ -1761,7 +1761,7 @@ input:focus { border-color: #ffffff; }
 
 .movie-card.favorite-card {
     border: none !important;
-    border-radius: 0 !important;
+    border-radius: 16px !important;
     background: transparent !important;
     box-shadow: none !important;
     filter: drop-shadow(0 0 12px rgba(234, 179, 8, 0.45));
@@ -1774,12 +1774,8 @@ input:focus { border-color: #ffffff; }
     overflow: hidden;
     pointer-events: none;
     z-index: 0;
-    clip-path: polygon(
-        18px 0%, calc(100% - 18px) 0%,
-        100% 18px, 100% calc(100% - 18px),
-        calc(100% - 18px) 100%, 18px 100%,
-        0% calc(100% - 18px), 0% 18px
-    );
+    border-radius: 16px;
+    clip-path: inset(0 round 16px);
 }
 
 .movie-card.favorite-card .favorite-border-shell::before {
@@ -1823,12 +1819,8 @@ input:focus { border-color: #ffffff; }
     inset: 3.5px;
     border-radius: 0;
     background-color: rgba(18, 18, 18, 0.94);
-    clip-path: polygon(
-        16px 0%, calc(100% - 16px) 0%,
-        100% 16px, 100% calc(100% - 16px),
-        calc(100% - 16px) 100%, 16px 100%,
-        0% calc(100% - 16px), 0% 16px
-    );
+    border-radius: 12px;
+    clip-path: inset(0 round 12px);
 }
 
 .movie-card.favorite-card .movie-title {
@@ -2544,3 +2536,510 @@ body.theme-pickme .border-white {
     .home-main-heading { font-size: 1.4rem; }
     .showcase-marquee-card { width: 320px !important; height: 175px !important; }
 }
+
+/* =========================================================
+   ДОПОЛНИТЕЛЬНЫЕ ТЕМЫ ЗАЛА DUORATE
+   Меняют только фон страницы и фоновые поверхности; структура,
+   карточки и элементы управления сохраняют исходную геометрию.
+   ========================================================= */
+
+/* Океан: бирюзовая глубина и солнечные блики на колышущейся воде */
+body.theme-ocean {
+    background-color: #063f4b;
+    background-image: linear-gradient(180deg, #087e89 0%, #075463 45%, #032f42 100%);
+}
+body.theme-ocean::before {
+    opacity: .82;
+    filter: none;
+    background-image:
+      radial-gradient(ellipse at 18% 18%, rgba(206,255,235,.82) 0, rgba(112,255,231,.28) 5%, transparent 20%),
+      radial-gradient(ellipse at 72% 32%, rgba(177,255,241,.68) 0, rgba(83,239,222,.2) 7%, transparent 24%),
+      radial-gradient(ellipse at 48% 72%, rgba(204,255,239,.56) 0, rgba(47,221,207,.16) 8%, transparent 26%),
+      repeating-linear-gradient(103deg, transparent 0 38px, rgba(175,255,240,.08) 42px, transparent 50px 88px),
+      linear-gradient(115deg, rgba(0,36,57,.25), rgba(37,218,202,.24), rgba(0,38,59,.3));
+    background-size: 140% 130%, 150% 140%, 130% 140%, 220% 180%, 180% 180%;
+    animation: oceanCaustics 13s ease-in-out infinite alternate;
+}
+@keyframes oceanCaustics {
+    0% { background-position: 0% 0%, 100% 20%, 20% 100%, 0% 0%, 0% 50%; }
+    50% { background-position: 45% 30%, 30% 55%, 80% 35%, 45% 30%, 100% 40%; }
+    100% { background-position: 100% 65%, 0% 90%, 50% 0%, 100% 80%, 20% 60%; }
+}
+
+/* Звёздное небо: глубокий синий фон и мягко пульсирующие звёзды */
+body.theme-stars { background-color: #06132c; }
+body.theme-stars::before {
+    opacity: .9;
+    filter: none;
+    background-image:
+      radial-gradient(circle, #ffffff 0 1px, transparent 1.8px),
+      radial-gradient(circle, rgba(180,213,255,.95) 0 1.2px, transparent 2px),
+      radial-gradient(circle, rgba(255,239,194,.9) 0 1px, transparent 1.8px),
+      radial-gradient(ellipse at 50% 0%, rgba(35,73,145,.48), transparent 62%),
+      linear-gradient(180deg, #07132f, #091d3c 65%, #030b1c);
+    background-size: 83px 91px, 137px 149px, 191px 173px, 100% 100%, 100% 100%;
+    background-position: 0 0, 42px 24px, 17px 66px, center, center;
+    animation: starsTwinkle 4.8s ease-in-out infinite alternate;
+}
+@keyframes starsTwinkle {
+    0%, 100% { opacity: .58; filter: brightness(.82); }
+    45% { opacity: .98; filter: brightness(1.25); }
+    70% { opacity: .76; filter: brightness(1.05); }
+}
+
+/* Красное золото: бордовая кожа, тонкие вертикальные швы и золотой блеск */
+body.theme-redgold { background-color: #3b0710; }
+body.theme-redgold::before {
+    opacity: .9;
+    filter: none;
+    background-image:
+      radial-gradient(circle at 18% 22%, transparent 0 95px, rgba(245,195,91,.72) 97px, transparent 101px),
+      radial-gradient(circle at 18% 22%, transparent 0 126px, rgba(255,224,146,.26) 128px, transparent 131px),
+      radial-gradient(circle at 82% 68%, transparent 0 145px, rgba(223,166,65,.64) 147px, transparent 151px),
+      radial-gradient(circle at 82% 68%, transparent 0 178px, rgba(255,219,129,.24) 180px, transparent 183px),
+      repeating-linear-gradient(90deg, transparent 0 95px, rgba(15,0,3,.38) 96px, rgba(255,207,137,.18) 98px, transparent 100px 102px),
+      linear-gradient(115deg, #390711, #781421 35%, #4b0914 68%, #24050c);
+    background-size: 100% 100%;
+    animation: redGoldShimmer 9s ease-in-out infinite alternate;
+}
+@keyframes redGoldShimmer {
+    from { background-position: 0 0; filter: brightness(.88); }
+    to { background-position: 12px -8px; filter: brightness(1.12); }
+}
+
+/* Уроборос: выцветшая бумага и стилизованный змей, замкнутый в кольцо */
+body.theme-ouroboros {
+    background-color: #d8c9a7;
+    color: #2e2619;
+}
+body.theme-ouroboros::before {
+    opacity: .62;
+    filter: none;
+    background-image:
+      radial-gradient(ellipse at 50% 50%, transparent 0 145px, rgba(86,66,37,.12) 146px, transparent 260px),
+      repeating-linear-gradient(0deg, rgba(97,72,39,.035) 0 1px, transparent 1px 5px),
+      radial-gradient(ellipse at 20% 15%, rgba(255,250,224,.52), transparent 50%),
+      linear-gradient(135deg, #d9cba9, #cabb96);
+    background-size: 100% 100%;
+}
+body.theme-ouroboros::after {
+    content: '';
+    position: fixed;
+    z-index: -1;
+    pointer-events: none;
+    width: min(54vw, 470px);
+    height: min(54vw, 470px);
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    opacity: .32;
+    background:
+      radial-gradient(ellipse at 50% 0%, #79613b 0 7%, transparent 7.5%),
+      conic-gradient(from 0deg, transparent 0 7%, #7c633c 8% 13%, #b39a68 14% 18%, #705631 20% 28%, #a58a59 30% 40%, #705631 42% 52%, #b39a68 54% 64%, #705631 66% 76%, #a58a59 78% 88%, #705631 90% 96%, transparent 97%);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 30px), #000 calc(100% - 28px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 30px), #000 calc(100% - 28px));
+    animation: ouroborosTurn 34s linear infinite;
+}
+@keyframes ouroborosTurn { to { rotate: 360deg; } }
+
+/* Тёплые поверхности для темы выцветшей страницы */
+body.theme-ouroboros .home-showcase-block,
+body.theme-ouroboros .home-hero-section,
+body.theme-ouroboros .home-halls-block,
+body.theme-ouroboros .center-state-box {
+    background-color: rgba(236, 224, 194, .72);
+    border-color: rgba(91, 69, 37, .35);
+    box-shadow: 0 12px 35px rgba(70, 48, 20, .2);
+}
+body.theme-ouroboros .home-main-heading,
+body.theme-ouroboros .home-halls-heading,
+body.theme-ouroboros .home-step-title,
+body.theme-ouroboros .home-step-desc,
+body.theme-ouroboros .center-state-text,
+body.theme-ouroboros .site-subtitle {
+    color: #382b1b;
+    text-shadow: none;
+}
+body.theme-ouroboros .home-step-card,
+body.theme-ouroboros .home-hall-card {
+    background-color: rgba(215, 198, 158, .8);
+    border-color: rgba(91, 69, 37, .4);
+}
+body.theme-ouroboros .home-hall-card-title { color: #382b1b; }
+body.theme-ouroboros .home-hall-card-sub { color: #6d5736; }
+
+/* Карточки залов сохраняют вид выбранной темы в списке на главной */
+.home-hall-card.hall-theme-ocean { background: linear-gradient(135deg,#087e89,#063f4b); border-color:#36d8ce; }
+.home-hall-card.hall-theme-stars { background: linear-gradient(135deg,#0b2450,#06132c); border-color:#8dbbff; }
+.home-hall-card.hall-theme-redgold { background: linear-gradient(135deg,#7b1422,#35070f); border-color:#d8ad57; }
+.home-hall-card.hall-theme-ouroboros { background: linear-gradient(135deg,#e4d6b5,#c5b38b); border-color:#8d754b; }
+.home-hall-card.hall-theme-ouroboros .home-hall-card-title { color:#382b1b; }
+.home-hall-card.hall-theme-ouroboros .home-hall-card-sub { color:#6d5736; }
+
+@media (prefers-reduced-motion: reduce) {
+    body.theme-ocean::before, body.theme-stars::before, body.theme-redgold::before,
+    body.theme-ouroboros::after { animation: none !important; }
+}
+
+
+/* Тонировка полупрозрачных панелей под фон выбранной темы */
+body.theme-ocean .home-showcase-block,
+body.theme-ocean .home-hero-section,
+body.theme-ocean .home-halls-block,
+body.theme-ocean .center-state-box {
+    background-color: rgba(2, 48, 61, .58);
+    border-color: rgba(139, 255, 239, .25);
+}
+body.theme-stars .home-showcase-block,
+body.theme-stars .home-hero-section,
+body.theme-stars .home-halls-block,
+body.theme-stars .center-state-box {
+    background-color: rgba(4, 13, 34, .62);
+    border-color: rgba(150, 184, 255, .24);
+}
+body.theme-redgold .home-showcase-block,
+body.theme-redgold .home-hero-section,
+body.theme-redgold .home-halls-block,
+body.theme-redgold .center-state-box {
+    background-color: rgba(48, 4, 12, .64);
+    border-color: rgba(229, 184, 93, .28);
+}
+
+/* =========================================================
+   ФИНАЛЬНАЯ ДОРАБОТКА ТЕМ DUORATE
+   Анимация затрагивает только декоративный фон, не содержимое.
+   ========================================================= */
+
+/* ОКЕАН — органические солнечные каустики, без прямых полос */
+body.theme-ocean {
+    background-color: #07515d !important;
+    background-image: linear-gradient(180deg, #159da3 0%, #087582 32%, #064c60 70%, #022d43 100%) !important;
+    color: #f2ffff;
+}
+body.theme-ocean::before {
+    opacity: .92;
+    filter: none;
+    background-image:
+      radial-gradient(ellipse 7% 3% at 16% 18%, rgba(231,255,239,.95) 0%, rgba(153,255,235,.64) 34%, transparent 100%),
+      radial-gradient(ellipse 12% 5% at 22% 23%, rgba(191,255,238,.68) 0%, rgba(93,244,224,.24) 48%, transparent 100%),
+      radial-gradient(ellipse 5% 2.5% at 37% 12%, rgba(255,255,221,.9) 0%, rgba(139,255,232,.4) 45%, transparent 100%),
+      radial-gradient(ellipse 10% 4% at 45% 20%, rgba(177,255,235,.72) 0%, rgba(71,221,218,.22) 55%, transparent 100%),
+      radial-gradient(ellipse 8% 3% at 72% 29%, rgba(237,255,222,.88) 0%, rgba(115,250,230,.35) 48%, transparent 100%),
+      radial-gradient(ellipse 13% 5% at 81% 35%, rgba(162,255,239,.7) 0%, rgba(64,213,210,.18) 52%, transparent 100%),
+      radial-gradient(ellipse 6% 3% at 62% 58%, rgba(236,255,232,.72) 0%, rgba(110,255,229,.26) 48%, transparent 100%),
+      radial-gradient(ellipse 12% 5% at 32% 72%, rgba(179,255,237,.56) 0%, rgba(56,222,212,.18) 52%, transparent 100%),
+      radial-gradient(ellipse 7% 3% at 88% 83%, rgba(222,255,232,.72) 0%, rgba(81,240,221,.2) 50%, transparent 100%),
+      radial-gradient(ellipse at 50% -10%, rgba(178,255,238,.38), transparent 58%),
+      linear-gradient(160deg, rgba(0,36,54,.1), rgba(29,209,199,.12) 48%, rgba(0,24,46,.25));
+    background-size: 125% 125%, 140% 130%, 130% 140%, 150% 140%, 140% 130%, 145% 150%, 150% 140%, 140% 150%, 130% 140%, 100% 100%, 100% 100%;
+    background-position: 0% 0%, 15% 12%, 30% 0%, 40% 18%, 70% 20%, 80% 32%, 60% 58%, 20% 70%, 90% 80%, center, center;
+    animation: oceanSunCaustics 17s ease-in-out infinite alternate;
+    will-change: background-position, opacity;
+}
+@keyframes oceanSunCaustics {
+    0% { background-position: 0% 0%, 15% 12%, 30% 0%, 40% 18%, 70% 20%, 80% 32%, 60% 58%, 20% 70%, 90% 80%, center, center; opacity: .68; }
+    35% { background-position: 24% 18%, 4% 28%, 48% 14%, 25% 34%, 86% 8%, 64% 46%, 75% 42%, 38% 85%, 72% 68%, center, center; opacity: .96; }
+    68% { background-position: 48% 36%, 35% 5%, 12% 28%, 58% 4%, 54% 42%, 92% 20%, 42% 72%, 8% 54%, 82% 92%, center, center; opacity: .78; }
+    100% { background-position: 75% 55%, 60% 42%, 64% 38%, 80% 48%, 28% 60%, 48% 60%, 88% 18%, 62% 38%, 40% 58%, center, center; opacity: 1; }
+}
+
+/* ЗВЁЗДНОЕ НЕБО — много мелких звёзд с независимым визуальным мерцанием */
+body.theme-stars { background-color: #050d22 !important; background-image: linear-gradient(180deg,#071631 0%,#091a3a 48%,#020817 100%) !important; }
+body.theme-stars::before {
+    opacity: .8;
+    filter: none;
+    background-image:
+      radial-gradient(circle, rgba(255,255,255,.98) 0 1px, transparent 1.7px),
+      radial-gradient(circle, rgba(184,216,255,.95) 0 1.2px, transparent 2px),
+      radial-gradient(circle, rgba(255,235,190,.92) 0 .8px, transparent 1.7px),
+      radial-gradient(circle, rgba(223,237,255,.8) 0 .7px, transparent 1.5px),
+      radial-gradient(ellipse at 50% 0%, rgba(38,76,153,.45), transparent 65%);
+    background-size: 67px 73px, 113px 127px, 157px 149px, 43px 51px, 100% 100%;
+    background-position: 0 0, 32px 18px, 12px 61px, 20px 9px, center;
+    animation: starsGlowA 5.2s ease-in-out infinite alternate;
+}
+body.theme-stars::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: .42;
+    background-image:
+      radial-gradient(circle, #fff 0 1.4px, transparent 2.5px),
+      radial-gradient(circle, rgba(158,204,255,.9) 0 1px, transparent 2px),
+      radial-gradient(circle, rgba(255,246,218,.95) 0 .8px, transparent 1.8px);
+    background-size: 181px 167px, 223px 197px, 127px 139px;
+    background-position: 45px 29px, 110px 75px, 18px 94px;
+    animation: starsGlowB 7.4s ease-in-out infinite alternate;
+}
+@keyframes starsGlowA {
+    0%,100% { opacity: .55; filter: brightness(.78); }
+    32% { opacity: .9; filter: brightness(1.15); }
+    64% { opacity: .68; filter: brightness(.96); }
+}
+@keyframes starsGlowB {
+    0%,100% { opacity: .22; }
+    45% { opacity: .7; }
+    75% { opacity: .38; }
+}
+
+/* КРАСНОЕ ЗОЛОТО — неподвижная фактура кожи и круги, мерцает только свет */
+body.theme-redgold {
+    background-color: #3b0710 !important;
+    background-image: linear-gradient(90deg,#30050c 0%,#5d0b18 16%,#741321 34%,#4a0913 52%,#68101b 72%,#31050d 100%) !important;
+    color: #fff5df;
+}
+body.theme-redgold::before {
+    opacity: 1;
+    filter: none;
+    background-image:
+      /* вертикальные швы и мягкая фактура кожи — всё неподвижно */
+      repeating-linear-gradient(90deg, transparent 0 86px, rgba(20,0,4,.38) 87px, rgba(255,205,130,.22) 89px, rgba(20,0,4,.22) 91px, transparent 93px 96px),
+      repeating-linear-gradient(90deg, rgba(255,226,168,.035) 0 1px, transparent 1px 8px),
+      radial-gradient(ellipse at 30% 25%, rgba(255,160,110,.12), transparent 38%),
+      radial-gradient(ellipse at 75% 75%, rgba(20,0,0,.28), transparent 45%);
+    background-size: 100% 100%;
+    animation: none !important;
+}
+body.theme-redgold::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: .75;
+    background-image:
+      radial-gradient(circle at 18% 24%, transparent 0 74px, rgba(255,218,126,.82) 75px, rgba(255,193,70,.35) 78px, transparent 83px),
+      radial-gradient(circle at 18% 24%, transparent 0 101px, rgba(255,230,164,.42) 102px, transparent 106px),
+      radial-gradient(circle at 82% 69%, transparent 0 112px, rgba(255,205,91,.76) 113px, rgba(226,164,49,.3) 117px, transparent 122px),
+      radial-gradient(circle at 82% 69%, transparent 0 143px, rgba(255,227,145,.4) 144px, transparent 149px),
+      radial-gradient(circle at 52% 46%, transparent 0 48px, rgba(255,210,100,.4) 49px, transparent 53px);
+    background-size: 100% 100%;
+    animation: goldRingLustre 5.5s ease-in-out infinite alternate;
+    will-change: opacity, filter;
+}
+@keyframes goldRingLustre {
+    0%,100% { opacity: .48; filter: brightness(.82) drop-shadow(0 0 2px rgba(255,198,69,.18)); }
+    50% { opacity: .95; filter: brightness(1.35) drop-shadow(0 0 8px rgba(255,208,91,.42)); }
+}
+
+/* Меняем именно фоновые поверхности в зале, не трогая текст, кнопки и геометрию */
+body.theme-ocean .movie-card,
+body.theme-ocean .add-form-container,
+body.theme-ocean .search-filter-bar,
+body.theme-ocean .watchlist-sidebar,
+body.theme-ocean .stats-sidebar,
+body.theme-ocean .stats-block-wrapper,
+body.theme-ocean .auth-panel,
+body.theme-ocean .halls-section,
+body.theme-ocean .watchlist-form,
+body.theme-ocean .watchlist-items,
+body.theme-ocean .edit-mode-container {
+    background-color: rgba(2,55,68,.78) !important;
+    background-image: linear-gradient(145deg,rgba(27,177,177,.13),rgba(0,38,55,.2)) !important;
+    border-color: rgba(139,255,239,.24);
+}
+body.theme-stars .movie-card,
+body.theme-stars .add-form-container,
+body.theme-stars .search-filter-bar,
+body.theme-stars .watchlist-sidebar,
+body.theme-stars .stats-sidebar,
+body.theme-stars .stats-block-wrapper,
+body.theme-stars .auth-panel,
+body.theme-stars .halls-section,
+body.theme-stars .watchlist-form,
+body.theme-stars .watchlist-items,
+body.theme-stars .edit-mode-container {
+    background-color: rgba(4,13,34,.82) !important;
+    background-image: linear-gradient(145deg,rgba(54,91,160,.12),rgba(2,8,24,.2)) !important;
+    border-color: rgba(150,184,255,.24);
+}
+body.theme-redgold .movie-card,
+body.theme-redgold .add-form-container,
+body.theme-redgold .search-filter-bar,
+body.theme-redgold .watchlist-sidebar,
+body.theme-redgold .stats-sidebar,
+body.theme-redgold .stats-block-wrapper,
+body.theme-redgold .auth-panel,
+body.theme-redgold .halls-section,
+body.theme-redgold .watchlist-form,
+body.theme-redgold .watchlist-items,
+body.theme-redgold .edit-mode-container {
+    background-color: rgba(48,4,12,.82) !important;
+    background-image: linear-gradient(145deg,rgba(157,35,45,.18),rgba(35,2,8,.24)) !important;
+    border-color: rgba(229,184,93,.28);
+}
+
+/* Карточки и мелкие панели внутри зала тоже получают оттенок темы */
+body.theme-ocean .movie-card .rating-row,
+body.theme-ocean .movie-card .tag-item { background-color: rgba(4,91,103,.7); }
+body.theme-stars .movie-card .rating-row,
+body.theme-stars .movie-card .tag-item { background-color: rgba(13,31,66,.78); }
+body.theme-redgold .movie-card .rating-row,
+body.theme-redgold .movie-card .tag-item { background-color: rgba(91,14,26,.72); }
+
+@media (prefers-reduced-motion: reduce) {
+    body.theme-ocean::before,
+    body.theme-stars::before,
+    body.theme-stars::after,
+    body.theme-redgold::after { animation: none !important; }
+}
+
+
+/* =========================================================
+   ФИНАЛЬНАЯ ПОДСТРОЙКА ИНТЕРФЕЙСА ПОД ТЕМЫ
+   ========================================================= */
+
+/* Внутренние оценки и теги прозрачны: показывается поверхность самой карточки */
+.movie-card .rating-row,
+.movie-card .tag-item,
+.movie-card .movie-tags {
+    background-color: transparent !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+.movie-card .tag-item {
+    border-color: rgba(255,255,255,.16);
+    box-shadow: none;
+}
+body.theme-pickme .movie-card .tag-item {
+    color: #831843;
+    border-color: rgba(131,24,67,.22);
+    text-shadow: none;
+}
+body.theme-stars .movie-card .tag-item {
+    color: #dceaff;
+    border-color: rgba(180,207,255,.24);
+}
+body.theme-redgold .movie-card .tag-item {
+    color: #f2d9a0;
+    border-color: rgba(233,189,98,.25);
+}
+
+/* Избранное: цельная округлая карточка без тёмных срезанных уголков */
+.movie-card.favorite-card,
+.movie-card.favorite-card .favorite-border-shell,
+.movie-card.favorite-card .movie-card-clip {
+    border-radius: 16px !important;
+}
+.movie-card.favorite-card .favorite-border-shell {
+    clip-path: inset(0 round 16px);
+}
+.movie-card.favorite-card .movie-card-clip {
+    inset: 3px;
+    clip-path: inset(0 round 13px);
+    background: inherit;
+}
+.movie-card.favorite-card .favorite-border-shell::before {
+    border-radius: inherit;
+}
+
+/* Единая геометрия и плавные переходы у панели добавления, поиска, тегов и сортировки */
+.btn-open-form,
+.add-form-container,
+.search-filter-bar,
+.search-input,
+.custom-select,
+.multiselect-header,
+.multiselect-dropdown,
+.form-tags-list .tag-item,
+#formTagsList .tag-item,
+#watchFormTagsList .tag-item {
+    border-radius: 12px;
+    transition: background-color .22s ease, color .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+.search-filter-bar {
+    align-items: stretch;
+}
+.search-input,
+.search-filter-bar .custom-select,
+.search-filter-bar .multiselect-header {
+    min-height: 46px;
+}
+
+/* Стандартная тема */
+body:not(.theme-pickme):not(.theme-stars):not(.theme-redgold) .btn-open-form,
+body:not(.theme-pickme):not(.theme-stars):not(.theme-redgold) .search-input,
+body:not(.theme-pickme):not(.theme-stars):not(.theme-redgold) .search-filter-bar .custom-select,
+body:not(.theme-pickme):not(.theme-stars):not(.theme-redgold) .search-filter-bar .multiselect-header {
+    background-color: rgba(22,22,22,.92);
+    color: #fff;
+    border-color: rgba(255,255,255,.24);
+}
+
+/* Пикми */
+body.theme-pickme .btn-open-form,
+body.theme-pickme .search-input,
+body.theme-pickme .search-filter-bar .custom-select,
+body.theme-pickme .search-filter-bar .multiselect-header {
+    background-color: rgba(255,255,255,.94);
+    color: #831843;
+    border-color: rgba(255,105,180,.55);
+    box-shadow: 0 3px 12px rgba(214,31,105,.10);
+}
+body.theme-pickme .btn-open-form:hover {
+    background-color: #ff69b4;
+    color: #fff;
+    border-color: #ff69b4;
+}
+body.theme-pickme .search-input::placeholder { color: #b45379; }
+body.theme-pickme .multiselect-dropdown {
+    background-color: #fff5f9;
+    color: #831843;
+    border-color: rgba(255,105,180,.5);
+}
+
+/* Звёздное небо */
+body.theme-stars .btn-open-form,
+body.theme-stars .search-input,
+body.theme-stars .search-filter-bar .custom-select,
+body.theme-stars .search-filter-bar .multiselect-header {
+    background-color: rgba(7,21,47,.94);
+    color: #e5efff;
+    border-color: rgba(141,187,255,.42);
+    box-shadow: 0 3px 12px rgba(0,0,0,.18);
+}
+body.theme-stars .btn-open-form:hover {
+    background-color: #173568;
+    border-color: #a9ccff;
+}
+body.theme-stars .search-input::placeholder { color: #a7bddf; }
+body.theme-stars .multiselect-dropdown {
+    background-color: #091a38;
+    color: #e5efff;
+    border-color: rgba(141,187,255,.42);
+}
+
+/* Красное золото */
+body.theme-redgold .btn-open-form,
+body.theme-redgold .search-input,
+body.theme-redgold .search-filter-bar .custom-select,
+body.theme-redgold .search-filter-bar .multiselect-header {
+    background-color: rgba(59,7,16,.94);
+    color: #f4dfb0;
+    border-color: rgba(216,173,87,.48);
+    box-shadow: 0 3px 12px rgba(0,0,0,.2);
+}
+body.theme-redgold .btn-open-form:hover {
+    background-color: #7b1422;
+    border-color: #e9bd62;
+}
+body.theme-redgold .search-input::placeholder { color: #c9a76c; }
+body.theme-redgold .multiselect-dropdown {
+    background-color: #3b0710;
+    color: #f4dfb0;
+    border-color: rgba(216,173,87,.48);
+}
+
+/* Элементы тегов в форме согласованы с активной темой */
+body.theme-pickme .form-tags-list .tag-item,
+body.theme-pickme #formTagsList .tag-item,
+body.theme-pickme #watchFormTagsList .tag-item { background: #ffe4ef; color: #831843; }
+body.theme-stars .form-tags-list .tag-item,
+body.theme-stars #formTagsList .tag-item,
+body.theme-stars #watchFormTagsList .tag-item { background: #0b2450; color: #dceaff; }
+body.theme-redgold .form-tags-list .tag-item,
+body.theme-redgold #formTagsList .tag-item,
+body.theme-redgold #watchFormTagsList .tag-item { background: #650d18; color: #f2d9a0; }
