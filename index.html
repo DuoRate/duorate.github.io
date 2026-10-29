@@ -65,7 +65,24 @@
                 <button class="theme-option-btn" data-theme="redgold">
                     <span>Красное золото</span><span class="theme-preview-dots"><span style="background:#650d18"></span><span style="background:#e9bd62"></span></span>
                 </button>
+                <button class="theme-option-btn" data-theme="waterdrop">
+                    <span>Водичка</span><span class="theme-preview-dots"><span style="background:#045d8b"></span><span style="background:#bffff7"></span></span>
+                </button>
             </div>
+        </div>
+    </div>
+
+    <div id="topRightNews" class="top-news-wrapper" style="display: none;">
+        <button id="newsToggleBtn" class="btn-notif-bell" title="Последние новости">
+            <span aria-hidden="true">📰</span>
+            <span class="notif-btn-text">Новости</span>
+        </button>
+        <div id="newsDropdown" class="notif-dropdown news-dropdown">
+            <div class="notif-dropdown-header">
+                <span>Последние новости</span>
+                <button id="addNewsBtn" class="btn-clear-notifs" style="display:none;">Добавить новость</button>
+            </div>
+            <div id="newsList" class="news-list"></div>
         </div>
     </div>
 
@@ -146,7 +163,7 @@
         </div>
         <div class="delete-hall-confirm-text">
             Вы действительно хотите безвозвратно удалить свой профиль <strong id="deleteProfileNameDisplay" style="color: #eab308;"></strong> из базы данных?<br>
-            <span style="font-size: 0.82rem; color: #aaa;">Для подтверждения введите пароль от вашего профиля:</span>
+            <span style="font-size: 0.82rem; opacity: 0.8;">Для подтверждения введите пароль от вашего профиля:</span>
         </div>
         <div class="auth-form">
             <input type="password" id="deleteProfilePasswordInput" placeholder="Введите пароль от профиля" maxlength="32" autocomplete="current-password" />
@@ -159,30 +176,94 @@
     </div>
 </div>
 
-<!-- Левая панель: Статистика (сверху) и Нужно посмотреть (снизу) -->
+<!-- Обратная связь внутри оценочного зала -->
+<div id="feedbackModal" class="auth-modal">
+    <div class="auth-modal-content feedback-modal-content">
+        <div class="auth-modal-header">
+            <span>Обратная связь</span>
+            <button id="closeFeedbackModal" class="btn-close-modal" aria-label="Закрыть">✕</button>
+        </div>
+        <div class="auth-form">
+            <label for="feedbackTypeSelect" class="modal-field-label">Тема обращения</label>
+            <select id="feedbackTypeSelect" class="custom-select feedback-type-select">
+                <option value="Баг">Баг</option>
+                <option value="Предложение">Предложение</option>
+            </select>
+            <textarea id="feedbackMessageInput" class="feedback-message-input" placeholder="Опишите обращение..." maxlength="5000" rows="6"></textarea>
+            <div id="feedbackStatus" class="invite-status"></div>
+            <button id="sendFeedbackBtn" class="btn-auth-submit">Отправить</button>
+        </div>
+    </div>
+</div>
+
+<!-- Создание новости (только для Aristo на главной странице) -->
+<div id="newsModal" class="auth-modal">
+    <div class="auth-modal-content">
+        <div class="auth-modal-header">
+            <span>Добавить новость</span>
+            <button id="closeNewsModal" class="btn-close-modal" aria-label="Закрыть">✕</button>
+        </div>
+        <div class="auth-form">
+            <textarea id="newsMessageInput" class="feedback-message-input" placeholder="Текст новости..." maxlength="5000" rows="6"></textarea>
+            <div id="newsStatus" class="invite-status"></div>
+            <button id="confirmAddNewsBtn" class="btn-auth-submit">Опубликовать</button>
+        </div>
+    </div>
+</div>
+
+<!-- Левая панель: Статистика, История просмотра и Нужно посмотреть (единый стиль с полоской и стрелочкой) -->
 <div class="watchlist-sidebar" id="watchlistSidebar" style="display: none;">
+    <button id="sidebarCollapseToggle" class="sidebar-collapse-toggle" type="button" aria-label="Скрыть боковую панель" title="Скрыть боковую панель">‹</button>
+
+    <!-- 1. Блок Статистика -->
     <div id="statsBlock" class="stats-block-wrapper" style="display: none;">
-        <div class="stats-title">Статистика</div>
-        <div class="stats-item total">
-            <span class="stats-label">Всего проектов:</span>
-            <span class="stats-value" id="countTotal">0</span>
+        <div class="watchlist-title" style="justify-content: space-between;">
+            <span id="statsTitleText" style="cursor: pointer; flex: 1;">Статистика</span>
+            <div class="watchlist-header-controls">
+                <button id="statsToggleBtn" class="watchlist-ctrl-btn" type="button" title="Развернуть / свернуть статистику">
+                    <span id="statsArrow" style="display: inline-block; transition: transform 0.3s; font-size: 0.85em;">▼</span>
+                </button>
+            </div>
         </div>
-        <div class="stats-item aristo">
-            <span class="stats-label" id="statsLabelUser1">Оценено:</span>
-            <span class="stats-value" id="countAristo">0</span>
-        </div>
-        <div class="stats-item fliri">
-            <span class="stats-label" id="statsLabelFliri">Оценено:</span>
-            <span class="stats-value" id="countFliri">0</span>
+        <div id="statsItemsContainer" class="stats-items-container">
+            <div class="stats-item total">
+                <span class="stats-label">Всего проектов:</span>
+                <span class="stats-value" id="countTotal">0</span>
+            </div>
+            <div class="stats-item aristo">
+                <span class="stats-label" id="statsLabelUser1">Оценено:</span>
+                <span class="stats-value" id="countAristo">0</span>
+            </div>
+            <div class="stats-item fliri">
+                <span class="stats-label" id="statsLabelFliri">Оценено:</span>
+                <span class="stats-value" id="countFliri">0</span>
+            </div>
         </div>
         <hr class="sidebar-divider">
     </div>
 
+    <!-- 2. Блок История просмотра -->
+    <div class="view-history-block" id="viewHistoryBlock">
+        <div class="watchlist-title" style="justify-content: space-between;">
+            <span id="viewHistoryTitleText" style="cursor: pointer; flex: 1;">История просмотра</span>
+            <div class="watchlist-header-controls">
+                <button id="viewHistoryToggle" class="watchlist-ctrl-btn" type="button" aria-expanded="false" title="Развернуть / свернуть историю">
+                    <span id="viewHistoryArrow" class="rotated" style="display: inline-block; transition: transform 0.3s; font-size: 0.85em;">▼</span>
+                </button>
+            </div>
+        </div>
+        <div id="viewHistoryList" class="view-history-list collapsed">
+            <div class="history-empty">История пока пуста</div>
+        </div>
+        <hr class="sidebar-divider">
+    </div>
+
+    <!-- 3. Блок Нужно посмотреть -->
     <div class="watchlist-title" style="justify-content: space-between;">
         <span id="watchlistTitleText" style="cursor: pointer; flex: 1;">Нужно посмотреть</span>
         <div class="watchlist-header-controls">
-            <button id="watchlistAddToggleBtn" class="watchlist-ctrl-btn" title="Добавить проект в список">+</button>
-            <button id="watchlistToggle" class="watchlist-ctrl-btn" title="Развернуть / свернуть список">
+            <button id="watchlistAddToggleBtn" class="watchlist-ctrl-btn" type="button" title="Добавить проект в список">+</button>
+            <button id="watchlistToggle" class="watchlist-ctrl-btn" type="button" title="Развернуть / свернуть список">
                 <span id="watchlistArrow" class="rotated" style="display: inline-block; transition: transform 0.3s; font-size: 0.85em;">▼</span>
             </button>
         </div>
@@ -230,7 +311,7 @@
             <option value="Аниме">Аниме</option>
             <option value="Фантастика">Фантастика</option>
             <option value="Комедия">Комедия</option>
-            <option value="Драма">Драма</option>
+            <option value="Драма">Комедия</option>
             <option value="Экшен">Экшен</option>
             <option value="Хоррор">Хоррор</option>
             <option value="Фэнтези">Фэнтези</option>
@@ -277,7 +358,6 @@
 
     <!-- ГЛАВНАЯ СТРАНИЦА -->
     <div id="homePageWrapper" class="home-page-wrapper">
-        <!-- Отдельный блок с описанием и плавно движущимися плашками проектов из зала Aristo и Fliri -->
         <div class="home-showcase-block">
             <h2 class="home-main-heading">Оценивай проекты вместе с друзьями</h2>
             <div class="home-marquee-viewport">
@@ -285,7 +365,6 @@
             </div>
         </div>
 
-        <!-- Отдельный блок с последовательностью действий -->
         <div class="home-hero-section">
             <div class="home-steps-row">
                 <div id="stepCreateHallCard" class="home-step-card">
@@ -300,19 +379,16 @@
             </div>
         </div>
 
-        <!-- Если у пользователя уже есть залы, они отображаются блочками здесь -->
         <div id="homeHallsBlock" class="home-halls-block" style="display: none;">
             <div class="home-halls-heading">Ваши оценочные залы</div>
             <div id="homeHallsGrid" class="home-halls-grid"></div>
         </div>
 
-        <!-- 1. Состояние для неавторизованного пользователя на главной -->
         <div id="guestStateBox" class="center-state-box" style="display: none;">
             <p class="center-state-text">Авторизуйтесь, чтобы оценивать проекты вместе с друзьями</p>
             <button id="guestAuthBtn" class="btn-state-action btn-guest-auth">Авторизация / Регистрация</button>
         </div>
 
-        <!-- 2. Форма приглашения друга на главной для авторизованного пользователя -->
         <div id="inviteStateBox" class="center-state-box" style="display: none;">
             <p class="center-state-text">Предложите другу оценивать вместе</p>
             <div class="invite-inline-form">
@@ -426,16 +502,28 @@
             </div>
 
             <select id="sortSelect" class="custom-select sort-select">
-                <option value="desc" selected>Сначала выше оценка</option>
-                <option value="asc">Сначала ниже оценка</option>
+                <option value="desc" selected>Выше оценка</option>
+                <option value="asc">Ниже оценка</option>
                 <option value="asc_alpha">Алфавит А-Я</option>
                 <option value="desc_alpha">Алфавит Я-А</option>
             </select>
+
+            <div id="viewSelector" class="view-selector">
+                <button id="viewToggleBtn" class="custom-select multiselect-header view-toggle-btn" type="button" aria-expanded="false">Вид</button>
+                <div id="viewDropdown" class="multiselect-dropdown view-dropdown">
+                    <button type="button" class="multi-option custom-dropdown-option" data-view="two">2 в строке</button>
+                    <button type="button" class="multi-option custom-dropdown-option" data-view="one">1 в строке</button>
+                </div>
+            </div>
         </div>
 
         <div id="movieContainer" class="movie-list"></div>
     </div>
 </div>
+
+<button id="openFeedbackBtn" class="floating-feedback-btn" type="button" title="Обратная связь" aria-label="Обратная связь" style="display:none;">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 3v18M6 4h12l-3.2 4L18 12H6"/></svg>
+</button>
 
 <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
@@ -444,7 +532,7 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwYXh2bmxka2NhZmZicWh3aXdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5MjQ1NzUsImV4cCI6MjEwMzUwMDU3NX0.L-VDWW98Vi2G1oAlLRYTEq13v12LCILGgGWma9WSIOI';
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     // --- НАСТРОЙКИ TMDB (БАЗА ДАННЫХ LETTERBOXD) ---
-    const TMDB_API_KEY = 'e68904a99045331d9633fa7145ffe29c'; // <-- Вставьте сюда API Key (v3 auth)
+    const TMDB_API_KEY = 'e68904a99045331d9633fa7145ffe29c';
     let tmdbDebounceTimer = null;
     let tmdbSearchAbortController = null;
 
@@ -469,6 +557,8 @@
     let allHalls = [];
     let allInvites = [];
     let allNotifications = [];
+    let allFeedback = [];
+    let allNews = [];
     let currentHallId = null;
     let pendingDeleteHall = null;
 
@@ -483,6 +573,8 @@
     let selectedFilterTags = [];
     let watchlistFilterTag = '';
     let sortOrder = 'desc';
+    let movieViewMode = localStorage.getItem('duorate_movie_view_mode') === 'two' ? 'two' : 'one';
+    let sidebarCollapsed = localStorage.getItem('duorate_sidebar_collapsed') === 'true';
     let editingMovieId = null;
     let addingSeasonMovieId = null; 
     let activeSeasonView = {};      
@@ -494,7 +586,7 @@
     // --- УПРАВЛЕНИЕ ТЕМАМИ ОФОРМЛЕНИЯ ДЛЯ КАЖДОГО ЗАЛА ОТДЕЛЬНО ---
     let currentTheme = 'standard';
 
-    const AVAILABLE_THEMES = ['standard', 'pickme', 'stars', 'redgold'];
+    const AVAILABLE_THEMES = ['standard', 'pickme', 'stars', 'redgold', 'waterdrop'];
     function normalizeTheme(theme) {
         return AVAILABLE_THEMES.includes(theme) ? theme : 'standard';
     }
@@ -530,13 +622,21 @@
         }
     }
 
+    function getThemeFilterActiveBorderColor(theme) {
+        if (theme === 'pickme') return '#ff69b4';
+        if (theme === 'stars') return '#8dbbff';
+        if (theme === 'redgold') return '#e9bd62';
+        if (theme === 'waterdrop') return '#aafff5';
+        return '#ffffff';
+    }
+
     function syncActivePageTheme() {
         if (!currentHallId) {
             currentTheme = 'standard';
         } else {
             currentTheme = getHallTheme(currentHallId);
         }
-        document.body.classList.remove('theme-pickme', 'theme-stars', 'theme-redgold', 'theme-ocean', 'theme-ouroboros');
+        document.body.classList.remove('theme-pickme', 'theme-stars', 'theme-redgold', 'theme-ocean', 'theme-ouroboros', 'theme-waterdrop');
         if (currentHallId && currentTheme !== 'standard') {
             document.body.classList.add(`theme-${currentTheme}`);
         }
@@ -547,7 +647,7 @@
 
         const filterHeader = document.getElementById('filterHeader');
         if (filterHeader && selectedFilterTags.length > 0) {
-            filterHeader.style.borderColor = currentTheme === 'pickme' ? '#ff69b4' : '#ffffff';
+            filterHeader.style.borderColor = getThemeFilterActiveBorderColor(currentTheme);
         }
     }
 
@@ -694,19 +794,10 @@
     }
 
     // --- ПОИСК В TMDB И АВТОЗАПОЛНЕНИЕ В ФОРМЕ ДОБАВЛЕНИЯ ---
-    function normalizeSearchComparison(str) {
-        return String(str || '')
-            .toLowerCase()
-            .replace(/ё/g, 'е')
-            .trim();
-    }
-
-    // Сопоставление ID жанров TMDB и стран с тегами вашего сайта
     function mapTmdbToSiteTags(item, details = null) {
         const tags = new Set();
         const mediaType = item.media_type || (details && details.number_of_seasons ? 'tv' : 'movie');
 
-        // Собираем ID жанров из поиска или из детального запроса
         const genreIds = item.genre_ids || (details && details.genres ? details.genres.map(g => g.id) : []);
         const originCountries = item.origin_country || (details && details.origin_country) || [];
         const originalLang = item.original_language || (details && details.original_language) || '';
@@ -714,7 +805,6 @@
         const isAnimation = genreIds.includes(16);
         const isAnime = isAnimation && (originCountries.includes('JP') || originalLang === 'ja');
 
-        // 1. Определяем формат проекта
         if (isAnime) {
             tags.add('Аниме');
             if (mediaType === 'movie') tags.add('Фильм');
@@ -726,14 +816,13 @@
             else tags.add('Фильм');
         }
 
-        // 2. Сопоставляем жанры с вашими тегами
         const genreMap = {
-            878: 'Фантастика',     // Sci-Fi (Фильмы)
-            10765: 'Фантастика',   // Sci-Fi & Fantasy (Сериалы)
+            878: 'Фантастика',
+            10765: 'Фантастика',
             35: 'Комедия',
             18: 'Драма',
-            28: 'Экшен',           // Action (Фильмы)
-            10759: 'Экшен',        // Action & Adventure (Сериалы)
+            28: 'Экшен',
+            10759: 'Экшен',
             27: 'Хоррор',
             14: 'Фэнтези',
             12: 'Приключения',
@@ -743,8 +832,8 @@
             36: 'История',
             10402: 'Мюзикл',
             10749: 'Романтика',
-            10752: 'Военный',      // War (Фильмы)
-            10768: 'Военный'       // War & Politics (Сериалы)
+            10752: 'Военный',
+            10768: 'Военный'
         };
 
         genreIds.forEach(id => {
@@ -754,7 +843,6 @@
         return Array.from(tags);
     }
 
-    // Поиск проектов на русском языке с получением обложки из шапки Letterboxd (backdrop_path)
     async function fetchLetterboxdTmdbSuggestions(queryText, signal) {
         if (!TMDB_API_KEY || TMDB_API_KEY === 'ВАШ_КЛЮЧ_TMDB') return [];
         const cleanQuery = queryText.trim();
@@ -774,8 +862,6 @@
                         const releaseDate = item.release_date || item.first_air_date || '';
                         const year = releaseDate ? releaseDate.slice(0, 4) : '';
 
-                        // Берем горизонтальный кадр из шапки Letterboxd (backdrop_path),
-                        // а если его вдруг нет — обычный постер (poster_path)
                         const headerBackdropUrl = item.backdrop_path
                             ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}`
                             : (item.poster_path ? `https://image.tmdb.org/t/p/w780${item.poster_path}` : '');
@@ -833,7 +919,6 @@
         let finalTags = item.tags || [];
         let finalSeasons = item.seasons || [];
 
-        // Подгружаем детальные данные проекта (жанры и сезоны для сериалов) из TMDB
         if (item.source === 'letterboxd' && item.tmdbId && TMDB_API_KEY && TMDB_API_KEY !== 'ВАШ_КЛЮЧ_TMDB') {
             try {
                 const detailUrl = `https://api.themoviedb.org/3/${item.mediaType}/${item.tmdbId}?api_key=${TMDB_API_KEY}&language=ru-RU`;
@@ -841,13 +926,11 @@
                 const details = await res.json();
 
                 if (details) {
-                    // Если в деталях есть backdrop_path, убеждаемся, что стоит максимальное качество из шапки
                     if (details.backdrop_path && posterInput) {
                         posterInput.value = `https://image.tmdb.org/t/p/w1280${details.backdrop_path}`;
                     }
                     finalTags = mapTmdbToSiteTags(item.rawItem || item, details);
 
-                    // Если это сериал, автоматически создаем сезоны (кроме 0-го сезона со спецвыпусками)
                     if (item.mediaType === 'tv' && Array.isArray(details.seasons)) {
                         const validSeasons = details.seasons.filter(s => s.season_number > 0);
                         finalSeasons = validSeasons.map(s => ({
@@ -972,7 +1055,6 @@
             return;
         }
 
-        // Подгружаем фильмы и сериалы на русском только из базы TMDB (без залов других пользователей)
         if (tmdbDebounceTimer) clearTimeout(tmdbDebounceTimer);
         if (tmdbSearchAbortController) tmdbSearchAbortController.abort();
 
@@ -1167,7 +1249,6 @@
         goToHomePage();
     });
 
-    // Действия по клику на карточки шагов на главной странице
     document.getElementById('stepCreateHallCard').addEventListener('click', () => {
         openCreateHallModalAction();
     });
@@ -1202,7 +1283,6 @@
         }
     });
 
-    // Рендер карточек существующих залов пользователя на главной странице
     function renderHomeHallsList() {
         const homeHallsBlock = document.getElementById('homeHallsBlock');
         const homeHallsGrid = document.getElementById('homeHallsGrid');
@@ -1372,12 +1452,11 @@
         });
     }
 
-    // --- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ УДАЛЕНИЯ ЗАЛА ---
     function openDeleteHallModal(hall, friendName) {
         pendingDeleteHall = hall;
         const textEl = document.getElementById('deleteHallConfirmText');
         if (textEl) {
-            textEl.innerHTML = `Вы действительно хотите удалить <strong>«Зал с ${friendName}»</strong>?<br><span style="font-size: 0.82rem; color: #aaa;">Это действие требует подтверждения: все проекты и оценки в этом зале будут безвозвратно удалены.</span>`;
+            textEl.innerHTML = `Вы действительно хотите удалить <strong>«Зал с ${friendName}»</strong>?<br><span style="font-size: 0.82rem; opacity: 0.8;">Это действие требует подтверждения: все проекты и оценки в этом зале будут безвозвратно удалены.</span>`;
         }
         document.getElementById('deleteHallModal').classList.add('show');
     }
@@ -1626,11 +1705,14 @@
         list.innerHTML = '';
 
         const incomingInvites = allInvites.filter(inv => isTargetUser(inv.to));
+        const incomingFeedback = allFeedback
+            .filter(item => isTargetUser(item.to) && (item.status || 'pending') === 'pending')
+            .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
         const incomingNotifs = allNotifications
             .filter(n => isTargetUser(n.to))
             .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
-        const totalCount = incomingInvites.length + incomingNotifs.length;
+        const totalCount = incomingInvites.length + incomingFeedback.length + incomingNotifs.length;
         if (totalCount > 0) {
             badge.style.display = 'inline-flex';
             badge.textContent = totalCount;
@@ -1647,47 +1729,246 @@
             const item = document.createElement('div');
             item.className = 'notif-card invite-type';
             item.innerHTML = `
-                <div class="notif-card-text">
-                    Пользователь <strong>${inv.from}</strong> предлагает вам оценивать фильмы вместе
-                </div>
+                <div class="notif-card-text">Пользователь <strong></strong> предлагает вам оценивать фильмы вместе</div>
                 <div class="notif-card-actions">
                     <button class="btn-accept-invite">Принять</button>
                     <button class="btn-decline-invite">Отклонить</button>
-                </div>
-            `;
-            item.querySelector('.btn-accept-invite').onclick = (e) => {
-                e.stopPropagation();
-                acceptInvite(inv);
-            };
-            item.querySelector('.btn-decline-invite').onclick = (e) => {
-                e.stopPropagation();
-                declineInvite(inv);
-            };
+                </div>`;
+            item.querySelector('strong').textContent = inv.from;
+            item.querySelector('.btn-accept-invite').onclick = (e) => { e.stopPropagation(); acceptInvite(inv); };
+            item.querySelector('.btn-decline-invite').onclick = (e) => { e.stopPropagation(); declineInvite(inv); };
+            list.appendChild(item);
+        });
+
+        incomingFeedback.forEach(feedback => {
+            const item = document.createElement('div');
+            item.className = 'notif-card feedback-type';
+            const text = document.createElement('div');
+            text.className = 'notif-card-text';
+            const heading = document.createElement('div');
+            heading.className = 'feedback-notif-heading';
+            heading.textContent = `${feedback.type || 'Обратная связь'} от ${feedback.from}`;
+            const message = document.createElement('div');
+            message.className = 'feedback-notif-message';
+            message.textContent = feedback.message;
+            text.append(heading, message);
+            const actions = document.createElement('div');
+            actions.className = 'notif-card-actions';
+            const accept = document.createElement('button');
+            accept.className = 'btn-accept-invite';
+            accept.textContent = 'Принять';
+            const decline = document.createElement('button');
+            decline.className = 'btn-decline-invite';
+            decline.textContent = 'Отклонить';
+            accept.onclick = (e) => { e.stopPropagation(); resolveFeedback(feedback, 'accepted'); };
+            decline.onclick = (e) => { e.stopPropagation(); resolveFeedback(feedback, 'rejected'); };
+            actions.append(accept, decline);
+            item.append(text, actions);
             list.appendChild(item);
         });
 
         incomingNotifs.forEach(notif => {
             const item = document.createElement('div');
-            item.className = 'notif-card movie-type';
-            item.innerHTML = `
-                <div class="notif-card-row">
-                    <div class="notif-card-text">
-                        <strong>${notif.from}</strong> посмотрел новый проект <strong>${notif.movieTitle}</strong>
-                    </div>
-                    <button class="btn-dismiss-notif" title="Скрыть">✕</button>
-                </div>
-            `;
-            item.querySelector('.btn-dismiss-notif').onclick = (e) => {
-                e.stopPropagation();
-                deleteNotificationById(notif.id);
-            };
-            item.onclick = () => {
-                if (notif.hallId && allHalls.some(h => h.id === notif.hallId)) {
-                    openHallById(notif.hallId);
-                }
-            };
+            const isMovieNotif = !notif.type || notif.type === 'new_movie';
+            item.className = `notif-card ${isMovieNotif ? 'movie-type' : 'feedback-result-type'}`;
+            const row = document.createElement('div');
+            row.className = 'notif-card-row';
+            const text = document.createElement('div');
+            text.className = 'notif-card-text';
+            if (notif.type === 'feedback_result') {
+                text.textContent = notif.message || 'Статус вашей обратной связи обновлён';
+            } else if (isMovieNotif) {
+                text.textContent = `${notif.from} посмотрел новый проект «${notif.movieTitle || 'Без названия'}»`;
+            } else {
+                text.textContent = notif.message || 'Новое уведомление';
+            }
+            const dismiss = document.createElement('button');
+            dismiss.className = 'btn-dismiss-notif';
+            dismiss.title = 'Скрыть';
+            dismiss.textContent = '✕';
+            dismiss.onclick = (e) => { e.stopPropagation(); deleteNotificationById(notif.id); };
+            row.append(text, dismiss);
+            item.appendChild(row);
+            if (isMovieNotif) {
+                item.onclick = () => {
+                    if (notif.hallId && allHalls.some(h => h.id === notif.hallId)) openHallById(notif.hallId);
+                };
+            }
             list.appendChild(item);
         });
+    }
+
+    function isAristoUser() {
+        return Boolean(currentUser && currentUser.toLowerCase() === 'aristo');
+    }
+
+    async function sendFeedback() {
+        if (!currentUser) {
+            openAuthModal();
+            return;
+        }
+        const typeEl = document.getElementById('feedbackTypeSelect');
+        const messageEl = document.getElementById('feedbackMessageInput');
+        const statusEl = document.getElementById('feedbackStatus');
+        const sendBtn = document.getElementById('sendFeedbackBtn');
+        const message = (messageEl?.value || '').trim();
+        if (!message) {
+            statusEl.textContent = 'Напишите текст обращения';
+            statusEl.className = 'invite-status error';
+            return;
+        }
+        if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = 'Отправка...'; }
+        const payload = {
+            type: typeEl?.value || 'Жалоба',
+            from: currentUser,
+            to: 'Aristo',
+            message,
+            status: 'pending',
+            hallId: currentHallId,
+            createdAt: Date.now()
+        };
+        const id = `feedback_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        const { error } = await supabase.from('watchlist').upsert({
+            id,
+            title: JSON.stringify(payload),
+            priority: 'user_feedback',
+            tags: []
+        });
+        if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Отправить'; }
+        if (error) {
+            console.error('Ошибка отправки обратной связи:', error);
+            statusEl.textContent = 'Не удалось отправить обращение. Попробуйте ещё раз.';
+            statusEl.className = 'invite-status error';
+            return;
+        }
+        allFeedback = [{ id, ...payload }, ...allFeedback.filter(item => item.id !== id)];
+        renderTopNotifications();
+        messageEl.value = '';
+        statusEl.textContent = 'Обратная связь отправлена';
+        statusEl.className = 'invite-status success';
+        window.setTimeout(() => {
+            document.getElementById('feedbackModal')?.classList.remove('show');
+            statusEl.textContent = '';
+            statusEl.className = 'invite-status';
+        }, 800);
+    }
+
+    async function resolveFeedback(feedback, resolution) {
+        if (!isAristoUser() || !feedback || feedback.status !== 'pending') return;
+        const status = resolution === 'accepted' ? 'accepted' : 'rejected';
+        const updated = { ...feedback, status, resolvedAt: Date.now(), resolvedBy: currentUser };
+        const { error } = await supabase.from('watchlist').upsert({
+            id: feedback.id,
+            title: JSON.stringify(updated),
+            priority: 'user_feedback',
+            tags: []
+        });
+        if (error) {
+            console.error('Ошибка обработки обратной связи:', error);
+            return;
+        }
+        allFeedback = allFeedback.map(item => item.id === feedback.id ? updated : item);
+        const resultPayload = {
+            type: 'feedback_result',
+            from: currentUser,
+            to: feedback.from,
+            message: status === 'accepted' ? 'Ваша обратная связь принята' : 'Ваша обратная связь отклонена',
+            feedbackId: feedback.id,
+            createdAt: Date.now()
+        };
+        const notifId = `notif_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        const { error: notifError } = await supabase.from('watchlist').upsert({
+            id: notifId,
+            title: JSON.stringify(resultPayload),
+            priority: 'user_notif',
+            tags: []
+        });
+        if (notifError) console.error('Не удалось уведомить автора обратной связи:', notifError);
+        else allNotifications.unshift({ id: notifId, ...resultPayload });
+        renderTopNotifications();
+    }
+
+    function renderNewsList() {
+        const list = document.getElementById('newsList');
+        const addBtn = document.getElementById('addNewsBtn');
+        if (!list) return;
+        if (addBtn) addBtn.style.display = isAristoUser() && !currentHallId ? 'inline-flex' : 'none';
+        list.innerHTML = '';
+        const news = allNews.slice().sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        if (!news.length) {
+            const empty = document.createElement('div');
+            empty.className = 'notif-empty';
+            empty.textContent = 'Новостей пока нет';
+            list.appendChild(empty);
+            return;
+        }
+        news.forEach(entry => {
+            const card = document.createElement('article');
+            card.className = 'news-card';
+            const message = document.createElement('div');
+            message.className = 'news-card-message';
+            message.textContent = entry.message || '';
+            const date = document.createElement('time');
+            date.className = 'news-card-date';
+            date.textContent = formatRuDate(entry.createdAt || Date.now());
+            card.append(message, date);
+            list.appendChild(card);
+        });
+    }
+
+    async function publishNews() {
+        if (!isAristoUser() || currentHallId) return;
+        const messageEl = document.getElementById('newsMessageInput');
+        const statusEl = document.getElementById('newsStatus');
+        const confirmBtn = document.getElementById('confirmAddNewsBtn');
+        const message = (messageEl?.value || '').trim();
+        if (!message) {
+            statusEl.textContent = 'Введите текст новости';
+            statusEl.className = 'invite-status error';
+            return;
+        }
+        if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.textContent = 'Публикация...'; }
+        const payload = { message, from: currentUser, createdAt: Date.now() };
+        const id = `news_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        const { error } = await supabase.from('watchlist').upsert({
+            id,
+            title: JSON.stringify(payload),
+            priority: 'site_news',
+            tags: []
+        });
+        if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.textContent = 'Опубликовать'; }
+        if (error) {
+            console.error('Ошибка публикации новости:', error);
+            statusEl.textContent = 'Не удалось опубликовать новость. Попробуйте ещё раз.';
+            statusEl.className = 'invite-status error';
+            return;
+        }
+        allNews = [{ id, ...payload }, ...allNews.filter(item => item.id !== id)];
+        renderNewsList();
+        messageEl.value = '';
+        statusEl.textContent = 'Новость опубликована';
+        statusEl.className = 'invite-status success';
+        window.setTimeout(() => {
+            document.getElementById('newsModal')?.classList.remove('show');
+            statusEl.textContent = '';
+            statusEl.className = 'invite-status';
+        }, 700);
+    }
+
+    function updateViewSelectorUI() {
+        document.querySelectorAll('#viewDropdown [data-view]').forEach(btn => {
+            btn.classList.toggle('selected', btn.dataset.view === movieViewMode);
+        });
+    }
+
+    function setMovieViewMode(mode) {
+        movieViewMode = mode === 'two' ? 'two' : 'one';
+        localStorage.setItem('duorate_movie_view_mode', movieViewMode);
+        document.getElementById('movieContainer')?.classList.toggle('view-two', movieViewMode === 'two');
+        document.getElementById('viewDropdown')?.classList.remove('show');
+        document.getElementById('viewToggleBtn')?.setAttribute('aria-expanded', 'false');
+        updateViewSelectorUI();
+        renderMoviesAnimated();
     }
 
     function updateAuthUI() {
@@ -1702,18 +1983,25 @@
         const siteSubtitle = document.getElementById('siteSubtitle');
         const topRightThemes = document.getElementById('topRightThemes');
         const themeDropdown = document.getElementById('themeDropdown');
+        const topRightNews = document.getElementById('topRightNews');
+        const newsDropdown = document.getElementById('newsDropdown');
+        const openFeedbackBtn = document.getElementById('openFeedbackBtn');
+        const sidebarToggle = document.getElementById('sidebarCollapseToggle');
 
         const userDisplay = document.getElementById('authUserDisplay');
         const openAuthBtn = document.getElementById('openAuthBtn');
         const authActionsRow = document.getElementById('authActionsRow');
         const openFormBtn = document.getElementById('openFormBtn');
 
-        // Если пользователь не авторизован — показываем главную страницу в режиме гостя
         if (!currentUser) {
             currentHallId = null;
             syncActivePageTheme();
             if (topRightThemes) topRightThemes.style.display = 'none';
             if (themeDropdown) themeDropdown.classList.remove('show');
+            if (topRightNews) topRightNews.style.display = 'flex';
+            if (newsDropdown) newsDropdown.classList.remove('show');
+            if (openFeedbackBtn) openFeedbackBtn.style.display = 'none';
+            if (watchlistSidebar) watchlistSidebar.classList.remove('sidebar-collapsed');
             homePageWrapper.style.display = 'flex';
             guestStateBox.style.display = 'flex';
             inviteStateBox.style.display = 'none';
@@ -1726,10 +2014,10 @@
             renderHomeHallsList();
             renderHomeShowcaseMarquee();
             renderTopNotifications();
+            renderNewsList();
             return;
         }
 
-        // Пользователь авторизован
         guestStateBox.style.display = 'none';
         statsSidebar.style.display = 'flex';
         userDisplay.textContent = currentUser;
@@ -1746,30 +2034,36 @@
         renderHomeHallsList();
         renderHomeShowcaseMarquee();
         renderTopNotifications();
+        renderNewsList();
+        if (topRightNews) topRightNews.style.display = currentHallId ? 'none' : 'flex';
+        if (newsDropdown && currentHallId) newsDropdown.classList.remove('show');
+        if (openFeedbackBtn) openFeedbackBtn.style.display = currentHallId ? 'flex' : 'none';
+        if (sidebarToggle) {
+            sidebarToggle.textContent = sidebarCollapsed ? '›' : '‹';
+            sidebarToggle.title = sidebarCollapsed ? 'Развернуть боковую панель' : 'Скрыть боковую панель';
+            sidebarToggle.setAttribute('aria-label', sidebarToggle.title);
+        }
 
         if (!currentHallId) {
-            // Мы находимся на ГЛАВНОЙ СТРАНИЦЕ:
-            // - Тема всегда стандартная, кнопки тем нет
-            // - В правой панели отображается только профиль (список залов скрыт)
             if (topRightThemes) topRightThemes.style.display = 'none';
             if (themeDropdown) themeDropdown.classList.remove('show');
             homePageWrapper.style.display = 'flex';
             inviteStateBox.style.display = 'flex';
             hallContentWrapper.style.display = 'none';
             watchlistSidebar.style.display = 'none';
+            watchlistSidebar.classList.remove('sidebar-collapsed');
             statsBlock.style.display = 'none';
             if (hallsSection) hallsSection.style.display = 'none';
             if (siteSubtitle) siteSubtitle.style.display = 'block';
         } else {
-            // Мы находимся ВНУТРИ ОТКРЫТОГО ЗАЛА:
-            // - Показываем кнопку тем для этого зала
-            // - В правой панели под профилем отображается список «Оценочные залы» для быстрого перехода
             if (topRightThemes) topRightThemes.style.display = 'block';
             homePageWrapper.style.display = 'none';
             inviteStateBox.style.display = 'none';
             hallContentWrapper.style.display = 'flex';
             watchlistSidebar.style.display = 'flex';
+            watchlistSidebar.classList.toggle('sidebar-collapsed', sidebarCollapsed);
             statsBlock.style.display = 'flex';
+            renderViewHistory();
             openFormBtn.style.display = 'flex';
             if (hallsSection) hallsSection.style.display = 'flex';
             if (siteSubtitle) siteSubtitle.style.display = 'block';
@@ -2070,6 +2364,8 @@
         const dbHalls = [];
         const dbInvites = [];
         const dbNotifs = [];
+        const dbFeedback = [];
+        const dbNews = [];
 
         (rawWatchlist || []).forEach(item => {
             const idStr = String(item.id || '');
@@ -2101,16 +2397,21 @@
             } else if (idStr.startsWith('notif_')) {
                 try {
                     const parsed = JSON.parse(item.title);
-                    if (parsed && parsed.from && parsed.to && parsed.movieTitle) {
-                        dbNotifs.push({
-                            id: idStr,
-                            from: parsed.from,
-                            to: parsed.to,
-                            movieTitle: parsed.movieTitle,
-                            hallId: parsed.hallId,
-                            createdAt: parsed.createdAt || 0
-                        });
+                    if (parsed && parsed.from && parsed.to) {
+                        dbNotifs.push({ id: idStr, ...parsed, createdAt: parsed.createdAt || 0 });
                     }
+                } catch {}
+            } else if (idStr.startsWith('feedback_')) {
+                try {
+                    const parsed = JSON.parse(item.title);
+                    if (parsed && parsed.from && parsed.to && parsed.message) {
+                        dbFeedback.push({ id: idStr, ...parsed, createdAt: parsed.createdAt || 0, status: parsed.status || 'pending' });
+                    }
+                } catch {}
+            } else if (idStr.startsWith('news_')) {
+                try {
+                    const parsed = JSON.parse(item.title);
+                    if (parsed && parsed.message) dbNews.push({ id: idStr, ...parsed, createdAt: parsed.createdAt || 0 });
                 } catch {}
             } else {
                 const rawTags = item.tags || [];
@@ -2129,11 +2430,14 @@
         allHalls = dbHalls;
         allInvites = dbInvites;
         allNotifications = dbNotifs;
+        allFeedback = dbFeedback;
+        allNews = dbNews.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
         allWatchlistRaw = cleanWatchlist;
     }
 
     async function initApp() {
         upgradeAllSelects();
+        updateViewSelectorUI();
         updateAuthUI();
 
         try {
@@ -2202,6 +2506,7 @@
             id: m.id,
             title: m.title,
             poster: m.poster,
+            createdAt: m.created_at || (Number.isFinite(Number(m.id)) && Number(m.id) > 0 ? Number(m.id) : null),
             ratingAristo: m.rating_aristo,
             ratingFliri: m.rating_fliri,
             tags: visibleTags,
@@ -2662,9 +2967,56 @@
         document.getElementById('countFliri').textContent = countUser2;
     }
 
+    function formatRuDate(value) {
+        const date = value instanceof Date ? value : new Date(value);
+        if (!Number.isFinite(date.getTime())) return 'Дата неизвестна';
+        return date.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    function getMovieAddedTimestamp(movie) {
+        const createdAt = movie?.createdAt;
+        if (createdAt) {
+            const parsed = typeof createdAt === 'number' ? createdAt : Date.parse(createdAt);
+            if (Number.isFinite(parsed) && parsed > 0) return parsed;
+        }
+        const idTimestamp = Number(movie?.id);
+        return Number.isFinite(idTimestamp) && idTimestamp > 0 ? idTimestamp : 0;
+    }
+
+    function renderViewHistory() {
+        const list = document.getElementById('viewHistoryList');
+        if (!list) return;
+        list.innerHTML = '';
+        const movies = getMoviesForCurrentHall()
+            .slice()
+            .sort((a, b) => getMovieAddedTimestamp(b) - getMovieAddedTimestamp(a));
+        if (!movies.length) {
+            const empty = document.createElement('div');
+            empty.className = 'history-empty';
+            empty.textContent = 'История пока пуста';
+            list.appendChild(empty);
+            return;
+        }
+        movies.forEach(movie => {
+            const row = document.createElement('div');
+            row.className = 'history-item';
+            const title = document.createElement('div');
+            title.className = 'history-item-title';
+            title.textContent = movie.title || 'Без названия';
+            const date = document.createElement('div');
+            date.className = 'history-item-date';
+            const timestamp = getMovieAddedTimestamp(movie);
+            date.textContent = timestamp ? formatRuDate(timestamp) : 'Дата неизвестна';
+            row.append(title, date);
+            row.title = 'Дата добавления карточки проекта';
+            list.appendChild(row);
+        });
+    }
+
     function renderMoviesDOM() {
         const container = document.getElementById('movieContainer');
         if (!container) return;
+        container.classList.toggle('view-two', movieViewMode === 'two');
         container.innerHTML = '';
 
         const hall = getCurrentHall();
@@ -2678,6 +3030,7 @@
 
         const hallMovies = getMoviesForCurrentHall();
         renderStats(hallMovies);
+        renderViewHistory();
 
         const onlyAristoSelected = selectedFilterTags.includes('only_aristo');
         const onlyFliriSelected = selectedFilterTags.includes('only_fliri');
@@ -2745,8 +3098,6 @@
             return;
         }
 
-        const actionBtnStyle = "background: #111; color: #fff; border: 1px solid #555; border-radius: 20px; padding: 6px 16px; font-size: 0.85rem; cursor: pointer; transition: 0.2s; font-family: inherit;";
-        const deleteBtnStyle = "background: #ef4444; color: #fff; border: none; border-radius: 20px; padding: 6px 16px; font-size: 0.85rem; cursor: pointer; transition: 0.2s; font-family: inherit;";
         const userCanEdit = canEditSite();
 
         filteredMovies.forEach((movie) => {
@@ -2794,10 +3145,10 @@
                                 <div class="edit-tags-list form-tags-list"></div>
                             </div>
                         </div>
-                        <div class="edit-mode-buttons" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
-                            <button class="btn-save-edit" style="${actionBtnStyle}">Сохранить</button>
-                            <button class="btn-cancel-edit" style="${actionBtnStyle}">Отмена</button>
-                            <button class="btn-delete-edit" style="${deleteBtnStyle}">Удалить проект</button>
+                        <div class="edit-mode-buttons">
+                            <button class="btn-save-edit">Сохранить</button>
+                            <button class="btn-cancel-edit">Отмена</button>
+                            <button class="btn-delete-edit">Удалить проект</button>
                         </div>
                     </div>
                 `;
@@ -2855,10 +3206,10 @@
                             <input type="text" class="edit-season-num" value="${season.seasonNumber}" placeholder="Номер сезона" />
                             <input type="url" class="edit-season-poster" value="${season.poster || ''}" placeholder="Ссылка на постер сезона" />
                         </div>
-                        <div class="edit-mode-buttons" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
-                            <button class="btn-save-season-edit" style="${actionBtnStyle}">Сохранить</button>
-                            <button class="btn-cancel-season-edit" style="${actionBtnStyle}">Отмена</button>
-                            <button class="btn-delete-season" style="${deleteBtnStyle}">Удалить сезон</button>
+                        <div class="edit-mode-buttons">
+                            <button class="btn-save-season-edit btn-save-edit">Сохранить</button>
+                            <button class="btn-cancel-season-edit btn-cancel-edit">Отмена</button>
+                            <button class="btn-delete-season btn-delete-edit">Удалить сезон</button>
                         </div>
                     </div>
                 `;
@@ -2894,9 +3245,9 @@
                             <input type="text" class="add-season-num" placeholder="Номер сезона (например: 1)" />
                             <input type="url" class="add-season-poster" placeholder="Ссылка на постер сезона" />
                         </div>
-                        <div class="edit-mode-buttons" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
-                            <button class="btn-save-season" style="${actionBtnStyle}">Добавить сезон</button>
-                            <button class="btn-cancel-season" style="${actionBtnStyle}">Отмена</button>
+                        <div class="edit-mode-buttons">
+                            <button class="btn-save-season btn-save-edit">Добавить сезон</button>
+                            <button class="btn-cancel-season btn-cancel-edit">Отмена</button>
                         </div>
                     </div>
                 `;
@@ -3351,12 +3702,13 @@
 
     filterHeader.addEventListener('click', (e) => {
         e.stopPropagation();
+        document.getElementById('viewDropdown')?.classList.remove('show');
         closeAllDropdowns(filterOptions);
         filterOptions.classList.toggle('show');
     });
 
     document.addEventListener('click', (e) => {
-        if (!e.target.closest('.custom-multiselect-container') && !e.target.closest('.custom-dropdown-wrapper')) {
+        if (!e.target.closest('.custom-multiselect-container') && !e.target.closest('.custom-dropdown-wrapper') && !e.target.closest('#viewSelector')) {
             closeAllDropdowns();
         }
         if (!e.target.closest('#topRightNotifications')) {
@@ -3380,7 +3732,7 @@
             
             if (selectedFilterTags.length > 0) {
                 filterHeader.textContent = `Теги (${selectedFilterTags.length})`;
-                filterHeader.style.borderColor = currentTheme === 'pickme' ? '#ff69b4' : '#ffffff';
+                filterHeader.style.borderColor = getThemeFilterActiveBorderColor(currentTheme);
             } else {
                 filterHeader.textContent = 'Теги';
                 filterHeader.style.borderColor = '';
@@ -3479,6 +3831,7 @@
 
         const newMovie = {
             id: Date.now().toString(),
+            createdAt: Date.now(),
             title: title,
             poster: poster,
             ratingAristo: ratingAristoInput.value,
@@ -3526,6 +3879,34 @@
         renderMoviesAnimated();
     });
 
+    // --- ЛЕВАЯ ПАНЕЛЬ: ЕДИНОЕ РАЗВОРАЧИВАНИЕ ДЛЯ СТАТИСТИКИ, ИСТОРИИ И СПИСКА ---
+    const toggleStatsItems = () => {
+        document.getElementById('statsItemsContainer')?.classList.toggle('collapsed');
+        document.getElementById('statsArrow')?.classList.toggle('rotated');
+    };
+
+    document.getElementById('statsToggleBtn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleStatsItems();
+    });
+    document.getElementById('statsTitleText')?.addEventListener('click', toggleStatsItems);
+
+    const toggleViewHistoryItems = () => {
+        const list = document.getElementById('viewHistoryList');
+        const button = document.getElementById('viewHistoryToggle');
+        const arrow = document.getElementById('viewHistoryArrow');
+        if (!list) return;
+        const collapsed = list.classList.toggle('collapsed');
+        button?.setAttribute('aria-expanded', String(!collapsed));
+        arrow?.classList.toggle('rotated', collapsed);
+    };
+
+    document.getElementById('viewHistoryToggle')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleViewHistoryItems();
+    });
+    document.getElementById('viewHistoryTitleText')?.addEventListener('click', toggleViewHistoryItems);
+
     const toggleWatchlistItems = () => {
         document.getElementById('watchlistItems').classList.toggle('collapsed');
         document.getElementById('watchlistArrow').classList.toggle('rotated');
@@ -3549,6 +3930,84 @@
         }
     });
 
+    // --- СКРЫТИЕ БОКОВОЙ ПАНЕЛИ, ВИД КАРТОЧЕК, НОВОСТИ И ОБРАТНАЯ СВЯЗЬ ---
+    const sidebarCollapseToggle = document.getElementById('sidebarCollapseToggle');
+    sidebarCollapseToggle?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sidebarCollapsed = !sidebarCollapsed;
+        localStorage.setItem('duorate_sidebar_collapsed', String(sidebarCollapsed));
+        const sidebar = document.getElementById('watchlistSidebar');
+        sidebar?.classList.toggle('sidebar-collapsed', sidebarCollapsed);
+        sidebarCollapseToggle.textContent = sidebarCollapsed ? '›' : '‹';
+        sidebarCollapseToggle.title = sidebarCollapsed ? 'Развернуть боковую панель' : 'Скрыть боковую панель';
+        sidebarCollapseToggle.setAttribute('aria-label', sidebarCollapseToggle.title);
+    });
+
+    document.getElementById('viewToggleBtn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const dropdown = document.getElementById('viewDropdown');
+        closeAllDropdowns(dropdown);
+        const opened = dropdown.classList.toggle('show');
+        document.getElementById('viewToggleBtn').setAttribute('aria-expanded', String(opened));
+        updateViewSelectorUI();
+    });
+    document.querySelectorAll('#viewDropdown [data-view]').forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.stopPropagation();
+            setMovieViewMode(button.dataset.view);
+        });
+    });
+
+    document.getElementById('openFeedbackBtn')?.addEventListener('click', () => {
+        if (!currentUser) { openAuthModal(); return; }
+        const status = document.getElementById('feedbackStatus');
+        status.textContent = '';
+        status.className = 'invite-status';
+        document.getElementById('feedbackModal').classList.add('show');
+        document.getElementById('feedbackMessageInput').focus();
+    });
+    document.getElementById('closeFeedbackModal')?.addEventListener('click', () => document.getElementById('feedbackModal').classList.remove('show'));
+    document.getElementById('sendFeedbackBtn')?.addEventListener('click', sendFeedback);
+
+    document.getElementById('newsToggleBtn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const dropdown = document.getElementById('newsDropdown');
+        document.getElementById('themeDropdown')?.classList.remove('show');
+        document.getElementById('notifDropdown')?.classList.remove('show');
+        renderNewsList();
+        dropdown.classList.toggle('show');
+    });
+    document.getElementById('addNewsBtn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.getElementById('newsDropdown')?.classList.remove('show');
+        document.getElementById('newsStatus').textContent = '';
+        document.getElementById('newsStatus').className = 'invite-status';
+        document.getElementById('newsMessageInput').value = '';
+        document.getElementById('newsModal').classList.add('show');
+        document.getElementById('newsMessageInput').focus();
+    });
+    document.getElementById('closeNewsModal')?.addEventListener('click', () => document.getElementById('newsModal').classList.remove('show'));
+    document.getElementById('confirmAddNewsBtn')?.addEventListener('click', publishNews);
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('#topRightNews')) document.getElementById('newsDropdown')?.classList.remove('show');
+        if (!e.target.closest('#viewSelector')) {
+            document.getElementById('viewDropdown')?.classList.remove('show');
+            document.getElementById('viewToggleBtn')?.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.getElementById('feedbackModal')?.classList.remove('show');
+            document.getElementById('newsModal')?.classList.remove('show');
+            document.getElementById('newsDropdown')?.classList.remove('show');
+            document.getElementById('viewDropdown')?.classList.remove('show');
+        }
+    });
+
+    document.getElementById('movieContainer')?.classList.toggle('view-two', movieViewMode === 'two');
+    renderNewsList();
     initApp();
 </script>
 
