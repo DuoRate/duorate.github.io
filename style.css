@@ -360,6 +360,26 @@ body::before {
     text-shadow: 0 1px 6px rgba(1, 28, 56, 0.85);
 }
 
+.home-hall-card.hall-theme-silenthill {
+    background: linear-gradient(145deg, #687375 0%, #3d4849 52%, #242d2a 100%);
+    border-color: #a3c2b3;
+    box-shadow: 0 4px 18px rgba(18, 24, 24, 0.45);
+}
+
+.home-hall-card.hall-theme-silenthill:hover {
+    border-color: #d8e6df;
+    transform: translateY(-2px);
+}
+
+.home-hall-card.hall-theme-silenthill .home-hall-card-title {
+    color: #eef3f2;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
+}
+
+.home-hall-card.hall-theme-silenthill .home-hall-card-sub {
+    color: #c2d1cb;
+}
+
 /* --- ПАНЕЛЬ В ПРАВОМ ВЕРХНЕМ УГЛУ (ТЕМЫ, НОВОСТИ И УВЕДОМЛЕНИЯ) --- */
 .top-right-bar {
     position: fixed;
@@ -3456,26 +3476,23 @@ body.theme-redgold .movie-card .tag-item {
 }
 
 
-/* ==========================================================================
+/* --------------------------------------------------------------------------
    4. ТЕМА "ВОДИЧКА" (theme-waterdrop) — НАСЫЩЕННАЯ БИРЮЗОВАЯ ВОДНАЯ ГЛАДЬ,
-   ВЗГЛЯД СНИЗУ ВВЕРХ НА СОЛНЦЕ + АНИМИРОВАННЫЕ БЕЗШОВНЫЕ ВОЛНУШКИ
-   ========================================================================== */
+   ВЗГЛЯД СНИЗУ ВВЕРХ НА СОЛНЦЕ + АНИМИРОВАННЫЕ БЕСШОВНЫЕ ВОЛНУШКИ
+   -------------------------------------------------------------------------- */
 body.theme-waterdrop {
     background-color: #024468 !important;
     background-image:
-        /* 1. Мягкое солнечное окно Снеллиуса в центре (взгляд из-под воды вверх на солнце) */
         radial-gradient(ellipse 17% 14% at 44% 34%,
             rgba(248, 255, 255, 0.95) 0%,
             rgba(182, 255, 252, 0.86) 28%,
             rgba(56, 232, 238, 0.58) 58%,
             transparent 100%),
-        /* 2. Широкое насыщенно-бирюзовое свечение вокруг солнечного центра */
         radial-gradient(ellipse 48% 42% at 46% 36%,
             rgba(24, 218, 228, 0.72) 0%,
             rgba(6, 174, 204, 0.52) 45%,
             rgba(4, 122, 168, 0.26) 76%,
             transparent 100%),
-        /* 3. Крупные аквамариновые переливы водной поверхности по бокам */
         radial-gradient(ellipse 65% 55% at 76% 32%,
             rgba(18, 198, 214, 0.46) 0%,
             rgba(5, 136, 176, 0.24) 55%,
@@ -3483,7 +3500,6 @@ body.theme-waterdrop {
         radial-gradient(ellipse 60% 50% at 20% 28%,
             rgba(16, 184, 206, 0.36) 0%,
             transparent 80%),
-        /* 4. Основной глубокий насыщенно-бирюзовый и морской синий фон */
         radial-gradient(ellipse 125% 115% at 46% 36%,
             #0cb8d4 0%,
             #068eb2 32%,
@@ -3493,7 +3509,6 @@ body.theme-waterdrop {
     color: #f2ffff;
 }
 
-/* Слой 1: Мягкие анимированные волнушки на водной глади + солнечные лучи сверху вниз */
 body.theme-waterdrop::before {
     content: "";
     position: fixed;
@@ -3503,9 +3518,7 @@ body.theme-waterdrop::before {
     opacity: 0.92;
     filter: none;
     background-image:
-        /* Деликатные плавные волнушки и солнечные дуги каустики (SVG-паттерн 720x360) */
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='720' height='360' viewBox='0 0 720 360'%3E%3Cdefs%3E%3Cfilter id='wBlur' x='-15%25' y='-15%25' width='130%25' height='130%25'%3E%3CfeGaussianBlur stdDeviation='1.8'/%3E%3C/filter%3E%3C/defs%3E%3Cg fill='none' stroke-linecap='round' filter='url(%23wBlur)'%3E%3Cpath d='M-60 55 Q 30 28, 120 55 T 300 55 T 480 55 T 660 55 T 840 55' stroke='rgba(210,255,254,0.28)' stroke-width='2.6'/%3E%3Cpath d='M-40 135 Q 50 162, 140 135 T 320 135 T 500 135 T 680 135 T 860 135' stroke='rgba(145,250,248,0.22)' stroke-width='2.2'/%3E%3Cpath d='M-50 225 Q 40 198, 130 225 T 310 225 T 490 225 T 670 225 T 850 225' stroke='rgba(195,255,252,0.25)' stroke-width='2.4'/%3E%3Cpath d='M-30 305 Q 60 330, 150 305 T 330 305 T 510 305 T 690 305 T 870 305' stroke='rgba(120,242,246,0.20)' stroke-width='2'/%3E%3Cpath d='M 90 92 Q 165 68, 240 92' stroke='rgba(255,255,255,0.34)' stroke-width='2.8'/%3E%3Cpath d='M 430 180 Q 515 154, 600 180' stroke='rgba(255,255,255,0.30)' stroke-width='2.6'/%3E%3Cpath d='M 210 268 Q 290 292, 370 268' stroke='rgba(220,255,254,0.28)' stroke-width='2.4'/%3E%3C/g%3E%3C/svg%3E"),
-        /* Объёмные солнечные лучи, пробивающие бирюзовую толщу воды */
         conic-gradient(from 118deg at 44% 34%,
             transparent 0deg,
             rgba(170, 255, 252, 0.28) 9deg,
@@ -3524,7 +3537,6 @@ body.theme-waterdrop::before {
             transparent 272deg,
             rgba(120, 242, 248, 0.20) 318deg,
             transparent 360deg),
-        /* Крупные мягкие аквамариновые переливы волн */
         radial-gradient(ellipse 28% 10% at 34% 22%, rgba(165, 255, 250, 0.34) 0%, rgba(32, 214, 226, 0.14) 55%, transparent 100%),
         radial-gradient(ellipse 32% 11% at 64% 24%, rgba(155, 255, 250, 0.32) 0%, rgba(28, 208, 222, 0.14) 55%, transparent 100%),
         radial-gradient(ellipse 36% 12% at 24% 48%, rgba(92, 238, 244, 0.26) 0%, transparent 90%),
@@ -3537,7 +3549,6 @@ body.theme-waterdrop::before {
     will-change: transform;
 }
 
-/* Слой 2: Встречные волнушки и покатые водные кольца на глади воды */
 body.theme-waterdrop::after {
     content: "";
     position: fixed;
@@ -3547,12 +3558,9 @@ body.theme-waterdrop::after {
     opacity: 0.86;
     filter: none;
     background-image:
-        /* Встречный слой мягких волнушек и овальных бликов воды (SVG-паттерн 640x320) */
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='320' viewBox='0 0 640 320'%3E%3Cdefs%3E%3Cfilter id='wBlur2' x='-15%25' y='-15%25' width='130%25' height='130%25'%3E%3CfeGaussianBlur stdDeviation='2.2'/%3E%3C/filter%3E%3C/defs%3E%3Cg fill='none' stroke-linecap='round' filter='url(%23wBlur2)'%3E%3Cpath d='M-40 82 C 70 52, 150 112, 260 82 C 370 52, 450 112, 560 82 C 615 67, 655 82, 700 82' stroke='rgba(235,255,255,0.24)' stroke-width='2.2'/%3E%3Cpath d='M-50 205 C 60 235, 150 175, 260 205 C 370 235, 460 175, 570 205 C 620 220, 660 205, 700 205' stroke='rgba(155,252,250,0.20)' stroke-width='2'/%3E%3Cellipse cx='180' cy='140' rx='78' ry='18' stroke='rgba(215,255,254,0.22)' stroke-width='2'/%3E%3Cellipse cx='470' cy='255' rx='92' ry='20' stroke='rgba(175,252,250,0.20)' stroke-width='1.8'/%3E%3Cpath d='M 330 44 Q 405 22, 480 44' stroke='rgba(255,255,255,0.28)' stroke-width='2.4'/%3E%3C/g%3E%3C/svg%3E"),
-        /* Живые солнечные блики прямо в центре окна Снеллиуса */
         radial-gradient(ellipse 14% 10% at 43% 33%, rgba(255, 255, 255, 0.72) 0%, rgba(140, 255, 252, 0.34) 55%, transparent 100%),
         radial-gradient(ellipse 16% 11% at 47% 37%, rgba(235, 255, 255, 0.62) 0%, rgba(90, 245, 248, 0.28) 58%, transparent 100%),
-        /* Мягкие бирюзовые и глубокие синие покатые волны по краям */
         radial-gradient(ellipse 36% 13% at 52% 16%, rgba(125, 248, 248, 0.28) 0%, transparent 85%),
         radial-gradient(ellipse 34% 12% at 18% 34%, rgba(2, 52, 86, 0.36) 0%, transparent 85%),
         radial-gradient(ellipse 36% 13% at 82% 38%, rgba(2, 56, 92, 0.34) 0%, transparent 85%),
@@ -3564,7 +3572,6 @@ body.theme-waterdrop::after {
     will-change: transform;
 }
 
-/* Бесшовное круговое колыхание водной глади и волнушек (0% и 100% полностью совпадают) */
 @keyframes turquoiseWaveSwayA {
     0% {
         transform: translate3d(0px, 0px, 0) scale(1.04, 1.02) rotate(0deg) skewX(0deg);
@@ -3616,7 +3623,6 @@ body.theme-waterdrop .dropdown-divider {
     border-top-color: rgba(126, 249, 245, 0.34);
 }
 
-/* Контейнеры и всплывающие окна в теме Водичка */
 body.theme-waterdrop .watchlist-sidebar,
 body.theme-waterdrop .stats-sidebar,
 body.theme-waterdrop .add-form-container,
@@ -3655,7 +3661,6 @@ body.theme-waterdrop .btn-clear-notifs:hover {
     color: #ffffff;
 }
 
-/* Плашки статистики, истории, буду смотреть, профиля, залов и уведомлений */
 body.theme-waterdrop .stats-item,
 body.theme-waterdrop .history-item,
 body.theme-waterdrop .watchlist-card,
@@ -3694,7 +3699,6 @@ body.theme-waterdrop .auth-user-display {
     border-color: rgba(126, 249, 245, 0.54) !important;
 }
 
-/* Все текстовые поля, инпуты и селекты в теме Водичка */
 body.theme-waterdrop input[type="text"],
 body.theme-waterdrop input[type="url"],
 body.theme-waterdrop input[type="password"],
@@ -3772,7 +3776,6 @@ body.theme-waterdrop .form-tag-chip {
     color: #d4fffb !important;
 }
 
-/* Кнопки управления в теме Водичка */
 body.theme-waterdrop .btn-notif-bell,
 body.theme-waterdrop .btn-open-form,
 body.theme-waterdrop .btn-confirm,
@@ -3860,13 +3863,348 @@ body.theme-waterdrop .movie-card .tag-item {
 }
 
 
+/* ==========================================================================
+   5. ТЕМА "ТИХИЙ ХОЛМ" (theme-silenthill)
+   Пустая пригородная дорога в левой трети экрана, уходящая в туманную даль,
+   знак "Welcome to DuoRate" в правой трети экрана, лёгкая постоянная дымка
+   и периодически заволакивающий весь задний план густой туман.
+   ========================================================================== */
+body.theme-silenthill {
+    background-color: #4f5859 !important;
+    background-image: linear-gradient(180deg, #b8c2c4 0%, #8e999b 44%, #555f60 76%, #313839 100%) !important;
+    background-attachment: fixed;
+    color: #e6eceb;
+}
+
+/* Слой 1: Детальная SVG-сцена пригородной дороги (в левой трети) и дорожного знака "Welcome to DuoRate" (в правой трети) */
+body.theme-silenthill::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    opacity: 0.96;
+    filter: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080' preserveAspectRatio='xMidYMid slice'%3E%3Cdefs%3E%3ClinearGradient id='shSky' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23c8d0d2'/%3E%3Cstop offset='38%25' stop-color='%239da7a9'/%3E%3Cstop offset='66%25' stop-color='%236c7678'/%3E%3Cstop offset='100%25' stop-color='%23353c3d'/%3E%3C/linearGradient%3E%3ClinearGradient id='shRoad' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%236e7779' stop-opacity='0.25'/%3E%3Cstop offset='28%25' stop-color='%23434a4c' stop-opacity='0.88'/%3E%3Cstop offset='100%25' stop-color='%231e2224'/%3E%3C/linearGradient%3E%3ClinearGradient id='shGround' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23788283' stop-opacity='0.5'/%3E%3Cstop offset='40%25' stop-color='%23454e4c'/%3E%3Cstop offset='100%25' stop-color='%23232928'/%3E%3C/linearGradient%3E%3ClinearGradient id='shHorizonMist' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23d4dcde' stop-opacity='0'/%3E%3Cstop offset='48%25' stop-color='%23d4dcde' stop-opacity='0.88'/%3E%3Cstop offset='100%25' stop-color='%23d4dcde' stop-opacity='0'/%3E%3C/linearGradient%3E%3ClinearGradient id='shSignFace' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23283d33'/%3E%3Cstop offset='55%25' stop-color='%231d2e26'/%3E%3Cstop offset='100%25' stop-color='%2314211b'/%3E%3C/linearGradient%3E%3Cfilter id='shBlurFar' x='-10%25' y='-10%25' width='120%25' height='120%25'%3E%3CfeGaussianBlur stdDeviation='3.5'/%3E%3C/filter%3E%3Cfilter id='shSoftFog' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeGaussianBlur stdDeviation='24'/%3E%3C/filter%3E%3Cfilter id='shShadow' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeDropShadow dx='0' dy='8' stdDeviation='8' flood-color='%23000000' flood-opacity='0.55'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='1920' height='1080' fill='url(%23shSky)'/%3E%3Cg fill='%23596364' opacity='0.42' filter='url(%23shBlurFar)'%3E%3Cpolygon points='0,440 45,355 90,440'/%3E%3Cpolygon points='65,440 120,330 175,440'/%3E%3Cpolygon points='150,440 195,365 240,440'/%3E%3Cpolygon points='220,440 270,340 320,440'/%3E%3Cpolygon points='460,440 505,360 550,440'/%3E%3Cpolygon points='525,440 580,335 635,440'/%3E%3Cpolygon points='610,440 660,350 710,440'/%3E%3Cpolygon points='780,440 835,345 890,440'/%3E%3Cpolygon points='860,440 915,325 970,440'/%3E%3Cpolygon points='1080,440 1135,340 1190,440'/%3E%3Cpolygon points='1160,440 1225,315 1290,440'/%3E%3Cpolygon points='1260,440 1320,345 1380,440'/%3E%3Cpolygon points='1450,440 1515,320 1580,440'/%3E%3Cpolygon points='1545,440 1615,300 1685,440'/%3E%3Cpolygon points='1650,440 1720,335 1790,440'/%3E%3Cpolygon points='1760,440 1835,310 1910,440'/%3E%3C/g%3E%3Crect x='0' y='425' width='1920' height='655' fill='url(%23shGround)'/%3E%3Cg stroke='%23434b4d' fill='none' opacity='0.65'%3E%3Cline x1='355' y1='425' x2='355' y2='365' stroke-width='2.5'/%3E%3Cline x1='346' y1='373' x2='364' y2='373' stroke-width='2'/%3E%3Cline x1='305' y1='505' x2='305' y2='395' stroke-width='4'/%3E%3Cline x1='290' y1='408' x2='320' y2='408' stroke-width='3'/%3E%3Cline x1='215' y1='655' x2='215' y2='455' stroke-width='6.5'/%3E%3Cline x1='192' y1='474' x2='238' y2='474' stroke-width='4.5'/%3E%3Cpath d='M355,373 Q330,398 305,408 Q260,452 215,474 Q120,545 0,600' stroke-width='1.5' opacity='0.55'/%3E%3C/g%3E%3Cpolygon points='368,425 408,425 790,1080 -90,1080' fill='%23474f4e' opacity='0.75'/%3E%3Cpolygon points='374,425 402,425 735,1080 -45,1080' fill='url(%23shRoad)'/%3E%3Cline x1='374' y1='425' x2='-15' y2='1080' stroke='%239aa3a4' stroke-width='3' opacity='0.42'/%3E%3Cline x1='402' y1='425' x2='705' y2='1080' stroke='%239aa3a4' stroke-width='3.5' opacity='0.48'/%3E%3Cline x1='388' y1='432' x2='342' y2='1080' stroke='%23d4be72' stroke-width='5' stroke-dasharray='34 28' opacity='0.62'/%3E%3Cpath d='M180,790 L225,805 L205,820 M445,890 L410,915 L435,935' stroke='%2316191a' stroke-width='2' fill='none' opacity='0.55'/%3E%3Crect x='0' y='330' width='1920' height='210' fill='url(%23shHorizonMist)'/%3E%3Cg transform='translate(1490, 560) rotate(-1.4)' filter='url(%23shShadow)'%3E%3Crect x='-128' y='65' width='18' height='390' rx='3' fill='%233d332a' stroke='%23231d17' stroke-width='2'/%3E%3Crect x='110' y='65' width='18' height='390' rx='3' fill='%233d332a' stroke='%23231d17' stroke-width='2'/%3E%3Crect x='-215' y='-95' width='430' height='190' rx='12' fill='url(%23shSignFace)' stroke='%2396a69e' stroke-width='5'/%3E%3Crect x='-203' y='-83' width='406' height='166' rx='7' fill='none' stroke='%23b8c9c0' stroke-width='2' opacity='0.78'/%3E%3Cpath d='M-190,-95 L-160,-45 L-175,15 M145,95 L165,45 L150,10' stroke='%230d1411' stroke-width='2' fill='none' opacity='0.6'/%3E%3Ccircle cx='165' cy='-62' r='16' fill='%234a251d' opacity='0.45'/%3E%3Ccircle cx='-168' cy='58' r='22' fill='%233d2219' opacity='0.4'/%3E%3Ctext x='0' y='-24' text-anchor='middle' fill='%23d8e4de' font-family='Georgia, Times New Roman, serif' font-size='27' font-weight='bold' font-style='italic' letter-spacing='3'%3EWELCOME TO%3C/text%3E%3Ctext x='0' y='34' text-anchor='middle' fill='%23eef5f2' font-family='Impact, Arial Black, sans-serif' font-size='56' font-weight='900' letter-spacing='4.5'%3EDUORATE%3C/text%3E%3Cline x1='-145' y1='56' x2='145' y2='56' stroke='%239bb0a5' stroke-width='2' opacity='0.65'/%3E%3C/g%3E%3Cg fill='%23d4dcde' filter='url(%23shSoftFog)' opacity='0.55'%3E%3Cellipse cx='350' cy='540' rx='420' ry='85'/%3E%3Cellipse cx='1480' cy='860' rx='380' ry='75'/%3E%3Cellipse cx='980' cy='680' rx='520' ry='95' opacity='0.45'/%3E%3C/g%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+}
+
+/* Слой 2: Периодически наплывающий и заволакивающий весь задний план густой туман */
+body.theme-silenthill::after {
+    content: "";
+    position: fixed;
+    inset: -18%;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+        radial-gradient(ellipse 46% 32% at 24% 38%, rgba(224, 232, 234, 0.92) 0%, rgba(192, 202, 205, 0.62) 48%, transparent 82%),
+        radial-gradient(ellipse 52% 36% at 74% 56%, rgba(218, 226, 228, 0.90) 0%, rgba(184, 195, 198, 0.58) 50%, transparent 84%),
+        radial-gradient(ellipse 58% 40% at 48% 26%, rgba(228, 235, 236, 0.88) 0%, rgba(196, 206, 208, 0.54) 52%, transparent 86%),
+        radial-gradient(ellipse 62% 38% at 36% 76%, rgba(210, 219, 221, 0.86) 0%, rgba(176, 188, 190, 0.52) 52%, transparent 85%),
+        radial-gradient(ellipse 48% 34% at 82% 24%, rgba(222, 230, 232, 0.84) 0%, transparent 80%),
+        linear-gradient(180deg, rgba(208, 217, 219, 0.78) 0%, rgba(178, 188, 190, 0.72) 52%, rgba(142, 152, 154, 0.65) 100%);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    filter: blur(22px);
+    animation: silentHillPeriodicFog 20s ease-in-out infinite;
+    will-change: opacity, transform;
+}
+
+/* Цикл тумана: сначала над дорогой и знаком стоит лёгкая туманная дымка (0.22–0.32),
+   затем густой клубящийся туман плавно накатывает и заволакивает почти весь задний план (0.93),
+   после чего снова рассеивается */
+@keyframes silentHillPeriodicFog {
+    0% {
+        opacity: 0.22;
+        transform: translate3d(-3%, 0%, 0) scale(1.02);
+    }
+    25% {
+        opacity: 0.34;
+        transform: translate3d(-1%, -1.5%, 0) scale(1.05);
+    }
+    52% {
+        opacity: 0.94;
+        transform: translate3d(2%, 1%, 0) scale(1.10);
+    }
+    68% {
+        opacity: 0.88;
+        transform: translate3d(3.5%, -1%, 0) scale(1.07);
+    }
+    100% {
+        opacity: 0.22;
+        transform: translate3d(-3%, 0%, 0) scale(1.02);
+    }
+}
+
+body.theme-silenthill h1 {
+    color: #eef3f2;
+    text-shadow: 0 3px 18px rgba(15, 20, 20, 0.9), 0 0 22px rgba(210, 222, 224, 0.45);
+}
+
+body.theme-silenthill .site-subtitle {
+    color: #d5e0de;
+    text-shadow: 0 2px 10px rgba(15, 20, 20, 0.92);
+}
+
+body.theme-silenthill .sidebar-divider,
+body.theme-silenthill .dropdown-divider {
+    border-top-color: rgba(163, 194, 179, 0.32);
+}
+
+/* Все окошки, боковые панели, модалки и дропдауны в атмосфере Silent Hill */
+body.theme-silenthill .watchlist-sidebar,
+body.theme-silenthill .stats-sidebar,
+body.theme-silenthill .add-form-container,
+body.theme-silenthill .auth-modal-content,
+body.theme-silenthill .feedback-modal-content,
+body.theme-silenthill .notif-dropdown,
+body.theme-silenthill .theme-dropdown,
+body.theme-silenthill .multiselect-dropdown,
+body.theme-silenthill .view-dropdown,
+body.theme-silenthill .title-autocomplete-dropdown,
+body.theme-silenthill .edit-mode-container {
+    background-color: rgba(32, 39, 40, 0.92) !important;
+    background-image: linear-gradient(155deg, rgba(64, 78, 75, 0.32), rgba(22, 27, 28, 0.58)) !important;
+    border-color: rgba(163, 194, 179, 0.44) !important;
+    color: #e4ece9 !important;
+    box-shadow: 0 12px 35px rgba(10, 14, 15, 0.82) !important;
+}
+
+body.theme-silenthill .stats-title,
+body.theme-silenthill .watchlist-title,
+body.theme-silenthill .auth-modal-header,
+body.theme-silenthill .notif-dropdown-header,
+body.theme-silenthill .edit-mode-header-title,
+body.theme-silenthill .modal-field-label {
+    color: #d2e3db !important;
+    border-bottom-color: rgba(163, 194, 179, 0.28) !important;
+}
+
+body.theme-silenthill .btn-close-modal,
+body.theme-silenthill .btn-clear-notifs,
+body.theme-silenthill .btn-dismiss-notif {
+    color: #a9bfb5;
+}
+body.theme-silenthill .btn-close-modal:hover,
+body.theme-silenthill .btn-clear-notifs:hover {
+    color: #ffffff;
+}
+
+/* Плашки статистики, истории просмотра, списка "Нужно посмотреть", уведомлений и новостей */
+body.theme-silenthill .stats-item,
+body.theme-silenthill .history-item,
+body.theme-silenthill .watchlist-card,
+body.theme-silenthill .notif-card,
+body.theme-silenthill .news-card {
+    background-color: rgba(45, 55, 54, 0.88) !important;
+    color: #e4ece9 !important;
+    border-color: rgba(163, 194, 179, 0.3) !important;
+}
+
+body.theme-silenthill .stats-item.total,
+body.theme-silenthill .stats-item.aristo,
+body.theme-silenthill .stats-item.fliri,
+body.theme-silenthill .history-item {
+    border-left-color: #9ab8a9 !important;
+}
+
+body.theme-silenthill .history-empty,
+body.theme-silenthill .watchlist-empty-msg,
+body.theme-silenthill .notif-empty,
+body.theme-silenthill .no-halls-hint,
+body.theme-silenthill .no-results {
+    color: #b8ccc3 !important;
+    background-color: rgba(38, 46, 46, 0.58) !important;
+    border-color: rgba(163, 194, 179, 0.32) !important;
+}
+
+body.theme-silenthill .notif-card-text,
+body.theme-silenthill .delete-hall-confirm-text {
+    color: #e4ece9 !important;
+}
+
+body.theme-silenthill .auth-user-display {
+    background-color: rgba(42, 56, 50, 0.92) !important;
+    color: #cbe3d8 !important;
+    border-color: rgba(163, 194, 179, 0.5) !important;
+}
+
+/* Все поля ввода, поиск, текстовые области и выпадающие списки в теме Тихий холм */
+body.theme-silenthill input[type="text"],
+body.theme-silenthill input[type="url"],
+body.theme-silenthill input[type="password"],
+body.theme-silenthill textarea,
+body.theme-silenthill .watchlist-input,
+body.theme-silenthill .search-input,
+body.theme-silenthill .feedback-message-input {
+    background-color: rgba(24, 30, 31, 0.92) !important;
+    color: #e8f0ed !important;
+    border-color: rgba(163, 194, 179, 0.44) !important;
+}
+
+body.theme-silenthill input::placeholder,
+body.theme-silenthill textarea::placeholder,
+body.theme-silenthill .watchlist-input::placeholder,
+body.theme-silenthill .search-input::placeholder,
+body.theme-silenthill .feedback-message-input::placeholder {
+    color: rgba(182, 198, 191, 0.68) !important;
+}
+
+body.theme-silenthill input:focus,
+body.theme-silenthill textarea:focus,
+body.theme-silenthill .watchlist-input:focus,
+body.theme-silenthill .search-input:focus,
+body.theme-silenthill .feedback-message-input:focus {
+    border-color: #c5ded2 !important;
+    box-shadow: 0 0 0 2px rgba(154, 184, 169, 0.25);
+}
+
+body.theme-silenthill .custom-select,
+body.theme-silenthill .multiselect-header,
+body.theme-silenthill .view-toggle-btn {
+    background-color: rgba(34, 43, 42, 0.92) !important;
+    color: #e8f0ed !important;
+    border-color: rgba(163, 194, 179, 0.46) !important;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23d2e3db%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E') !important;
+}
+
+body.theme-silenthill .custom-select:hover,
+body.theme-silenthill .multiselect-header:hover,
+body.theme-silenthill .view-toggle-btn:hover {
+    background-color: rgba(48, 62, 58, 0.96) !important;
+    border-color: #c5ded2 !important;
+}
+
+body.theme-silenthill .multi-option,
+body.theme-silenthill .view-dropdown button {
+    color: #e4ece9 !important;
+}
+
+body.theme-silenthill .multi-option:hover,
+body.theme-silenthill .view-dropdown button:hover,
+body.theme-silenthill .autocomplete-item:hover,
+body.theme-silenthill .autocomplete-item.active {
+    background-color: rgba(122, 158, 141, 0.25) !important;
+}
+
+body.theme-silenthill .custom-dropdown-option.selected {
+    background-color: #3b594b !important;
+    color: #ffffff !important;
+}
+
+body.theme-silenthill .multi-option input[type="checkbox"] {
+    accent-color: #6b9683;
+}
+
+body.theme-silenthill .autocomplete-title {
+    color: #e8f0ed;
+}
+
+body.theme-silenthill .autocomplete-tag-badge,
+body.theme-silenthill .form-tag-chip {
+    background-color: rgba(44, 58, 53, 0.95) !important;
+    border-color: rgba(163, 194, 179, 0.45) !important;
+    color: #d2e3db !important;
+}
+
+/* Кнопки управления в теме Тихий холм */
+body.theme-silenthill .btn-notif-bell,
+body.theme-silenthill .btn-open-form,
+body.theme-silenthill .btn-confirm,
+body.theme-silenthill .btn-add-watchlist,
+body.theme-silenthill .btn-auth-panel,
+body.theme-silenthill .watchlist-ctrl-btn,
+body.theme-silenthill .sidebar-collapse-toggle,
+body.theme-silenthill .floating-feedback-btn,
+body.theme-silenthill .btn-save-edit,
+body.theme-silenthill .btn-cancel-edit,
+body.theme-silenthill .btn-cancel-delete-hall {
+    background-color: rgba(34, 43, 42, 0.92) !important;
+    color: #e4ece9 !important;
+    border-color: rgba(163, 194, 179, 0.46) !important;
+}
+
+body.theme-silenthill .btn-notif-bell:hover,
+body.theme-silenthill .btn-open-form:hover,
+body.theme-silenthill .btn-confirm:hover,
+body.theme-silenthill .btn-add-watchlist:hover,
+body.theme-silenthill .btn-auth-panel:hover,
+body.theme-silenthill .watchlist-ctrl-btn:hover,
+body.theme-silenthill .watchlist-ctrl-btn.active,
+body.theme-silenthill .sidebar-collapse-toggle:hover,
+body.theme-silenthill .floating-feedback-btn:hover,
+body.theme-silenthill .btn-save-edit:hover {
+    background-color: #3b594b !important;
+    color: #ffffff !important;
+    border-color: #c5ded2 !important;
+}
+
+body.theme-silenthill .theme-option-btn,
+body.theme-silenthill .btn-hall-switch,
+body.theme-silenthill .auth-tab {
+    background-color: rgba(45, 55, 54, 0.88) !important;
+    color: #e4ece9 !important;
+    border-color: rgba(163, 194, 179, 0.32) !important;
+}
+
+body.theme-silenthill .theme-option-btn:hover,
+body.theme-silenthill .btn-hall-switch:hover {
+    background-color: rgba(58, 74, 69, 0.94) !important;
+    border-color: #a3c2b3 !important;
+}
+
+body.theme-silenthill .theme-option-btn.active,
+body.theme-silenthill .btn-hall-switch.active,
+body.theme-silenthill .auth-tab.active {
+    background-color: #84a997 !important;
+    color: #18221e !important;
+    border-color: #d2e3db !important;
+}
+
+body.theme-silenthill .btn-new-hall {
+    background-color: rgba(34, 43, 42, 0.9) !important;
+    color: #d2e3db !important;
+    border-color: rgba(163, 194, 179, 0.48) !important;
+}
+
+body.theme-silenthill .btn-new-hall:hover {
+    background-color: #84a997 !important;
+    color: #18221e !important;
+    border-color: #d2e3db !important;
+}
+
+body.theme-silenthill .btn-delete-profile-square,
+body.theme-silenthill .btn-hall-delete {
+    background-color: rgba(45, 55, 54, 0.88) !important;
+    border-color: rgba(239, 68, 68, 0.48) !important;
+}
+
+body.theme-silenthill .movie-card {
+    background-color: rgba(28, 34, 35, 0.84) !important;
+    background-image: linear-gradient(145deg, rgba(62, 78, 73, 0.22), rgba(18, 22, 23, 0.36)) !important;
+    border-color: rgba(163, 194, 179, 0.36);
+}
+
+body.theme-silenthill .movie-card.favorite-card .movie-card-clip {
+    background-color: rgba(28, 34, 35, 0.94) !important;
+}
+
+body.theme-silenthill .movie-card .tag-item {
+    color: #d2e3db;
+    border-color: rgba(163, 194, 179, 0.3);
+}
+
+
 /* --- АДАПТИВНОСТЬ --- */
 @media (prefers-reduced-motion: reduce) {
     body.theme-stars::before,
     body.theme-stars::after,
     body.theme-redgold::after,
     body.theme-waterdrop::before,
-    body.theme-waterdrop::after {
+    body.theme-waterdrop::after,
+    body.theme-silenthill::after {
         animation: none !important;
     }
 }

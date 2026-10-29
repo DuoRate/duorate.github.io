@@ -68,6 +68,9 @@
                 <button class="theme-option-btn" data-theme="waterdrop">
                     <span>Водичка</span><span class="theme-preview-dots"><span style="background:#045d8b"></span><span style="background:#bffff7"></span></span>
                 </button>
+                <button class="theme-option-btn" data-theme="silenthill">
+                    <span>Тихий холм</span><span class="theme-preview-dots"><span style="background:#7a8587; border: 1px solid #d8e0e2;"></span><span style="background:#2f4239; border: 1px solid #9ab0a6;"></span></span>
+                </button>
             </div>
         </div>
     </div>
@@ -586,7 +589,7 @@
     // --- УПРАВЛЕНИЕ ТЕМАМИ ОФОРМЛЕНИЯ ДЛЯ КАЖДОГО ЗАЛА ОТДЕЛЬНО ---
     let currentTheme = 'standard';
 
-    const AVAILABLE_THEMES = ['standard', 'pickme', 'stars', 'redgold', 'waterdrop'];
+    const AVAILABLE_THEMES = ['standard', 'pickme', 'stars', 'redgold', 'waterdrop', 'silenthill'];
     function normalizeTheme(theme) {
         return AVAILABLE_THEMES.includes(theme) ? theme : 'standard';
     }
@@ -627,6 +630,7 @@
         if (theme === 'stars') return '#8dbbff';
         if (theme === 'redgold') return '#e9bd62';
         if (theme === 'waterdrop') return '#aafff5';
+        if (theme === 'silenthill') return '#a3c2b3';
         return '#ffffff';
     }
 
@@ -636,7 +640,7 @@
         } else {
             currentTheme = getHallTheme(currentHallId);
         }
-        document.body.classList.remove('theme-pickme', 'theme-stars', 'theme-redgold', 'theme-ocean', 'theme-ouroboros', 'theme-waterdrop');
+        document.body.classList.remove('theme-pickme', 'theme-stars', 'theme-redgold', 'theme-ocean', 'theme-ouroboros', 'theme-waterdrop', 'theme-silenthill');
         if (currentHallId && currentTheme !== 'standard') {
             document.body.classList.add(`theme-${currentTheme}`);
         }
@@ -2546,7 +2550,7 @@
             id: movie.id,
             title: movie.title,
             poster: movie.poster,
-            rating_aristo: movie.ratingAristo,
+            rating_aristo: movie.ratingFliri ? movie.ratingAristo : movie.ratingAristo,
             rating_fliri: movie.ratingFliri,
             tags: combinedTags,
             is_favorite: movie.isFavorite,
