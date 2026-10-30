@@ -65,11 +65,17 @@
                 <button class="theme-option-btn" data-theme="redgold">
                     <span>Красное золото</span><span class="theme-preview-dots"><span style="background:#650d18"></span><span style="background:#e9bd62"></span></span>
                 </button>
-                <button class="theme-option-btn" data-theme="waterdrop">
-                    <span>Водичка</span><span class="theme-preview-dots"><span style="background:#045d8b"></span><span style="background:#bffff7"></span></span>
-                </button>
                 <button class="theme-option-btn" data-theme="silenthill">
                     <span>Тихий холм</span><span class="theme-preview-dots"><span style="background:#7a8587; border: 1px solid #d8e0e2;"></span><span style="background:#2f4239; border: 1px solid #9ab0a6;"></span></span>
+                </button>
+                <button class="theme-option-btn" data-theme="upsidedown">
+                    <span>Изнанка</span><span class="theme-preview-dots"><span style="background:#0d1322; border: 1px solid #5a1220;"></span><span style="background:#c81e32; border: 1px solid #ff6b7b;"></span></span>
+                </button>
+                <button class="theme-option-btn" data-theme="jurassic">
+                    <span>Юрский лес</span><span class="theme-preview-dots"><span style="background:#071f18; border: 1px solid #133829;"></span><span style="background:#f59e0b; border: 1px solid #fde047;"></span></span>
+                </button>
+                <button class="theme-option-btn" data-theme="cassette">
+                    <span>Кассета №1</span><span class="theme-preview-dots"><span style="background:#ff6b00; border: 1px solid #e2e8f0;"></span><span style="background:#00f0ff; border: 1px solid #2e1065;"></span></span>
                 </button>
             </div>
         </div>
@@ -589,7 +595,17 @@
     // --- УПРАВЛЕНИЕ ТЕМАМИ ОФОРМЛЕНИЯ ДЛЯ КАЖДОГО ЗАЛА ОТДЕЛЬНО ---
     let currentTheme = 'standard';
 
-    const AVAILABLE_THEMES = ['standard', 'pickme', 'stars', 'redgold', 'waterdrop', 'silenthill'];
+    const AVAILABLE_THEMES = [
+        'standard',
+        'pickme',
+        'stars',
+        'redgold',
+        'silenthill',
+        'upsidedown',
+        'jurassic',
+        'cassette'
+    ];
+
     function normalizeTheme(theme) {
         return AVAILABLE_THEMES.includes(theme) ? theme : 'standard';
     }
@@ -629,8 +645,10 @@
         if (theme === 'pickme') return '#ff69b4';
         if (theme === 'stars') return '#8dbbff';
         if (theme === 'redgold') return '#e9bd62';
-        if (theme === 'waterdrop') return '#aafff5';
         if (theme === 'silenthill') return '#a3c2b3';
+        if (theme === 'upsidedown') return '#c81e32';
+        if (theme === 'jurassic') return '#f59e0b';
+        if (theme === 'cassette') return '#00f0ff';
         return '#ffffff';
     }
 
@@ -640,7 +658,18 @@
         } else {
             currentTheme = getHallTheme(currentHallId);
         }
-        document.body.classList.remove('theme-pickme', 'theme-stars', 'theme-redgold', 'theme-ocean', 'theme-ouroboros', 'theme-waterdrop', 'theme-silenthill');
+        document.body.classList.remove(
+            'theme-pickme',
+            'theme-stars',
+            'theme-redgold',
+            'theme-ocean',
+            'theme-ouroboros',
+            'theme-waterdrop',
+            'theme-silenthill',
+            'theme-upsidedown',
+            'theme-jurassic',
+            'theme-cassette'
+        );
         if (currentHallId && currentTheme !== 'standard') {
             document.body.classList.add(`theme-${currentTheme}`);
         }
@@ -2716,7 +2745,13 @@
     function getRatingColor(aristo, fliri, themeOverride = null) {
         const activeTheme = themeOverride || currentTheme;
         const avg = getAverageScore(aristo, fliri);
-        if (avg === null) return activeTheme === 'pickme' ? '#d61f69' : '#ffffff';
+        if (avg === null) {
+            if (activeTheme === 'pickme') return '#d61f69';
+            if (activeTheme === 'upsidedown') return '#ff4d61';
+            if (activeTheme === 'jurassic') return '#fde047';
+            if (activeTheme === 'cassette') return '#00f0ff';
+            return '#ffffff';
+        }
         const val = parseFloat(avg);
         if (val >= 11) return '#a855f7';
         if (val >= 10) return '#3b82f6';
