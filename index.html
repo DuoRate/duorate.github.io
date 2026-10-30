@@ -320,7 +320,7 @@
             <option value="Аниме">Аниме</option>
             <option value="Фантастика">Фантастика</option>
             <option value="Комедия">Комедия</option>
-            <option value="Драма">Комедия</option>
+            <option value="Драма">Драма</option>
             <option value="Экшен">Экшен</option>
             <option value="Хоррор">Хоррор</option>
             <option value="Фэнтези">Фэнтези</option>
@@ -540,6 +540,11 @@
     const SUPABASE_URL = 'https://qpaxvnldkcaffbqhwiwj.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwYXh2bmxka2NhZmZicWh3aXdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5MjQ1NzUsImV4cCI6MjEwMzUwMDU3NX0.L-VDWW98Vi2G1oAlLRYTEq13v12LCILGgGWma9WSIOI';
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Дефолтный зал Aristo и Fliri, к которому привязываются все исторические проекты
+    const DEFAULT_ARISTO_FLIRI_HALL_ID = 'hall_Aristo__Fliri';
+    const DEFAULT_ARISTO_FLIRI_TAG = '__hall_Aristo__Fliri';
+
     // --- НАСТРОЙКИ TMDB (БАЗА ДАННЫХ LETTERBOXD) ---
     const TMDB_API_KEY = 'e68904a99045331d9633fa7145ffe29c';
     let tmdbDebounceTimer = null;
@@ -563,6 +568,7 @@
     let allMoviesRaw = [];
     let allWatchlistRaw = [];
     let registeredUsers = {};
+    let legacyUsersFromWatchlist = {};
     let allHalls = [];
     let allInvites = [];
     let allNotifications = [];
@@ -684,7 +690,7 @@
         }
     }
 
-    // --- АВТОРИЗАЦИЯ, ВАЛИДАЦИЯ АНГЛИЙСКОГО ЯЗЫКА И СКРЫТЫЕ ТЕГИ ---
+    // --- БЕЗОПАСНОЕ ХЕШИРОВАНИЕ ПАРОЛЕЙ И РАБОТА С ОТДЕЛЬНОЙ ТАБЛИЦЕЙ USERS ---
     let currentUser = localStorage.getItem('agregatoristo_current_user') || null;
     let authMode = 'login';
 
@@ -697,6 +703,79 @@
 
     function sanitizeEnglishPasswordInput(str) {
         return String(str || '').replace(/[^\x21-\x7E]/g, '').slice(0, 32);
+    }
+
+    async function hashPasswordSHA256(login, rawPassword) {
+        const normalizedLogin = String(login || '').trim().toLowerCase();
+        const payload = `duorate_v1:${normalizedLogin}:${rawPassword}`;
+        const msgBuffer = new TextEncoder().encode(payload);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return 'sha256$' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function verifyUserPassword(login, enteredPassword, storedSecret) {
+        if (!storedSecret) return { valid: false, needsUpgrade: false };
+        const hashedAttempt = await hashPasswordSHA256(login, enteredPassword);
+        if (storedSecret === hashedAttempt) {
+            return { valid: true, needsUpgrade: false };
+        }
+        // Обратная совместимость со старыми нехешированными паролями (при входе они автоматически обновляются на SHA-256)
+        if (storedSecret === enteredPassword) {
+            return { valid: true, needsUpgrade: true, newHash: hashedAttempt };
+        }
+        return { valid: false, needsUpgrade: false };
+    }
+
+    async function loadUsersFromSeparateTable() {
+        try {
+            const { data, error } = await supabase.from('users').select('login, password_hash');
+            if (!error && Array.isArray(data)) {
+                const dbUsers = { ...legacyUsersFromWatchlist };
+                data.forEach(row => {
+                    if (row && row.login) {
+                        dbUsers[row.login] = row.password_hash;
+                    }
+                });
+                registeredUsers = dbUsers;
+                return true;
+            }
+        } catch (err) {
+            console.warn('Таблица users ещё не создана или недоступна, используется резервный кеш:', err);
+        }
+        registeredUsers = { ...legacyUsersFromWatchlist };
+        return false;
+    }
+
+    async function saveUserAccountToDb(login, passwordHash) {
+        registeredUsers[login] = passwordHash;
+        const { error } = await supabase.from('users').upsert({
+            login: login,
+            password_hash: passwordHash
+        });
+        if (error) {
+            throw error;
+        }
+    }
+
+    async function migrateLegacyUsersToSeparateTable() {
+        const legacyLogins = Object.keys(legacyUsersFromWatchlist);
+        if (legacyLogins.length === 0) return;
+
+        for (const login of legacyLogins) {
+            const secret = legacyUsersFromWatchlist[login];
+            try {
+                const { error } = await supabase.from('users').upsert(
+                    { login: login, password_hash: secret },
+                    { onConflict: 'login' }
+                );
+                if (!error) {
+                    await supabase.from('watchlist').delete().eq('id', `user_${login}`);
+                    delete legacyUsersFromWatchlist[login];
+                }
+            } catch (e) {}
+        }
+        await loadUsersFromSeparateTable();
     }
 
     function isHiddenSystemTag(tag) {
@@ -746,6 +825,12 @@
     function getCanonicalHallTagForHall(hall) {
         if (!hall || !Array.isArray(hall.users) || hall.users.length < 2) return '';
         return makeCanonicalHallTag(hall.users[0], hall.users[1]);
+    }
+
+    function isAristoFliriHall(hall) {
+        if (!hall || !Array.isArray(hall.users) || hall.users.length < 2) return false;
+        const [p1, p2] = sortPairAlphabetically(hall.users[0], hall.users[1]);
+        return p1.toLowerCase() === 'aristo' && p2.toLowerCase() === 'fliri';
     }
 
     function doesTagMatchHall(tag, hall) {
@@ -800,11 +885,15 @@
         return null;
     }
 
+    // Все фильмы с тегом зала ИЛИ исторические фильмы без тега зала (для зала Aristo и Fliri)
     function getMoviesForHall(hall) {
         if (!hall) return [];
+        const isDefaultHall = isAristoFliriHall(hall);
         return allMoviesRaw.filter(m => {
             const rawTags = m.rawTags || [];
-            return rawTags.some(t => doesTagMatchHall(t, hall));
+            if (rawTags.some(t => doesTagMatchHall(t, hall))) return true;
+            if (isDefaultHall && !rawTags.some(t => isHallSystemTag(t))) return true;
+            return false;
         });
     }
 
@@ -820,9 +909,12 @@
     function getWatchlistForCurrentHall() {
         const hall = getCurrentHall();
         if (!hall) return [];
+        const isDefaultHall = isAristoFliriHall(hall);
         return allWatchlistRaw.filter(item => {
             const rawTags = item.rawTags || [];
-            return rawTags.some(t => doesTagMatchHall(t, hall));
+            if (rawTags.some(t => doesTagMatchHall(t, hall))) return true;
+            if (isDefaultHall && !rawTags.some(t => isHallSystemTag(t))) return true;
+            return false;
         });
     }
 
@@ -1034,6 +1126,7 @@
             img.className = 'autocomplete-poster-thumb';
             img.src = thumbSrc;
             img.alt = item.title;
+            img.loading = 'lazy';
             img.onerror = function() {
                 this.src = defaultPoster;
             };
@@ -1122,16 +1215,12 @@
 
     function getShowcaseMoviesFromAristoFliri() {
         const aristoFliriHall = {
-            id: 'hall_Aristo__Fliri',
+            id: DEFAULT_ARISTO_FLIRI_HALL_ID,
             users: ['Aristo', 'Fliri'],
-            tag: '__hall_Aristo__Fliri'
+            tag: DEFAULT_ARISTO_FLIRI_TAG
         };
 
-        const hallMovies = allMoviesRaw.filter(m => {
-            const rawTags = m.rawTags || [];
-            if (rawTags.some(t => doesTagMatchHall(t, aristoFliriHall))) return true;
-            return !rawTags.some(t => isHallSystemTag(t));
-        });
+        const hallMovies = getMoviesForHall(aristoFliriHall);
 
         const selected = [];
         SHOWCASE_TITLES.forEach(targetTitle => {
@@ -1196,10 +1285,10 @@
         card.innerHTML = `
             <div class="favorite-border-shell"></div>
             <div class="movie-card-clip">
-                <img class="movie-bg-blur" src="${displayPoster}" alt="" onerror="this.src='${defaultPoster}'">
+                <img class="movie-bg-blur" src="${displayPoster}" alt="" loading="lazy" onerror="this.src='${defaultPoster}'">
                 <div class="blur-overlay"></div>
                 <div class="movie-poster-stage">
-                    <img class="movie-fg-poster" src="${displayPoster}" alt="${movie.title}" onerror="this.src='${defaultPoster}'">
+                    <img class="movie-fg-poster" src="${displayPoster}" alt="${movie.title}" loading="lazy" onerror="this.src='${defaultPoster}'">
                 </div>
             </div>
             ${favStarHtml}
@@ -1360,28 +1449,54 @@
         });
     }
 
-    async function normalizeAllHallTagsInDb() {
+    // Гарантирует существование зала Aristo и Fliri и закрепление за ним всех исторических фильмов и списков
+    async function ensureAristoFliriHallAndPreserveProjects() {
+        let aristoFliriHall = allHalls.find(h => isAristoFliriHall(h));
+        if (!aristoFliriHall) {
+            const savedTheme = normalizeTheme(localStorage.getItem(`duorate_hall_theme_${DEFAULT_ARISTO_FLIRI_HALL_ID}`) || 'standard');
+            aristoFliriHall = {
+                id: DEFAULT_ARISTO_FLIRI_HALL_ID,
+                users: ['Aristo', 'Fliri'],
+                tag: DEFAULT_ARISTO_FLIRI_TAG,
+                theme: savedTheme
+            };
+            allHalls.push(aristoFliriHall);
+            try {
+                await supabase.from('watchlist').upsert({
+                    id: DEFAULT_ARISTO_FLIRI_HALL_ID,
+                    title: JSON.stringify({ users: ['Aristo', 'Fliri'], tag: DEFAULT_ARISTO_FLIRI_TAG, theme: savedTheme }),
+                    priority: 'hall_room',
+                    tags: [DEFAULT_ARISTO_FLIRI_TAG]
+                });
+            } catch (e) {}
+        }
+
         for (const m of allMoviesRaw) {
             const rawTags = m.rawTags || [];
             const hallTags = rawTags.filter(t => isHallSystemTag(t));
-            if (hallTags.length === 0) continue;
-
-            let matchedHall = null;
-            for (const h of allHalls) {
-                if (hallTags.some(t => doesTagMatchHall(t, h))) {
-                    matchedHall = h;
-                    break;
-                }
-            }
 
             let canonicalHallTag = null;
-            if (matchedHall) {
-                canonicalHallTag = getCanonicalHallTagForHall(matchedHall);
+            if (hallTags.length === 0) {
+                // Если у проекта не было тега зала — он принадлежит залу Aristo и Fliri
+                canonicalHallTag = DEFAULT_ARISTO_FLIRI_TAG;
             } else {
-                const stripped = String(hallTags[0]).trim().replace(/^#+/, '').replace(/^(__hall_|hall_)+/i, '');
-                const parts = stripped.split('__').filter(Boolean);
-                if (parts.length === 2) {
-                    canonicalHallTag = makeCanonicalHallTag(parts[0], parts[1]);
+                let matchedHall = null;
+                for (const h of allHalls) {
+                    if (hallTags.some(t => doesTagMatchHall(t, h))) {
+                        matchedHall = h;
+                        break;
+                    }
+                }
+                if (matchedHall) {
+                    canonicalHallTag = getCanonicalHallTagForHall(matchedHall);
+                } else {
+                    const stripped = String(hallTags[0]).trim().replace(/^#+/, '').replace(/^(__hall_|hall_)+/i, '');
+                    const parts = stripped.split('__').filter(Boolean);
+                    if (parts.length === 2) {
+                        canonicalHallTag = makeCanonicalHallTag(parts[0], parts[1]);
+                    } else {
+                        canonicalHallTag = DEFAULT_ARISTO_FLIRI_TAG;
+                    }
                 }
             }
 
@@ -1413,6 +1528,29 @@
                         tags: normalizedRaw,
                         is_favorite: m.isFavorite,
                         seasons: m.seasons
+                    });
+                } catch (e) {}
+            }
+        }
+
+        for (const w of allWatchlistRaw) {
+            const rawTags = w.rawTags || [];
+            const hallTags = rawTags.filter(t => isHallSystemTag(t));
+            if (hallTags.length === 0) {
+                const visibleTags = Array.from(new Set(
+                    rawTags
+                        .map(t => String(t).trim().replace(/^#+/, ''))
+                        .filter(t => t && !isHiddenSystemTag(t))
+                ));
+                const updatedTags = [...visibleTags, DEFAULT_ARISTO_FLIRI_TAG];
+                w.tags = visibleTags;
+                w.rawTags = updatedTags;
+                try {
+                    await supabase.from('watchlist').upsert({
+                        id: w.id,
+                        title: w.title,
+                        priority: w.priority,
+                        tags: updatedTags
                     });
                 } catch (e) {}
             }
@@ -1571,15 +1709,13 @@
             return;
         }
 
-        try {
-            const { data } = await supabase.from('watchlist').select('*');
-            if (data) parseWatchlistTableData(data);
-        } catch (err) {}
+        await loadUsersFromSeparateTable();
 
         const actualLogin = findExistingUsername(currentUser) || currentUser;
-        const correctPassword = registeredUsers[actualLogin];
+        const storedSecret = registeredUsers[actualLogin];
+        const check = await verifyUserPassword(actualLogin, enteredPassword, storedSecret);
 
-        if (enteredPassword !== correctPassword) {
+        if (!check.valid) {
             if (deleteProfileError) deleteProfileError.textContent = 'Неверный пароль';
             return;
         }
@@ -1597,6 +1733,7 @@
         }
 
         try {
+            await supabase.from('users').delete().eq('login', userToDelete);
             await supabase.from('watchlist').delete().eq('id', `user_${userToDelete}`);
 
             const userHalls = allHalls.filter(h => isUserInHall(h, userToDelete));
@@ -1637,6 +1774,7 @@
         }
 
         delete registeredUsers[userToDelete];
+        delete legacyUsersFromWatchlist[userToDelete];
         localStorage.removeItem('agregatoristo_current_user');
         localStorage.removeItem(`agregatoristo_active_hall_${userToDelete}`);
         localStorage.removeItem(`agregatoristo_favs_${userToDelete}`);
@@ -1655,6 +1793,7 @@
             const { data: watchlistData } = await supabase.from('watchlist').select('*');
             if (moviesData) allMoviesRaw = moviesData.map(mapFromDbMovie);
             if (watchlistData) parseWatchlistTableData(watchlistData);
+            await loadUsersFromSeparateTable();
         } catch (e) {}
 
         updateAuthUI();
@@ -2116,12 +2255,7 @@
             return;
         }
 
-        try {
-            const { data } = await supabase.from('watchlist').select('*');
-            if (data) parseWatchlistTableData(data);
-        } catch (err) {
-            console.warn('Не удалось обновить список пользователей из БД:', err);
-        }
+        await loadUsersFromSeparateTable();
 
         const matchedUser = findExistingUsername(targetNick);
 
@@ -2393,7 +2527,7 @@
 
     function parseWatchlistTableData(rawWatchlist) {
         const cleanWatchlist = [];
-        const dbUsers = {};
+        const dbLegacyUsers = {};
         const dbHalls = [];
         const dbInvites = [];
         const dbNotifs = [];
@@ -2404,7 +2538,7 @@
             const idStr = String(item.id || '');
             if (idStr.startsWith('user_')) {
                 const login = idStr.replace('user_', '');
-                dbUsers[login] = item.title;
+                dbLegacyUsers[login] = item.title;
             } else if (idStr.startsWith('hall_')) {
                 try {
                     const parsed = JSON.parse(item.title);
@@ -2459,7 +2593,19 @@
             }
         });
 
-        registeredUsers = dbUsers;
+        // Гарантируем, что зал Aristo и Fliri всегда присутствует в списке залов
+        if (!dbHalls.some(h => isAristoFliriHall(h))) {
+            const savedTheme = normalizeTheme(localStorage.getItem(`duorate_hall_theme_${DEFAULT_ARISTO_FLIRI_HALL_ID}`) || 'standard');
+            dbHalls.push({
+                id: DEFAULT_ARISTO_FLIRI_HALL_ID,
+                users: ['Aristo', 'Fliri'],
+                tag: DEFAULT_ARISTO_FLIRI_TAG,
+                theme: savedTheme
+            });
+        }
+
+        legacyUsersFromWatchlist = dbLegacyUsers;
+        registeredUsers = { ...dbLegacyUsers, ...registeredUsers };
         allHalls = dbHalls;
         allInvites = dbInvites;
         allNotifications = dbNotifs;
@@ -2474,11 +2620,16 @@
         updateAuthUI();
 
         try {
-            const { data: moviesData } = await supabase.from('movies').select('*');
-            const { data: watchlistData } = await supabase.from('watchlist').select('*');
+            const [{ data: moviesData }, { data: watchlistData }] = await Promise.all([
+                supabase.from('movies').select('*'),
+                supabase.from('watchlist').select('*')
+            ]);
 
             if (watchlistData) parseWatchlistTableData(watchlistData);
             if (moviesData) allMoviesRaw = moviesData.map(mapFromDbMovie);
+
+            await loadUsersFromSeparateTable();
+            await migrateLegacyUsersToSeparateTable();
 
             if (currentUser && !findExistingUsername(currentUser)) {
                 currentUser = null;
@@ -2486,7 +2637,7 @@
                 localStorage.removeItem('agregatoristo_current_user');
             }
 
-            await normalizeAllHallTagsInDb();
+            await ensureAristoFliriHallAndPreserveProjects();
 
             updateAuthUI();
             renderWatchlist();
@@ -2507,11 +2658,7 @@
                     if (data) {
                         const prevHallCount = getUserHalls().length;
                         parseWatchlistTableData(data);
-                        if (currentUser && !findExistingUsername(currentUser)) {
-                            currentUser = null;
-                            currentHallId = null;
-                            localStorage.removeItem('agregatoristo_current_user');
-                        }
+                        await loadUsersFromSeparateTable();
                         const newHallCount = getUserHalls().length;
                         updateAuthUI();
                         renderWatchlist();
@@ -2520,6 +2667,15 @@
                         } else if (currentHallId) {
                             renderMoviesDOM();
                         }
+                    }
+                })
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, async () => {
+                    await loadUsersFromSeparateTable();
+                    if (currentUser && !findExistingUsername(currentUser)) {
+                        currentUser = null;
+                        currentHallId = null;
+                        localStorage.removeItem('agregatoristo_current_user');
+                        updateAuthUI();
                     }
                 })
                 .subscribe();
@@ -2579,7 +2735,7 @@
             id: movie.id,
             title: movie.title,
             poster: movie.poster,
-            rating_aristo: movie.ratingFliri ? movie.ratingAristo : movie.ratingAristo,
+            rating_aristo: movie.ratingAristo,
             rating_fliri: movie.ratingFliri,
             tags: combinedTags,
             is_favorite: movie.isFavorite,
@@ -3391,10 +3547,10 @@
             card.innerHTML = `
                 <div class="favorite-border-shell"></div>
                 <div class="movie-card-clip">
-                    <img class="movie-bg-blur ${fadeClass}" src="${displayPoster}" alt="" onerror="this.src='${defaultPoster}'">
+                    <img class="movie-bg-blur ${fadeClass}" src="${displayPoster}" alt="" loading="lazy" onerror="this.src='${defaultPoster}'">
                     <div class="blur-overlay"></div>
                     <div class="movie-poster-stage ${fadeClass}">
-                        <img class="movie-fg-poster" src="${displayPoster}" alt="${displayTitle}" onerror="this.src='${defaultPoster}'">
+                        <img class="movie-fg-poster" src="${displayPoster}" alt="${displayTitle}" loading="lazy" onerror="this.src='${defaultPoster}'">
                     </div>
                 </div>
                 ${favButton}
@@ -3612,8 +3768,7 @@
         }
 
         try {
-            const { data } = await supabase.from('watchlist').select('*');
-            if (data) parseWatchlistTableData(data);
+            await loadUsersFromSeparateTable();
         } catch (err) {
             authError.textContent = 'Ошибка соединения с базой данных';
             return;
@@ -3626,23 +3781,15 @@
                 return;
             }
 
+            const passwordHash = await hashPasswordSHA256(login, password);
+
             try {
-                const { error } = await supabase.from('watchlist').upsert({
-                    id: `user_${login}`,
-                    title: password,
-                    priority: 'user_account',
-                    tags: []
-                });
-                if (error) {
-                    authError.textContent = 'Не удалось сохранить аккаунт в базу данных';
-                    return;
-                }
+                await saveUserAccountToDb(login, passwordHash);
             } catch (err) {
-                authError.textContent = 'Ошибка записи аккаунта в базу данных';
+                authError.textContent = 'Не удалось сохранить аккаунт в таблицу users (выполните SQL-скрипт в Supabase)';
                 return;
             }
 
-            registeredUsers[login] = password;
             currentUser = login;
             currentHallId = null;
             localStorage.setItem('agregatoristo_current_user', login);
@@ -3653,10 +3800,25 @@
             renderMoviesAnimated();
         } else {
             const actualLogin = findExistingUsername(login);
-            if (!actualLogin || registeredUsers[actualLogin] !== password) {
+            if (!actualLogin) {
                 authError.textContent = 'Неверный логин или пароль';
                 return;
             }
+
+            const storedSecret = registeredUsers[actualLogin];
+            const check = await verifyUserPassword(actualLogin, password, storedSecret);
+            if (!check.valid) {
+                authError.textContent = 'Неверный логин или пароль';
+                return;
+            }
+
+            // Если старый пароль был в текстовом виде, автоматически обновляем его на SHA-256 хеш в таблице users
+            if (check.needsUpgrade && check.newHash) {
+                try {
+                    await saveUserAccountToDb(actualLogin, check.newHash);
+                } catch (e) {}
+            }
+
             currentUser = actualLogin;
             currentHallId = null;
             localStorage.setItem('agregatoristo_current_user', actualLogin);
